@@ -60,7 +60,7 @@ Aquí se documentan los laboratorios, avances, resultados y la presentación de 
 - **Nombre completo:** Andrés Gustavo Pinilla Martínez
 - **Carrera:** Ingeniería Mecatrónica
 - **Correo institucional:** anpinillam@unal.edu.co
-- **Usuario de GitHub:** [usuariogithub](https://github.com/AndresPinilla20)
+- **Usuario de GitHub:** [AndresPinilla20](https://github.com/AndresPinilla20)
 - **Rol en el equipo:** Documentación y simulación
 - **Intereses:** Visión de máquina, SCADA, automatización
 - **Descripción breve:**  
@@ -76,7 +76,7 @@ Estudiante de ingeniería Mecatrónica, con interés en el área de la inteligen
 - **Nombre completo:** Duvan Felipe Pacheco Rodríguez
 - **Carrera:** Ingeniería Mecatrónica
 - **Correo institucional:** dupachecor@unal.edu.co
-- **Usuario de GitHub:** [usuariogithub](https://github.com/dupachecor)
+- **Usuario de GitHub:** [dupachecor](https://github.com/dupachecor)
 - **Rol en el equipo:** Ej. Modelado, diseño y programación
 - **Intereses:** Entrenamiento de inteligencia artificial, robótica, programación
 - **Descripción breve:**  
@@ -92,7 +92,7 @@ Estudiante de ingeniería Mecatrónica, con interés en el área de la inteligen
 - **Nombre completo:** Juan Andrés Mora Henao
 - **Carrera:** Ingeniería Mecatrónica
 - **Correo institucional:** jumorah@unal.edu.co
-- **Usuario de GitHub:** [usuariogithub](https://github.com/JuanMora345)
+- **Usuario de GitHub:** [JuanMora345](https://github.com/JuanMora345)
 - **Rol en el equipo:** Ej. Documentación, diseño y toma de evidencias
 - **Intereses:** Automatización de procesos, acondicionamiento de sensores, programación
 - **Descripción breve:**  
