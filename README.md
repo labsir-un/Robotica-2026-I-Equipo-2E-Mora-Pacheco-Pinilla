@@ -57,14 +57,14 @@ Aquí se documentan los laboratorios, avances, resultados y la presentación de 
   <img src="./assets/integrantes/integrante1.jpg" alt="Foto integrante 1" style="border-radius: 50%; width: 180px;"><br>
 </div>
 
-- **Nombre completo:** Nombre Apellido
+- **Nombre completo:** Andrés Gustavo Pinilla Martínez
 - **Carrera:** Ingeniería Mecatrónica
-- **Correo institucional:** nombre@unal.edu.co
-- **Usuario de GitHub:** [usuariogithub](https://github.com/usuariogithub)
-- **Rol en el equipo:** Ej. Integración ROS 2, documentación, simulación
-- **Intereses:** Robótica móvil, visión artificial, automatización
+- **Correo institucional:** anpinillam@unal.edu.co
+- **Usuario de GitHub:** [usuariogithub](https://github.com/AndresPinilla20)
+- **Rol en el equipo:**Documentación y simulación
+- **Intereses:** Visión de máquina, SCADA, automatización
 - **Descripción breve:**  
-  Escribe aquí una breve presentación personal y académica del integrante.
+Estudiante de ingeniería Mecatrónica, con interés en el área de la inteligencia artificial y la robótica, como hobbies principales me gusta jugar videojuegos y fútbol.
 
 ---
 
@@ -73,14 +73,14 @@ Aquí se documentan los laboratorios, avances, resultados y la presentación de 
   <img src="./assets/integrantes/integrante2.jpg" alt="Foto integrante 2" style="border-radius: 50%; width: 180px;"><br>
 </div>
 
-- **Nombre completo:** Nombre Apellido
+- **Nombre completo:** Duvan Felipe Pacheco Rodríguez
 - **Carrera:** Ingeniería Mecatrónica
-- **Correo institucional:** nombre@unal.edu.co
-- **Usuario de GitHub:** [usuariogithub](https://github.com/usuariogithub)
-- **Rol en el equipo:** Ej. Modelado, programación, control
-- **Intereses:** Manipulación, ROS 2, control de robots
+- **Correo institucional:** dupachecor@unal.edu.co
+- **Usuario de GitHub:** [usuariogithub](https://github.com/dupachecor)
+- **Rol en el equipo:** Ej. Modelado, diseño y programación
+- **Intereses:** Entrenamiento de inteligencia artificial, robótica, programación
 - **Descripción breve:**  
-  Escribe aquí una breve presentación personal y académica del integrante.
+  Estudiante de décima matrícula de ingeniería mecatrónica, interesado en entrenamiento y refuerzo de redes neuronales, programación y también interesado en hacer empredimiento.
 
 ---
 
@@ -89,12 +89,12 @@ Aquí se documentan los laboratorios, avances, resultados y la presentación de 
   <img src="./assets/integrantes/integrante3.jpg" alt="Foto integrante 3" style="border-radius: 50%; width: 180px;"><br>
 </div>
 
-- **Nombre completo:** Nombre Apellido
+- **Nombre completo:** Juan Andrés Mora Henao
 - **Carrera:** Ingeniería Mecatrónica
-- **Correo institucional:** nombre@unal.edu.co
-- **Usuario de GitHub:** [usuariogithub](https://github.com/usuariogithub)
-- **Rol en el equipo:** Ej. Documentación, pruebas, simulación
-- **Intereses:** Robótica industrial, sistemas autónomos, IA
+- **Correo institucional:** jumorah@unal.edu.co
+- **Usuario de GitHub:** [usuariogithub](https://github.com/JuanMora345)
+- **Rol en el equipo:** Ej. Documentación, diseño y toma de evidencias
+- **Intereses:** Automatización de procesos, acondicionamiento de sensores, programación
 - **Descripción breve:**  
-  Escribe aquí una breve presentación personal y académica del integrante.
+  Estudiante de noveno semestre, interesado en implementación robótica en procesos industriales, control y programación.
 
