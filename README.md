@@ -61,7 +61,7 @@ Aquí se documentan los laboratorios, avances, resultados y la presentación de 
 - **Carrera:** Ingeniería Mecatrónica
 - **Correo institucional:** anpinillam@unal.edu.co
 - **Usuario de GitHub:** [usuariogithub](https://github.com/AndresPinilla20)
-- **Rol en el equipo:**Documentación y simulación
+- **Rol en el equipo:** Documentación y simulación
 - **Intereses:** Visión de máquina, SCADA, automatización
 - **Descripción breve:**  
 Estudiante de ingeniería Mecatrónica, con interés en el área de la inteligencia artificial y la robótica, como hobbies principales me gusta jugar videojuegos y fútbol.
