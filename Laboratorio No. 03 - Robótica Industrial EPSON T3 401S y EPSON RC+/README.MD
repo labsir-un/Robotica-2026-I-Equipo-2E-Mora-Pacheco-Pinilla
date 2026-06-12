@@ -29,22 +29,22 @@
 
 | # | Sección |
 |---|---------|
-| 1 | [📊 Cuadro comparativo EPSON T3-401S vs MH6 vs IRB140](#-cuadro-comparativo-epson-t3-401s-vs-mh6-vs-irb140) |
-| 2 | [🏠 Configuración Home del EPSON T3-401S](#-configuración-home-del-epson-t3-401s) |
-| 3 | [🕹️ Movimientos manuales — procedimiento y teclas](#️-movimientos-manuales--procedimiento-y-teclas) |
-| 4 | [⚡ Niveles de velocidad para movimiento manual](#-niveles-de-velocidad-para-movimiento-manual) |
-| 5 | [💻 Software EPSON RC+ 7.0 — aplicaciones y comunicación](#-software-epson-rc-70--aplicaciones-y-comunicación) |
-| 6 | [⚖️ Comparación EPSON RC+ 7.0 vs RoboDK vs RobotStudio](#️-comparación-epson-rc-70-vs-robodk-vs-robotstudio) |
-| 7 | [🤏 Diseño del gripper neumático por vacío](#-diseño-del-gripper-neumático-por-vacío) |
-| 8 | [🔁 Diagrama de flujo — patrón de caballo de ajedrez](#-diagrama-de-flujo--patrón-de-caballo-de-ajedrez) |
-| 9 | [🗺️ Plano de planta](#️-plano-de-planta) |
-| 10 | [♟️ Trayectoria con patrón de caballo — código](#️-trayectoria-con-patrón-de-caballo--código) |
-| 11 | [🎥 Videos de simulación e implementación](#-videos-de-simulación-e-implementación) |
-| 12 | [🧾 Autores](#-autores) |
+| 1 | [Cuadro comparativo EPSON T3-401S vs MH6 vs IRB140](#-cuadro-comparativo-epson-t3-401s-vs-mh6-vs-irb140) |
+| 2 | [Configuración Home del EPSON T3-401S](#-configuración-home-del-epson-t3-401s) |
+| 3 | [Movimientos manuales — procedimiento y teclas](#️-movimientos-manuales--procedimiento-y-teclas) |
+| 4 | [Niveles de velocidad para movimiento manual](#-niveles-de-velocidad-para-movimiento-manual) |
+| 5 | [Software EPSON RC+ 7.0 — aplicaciones y comunicación](#-software-epson-rc-70--aplicaciones-y-comunicación) |
+| 6 | [Comparación EPSON RC+ 7.0 vs RoboDK vs RobotStudio](#️-comparación-epson-rc-70-vs-robodk-vs-robotstudio) |
+| 7 | [Diseño del gripper neumático por vacío](#-diseño-del-gripper-neumático-por-vacío) |
+| 8 | [Diagrama de flujo — patrón de caballo de ajedrez](#-diagrama-de-flujo--patrón-de-caballo-de-ajedrez) |
+| 9 | [Plano de planta](#️-plano-de-planta) |
+| 10 | [Trayectoria con patrón de caballo — código](#️-trayectoria-con-patrón-de-caballo--código) |
+| 11 | [Videos de simulación e implementación](#-videos-de-simulación-e-implementación) |
+| 12 | [Autores](#-autores) |
 
 ---
 
-## 📊 Cuadro comparativo EPSON T3-401S vs MH6 vs IRB140
+## Cuadro comparativo EPSON T3-401S vs MH6 vs IRB140
 
 | Característica | EPSON T3-401S | Motoman MH6 | ABB IRB140 |
 |---|---|---|---|
@@ -68,7 +68,7 @@
 
 ---
 
-## 🏠 Configuración Home del EPSON T3-401S
+## Configuración Home del EPSON T3-401S
 
 El manipulador EPSON T3-401S es un robot SCARA de 4 grados de libertad: dos articulaciones rotacionales en el plano horizontal (J1 y J2), un eje vertical lineal (J3) y una rotación de la herramienta (J4).
 
@@ -96,7 +96,7 @@ Home
 
 ---
 
-## 🕹️ Movimientos manuales — procedimiento y teclas
+## Movimientos manuales — procedimiento y teclas
 
 El EPSON T3-401S se opera manualmente desde el software **EPSON RC+ 7.0** en el PC, usando el panel **Jog & Teach** accesible desde el menú `Robot → Jog & Teach`.
 
@@ -138,7 +138,7 @@ Una vez seleccionado el modo `World` en el panel Jog & Teach:
 
 ---
 
-## ⚡ Niveles de velocidad para movimiento manual
+## Niveles de velocidad para movimiento manual
 
 ### Niveles disponibles en EPSON RC+ 7.0
 
@@ -161,11 +161,11 @@ En el panel **Jog & Teach**:
 
 El porcentaje de velocidad activo se muestra numéricamente en el campo `Speed` del panel Jog & Teach. Adicionalmente, la barra de estado inferior de EPSON RC+ 7.0 puede mostrar el estado de movimiento del robot en tiempo real.
 
-> ⚠️ *Complementar con captura de pantalla del panel Jog & Teach si se tomó durante el laboratorio.*
+> *Complementar con captura de pantalla del panel Jog & Teach si se tomó durante el laboratorio.*
 
 ---
 
-## 💻 Software EPSON RC+ 7.0 — aplicaciones y comunicación
+## Software EPSON RC+ 7.0 — aplicaciones y comunicación
 
 ### Principales aplicaciones
 
@@ -193,7 +193,7 @@ Al ejecutar un programa SPEL+, RC+ 7.0 interpreta las instrucciones de movimient
 
 ---
 
-## ⚖️ Comparación EPSON RC+ 7.0 vs RoboDK vs RobotStudio
+## Comparación EPSON RC+ 7.0 vs RoboDK vs RobotStudio
 
 | Aspecto | EPSON RC+ 7.0 | RoboDK | RobotStudio |
 |---|---|---|---|
@@ -228,7 +228,7 @@ Al ejecutar un programa SPEL+, RC+ 7.0 interpreta las instrucciones de movimient
 
 ---
 
-## 🤏 Diseño del gripper neumático por vacío
+## Diseño del gripper neumático por vacío
 
 ### Descripción general
 
@@ -261,11 +261,11 @@ Off 1
 
 ### Diagrama esquemático
 
-> ⚠️ *Adjuntar imagen del diagrama neumático y eléctrico del gripper. Incluir: compresor → electroválvula → eyector de vacío → ventosa, con las conexiones eléctricas al RC90.*
+> *Adjuntar imagen del diagrama neumático y eléctrico del gripper. Incluir: compresor → electroválvula → eyector de vacío → ventosa, con las conexiones eléctricas al RC90.*
 
 ---
 
-## 🔁 Diagrama de flujo — patrón de caballo de ajedrez
+## Diagrama de flujo — patrón de caballo de ajedrez
 
 El patrón de movimiento del caballo en ajedrez avanza en forma de "L": **2 posiciones en un eje y 1 en el perpendicular** (o viceversa). Sobre la cubeta de 6×5 (6 columnas, 5 filas = 30 posiciones), los dos huevos parten de las esquinas opuestas y se mueven alternadamente cubriendo todas las posiciones.
 
@@ -303,13 +303,13 @@ flowchart TD
 
 ---
 
-## 🗺️ Plano de planta
+## Plano de planta
 
-> ⚠️ *Adjuntar imagen o archivo con el plano de planta indicando: ubicación del EPSON T3-401S, posición de la cubeta de huevos respecto al robot, posiciones iniciales de los dos huevos (esquinas de la cubeta), y el sistema de coordenadas de referencia.*
+> *Adjuntar imagen o archivo con el plano de planta indicando: ubicación del EPSON T3-401S, posición de la cubeta de huevos respecto al robot, posiciones iniciales de los dos huevos (esquinas de la cubeta), y el sistema de coordenadas de referencia.*
 
 ---
 
-## ♟️ Trayectoria con patrón de caballo — código
+## Trayectoria con patrón de caballo — código
 
 ### Lógica del patrón de caballo sobre la cubeta 6×5
 
@@ -380,7 +380,7 @@ Function PickAndPlace(x_orig As Real, y_orig As Real, x_dest As Real, y_dest As 
 Fend
 ```
 
-> ⚠️ *El código completo con la secuencia de movimientos tipo caballo calculada para los 30 pasos se encuentra en el archivo `horse_pattern.prg` adjunto en el repositorio.*
+> *El código completo con la secuencia de movimientos tipo caballo calculada para los 30 pasos se encuentra en el archivo `horse_pattern.prg` adjunto en el repositorio.*
 
 ---
 
@@ -418,7 +418,7 @@ Fend
 
 ---
 
-## 🧾 Autores
+## Autores
 
 <div align="center">
 
