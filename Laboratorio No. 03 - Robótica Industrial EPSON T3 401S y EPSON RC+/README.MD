@@ -326,7 +326,7 @@ flowchart TD
 
 > Ubicación del EPSON T3-401S, posición de la cubeta de huevos respecto al robot, posiciones iniciales de los dos huevos (esquinas 1 y 30 de la cubeta) y el sistema de coordenadas de referencia.
 
-![Plano de planta — celda EPSON T3-401S y cubeta 6×5](./Planos/Plano_Lab03.pdf)
+![Plano de planta — celda EPSON T3-401S y cubeta 6×5](./Planos/Plano_Lab03_page-0001.jpg)
 
 <!-- Reemplazar la ruta ./docs/plano_de_planta.png por la del archivo real del plano dentro del repositorio -->
 
