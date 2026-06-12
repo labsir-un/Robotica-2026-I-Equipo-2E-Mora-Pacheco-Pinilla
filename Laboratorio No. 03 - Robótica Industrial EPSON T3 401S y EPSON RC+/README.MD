@@ -85,7 +85,6 @@ En el EPSON T3-401S, la posición de Home **no es fija de fábrica** como en el 
 | **J3** | Desplazamiento vertical del eje Z | Posición más alta (retracción máxima) |
 | **J4** | Rotación de la herramienta | 0° — herramienta sin rotación |
 
-> ⚠️ *Completar con los valores exactos observados en el pendant o en EPSON RC+ 7.0 durante el laboratorio, incluyendo si se usó el comando `Home` o se definió manualmente mediante `Hofs`.*
 
 ### ¿Cómo se define el Home en EPSON RC+ 7.0?
 
