@@ -422,7 +422,7 @@ Function InitRutas
 Fend
 ```
 
-> La secuencia completa de las 30 posiciones de cada ruta está en el archivo `main.prg` adjunto en el repositorio.
+
 
 ---
 
