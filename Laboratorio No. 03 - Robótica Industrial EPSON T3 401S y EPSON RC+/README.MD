@@ -14,8 +14,8 @@
 
 ```
 ╔══════════════════════════════════════════════════════════════════╗
-║  🦾  Análisis y Operación del Manipulador EPSON T3-401S          ║
-║  SCARA  ·  Gripper Neumático  ·  Patrón Caballo  ·  EPSON RC+   ║
+║      Análisis y Operación del Manipulador EPSON T3-401S          ║
+║   SCARA  ·  Gripper Neumático  ·  Patrón Caballo  ·  EPSON RC+   ║
 ╚══════════════════════════════════════════════════════════════════╝
 ```
 
@@ -25,7 +25,7 @@
 
 ---
 
-## 📋 Tabla de contenidos
+##Tabla de contenidos
 
 | # | Sección |
 |---|---------|
