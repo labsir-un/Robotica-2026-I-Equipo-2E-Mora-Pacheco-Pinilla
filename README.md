@@ -70,7 +70,7 @@ Estudiante de ingeniería Mecatrónica, con interés en el área de la inteligen
 
 ### Integrante 2
 <div align="center">
-  <img src="./assets/integrantes/integrante2.jpg" alt="Foto integrante 2" style="border-radius: 50%; width: 180px;"><br>
+  <img src="./assets/Duvan_pacheco (1).jpeg" alt="Foto integrante 2" style="border-radius: 50%; width: 180px;"><br>
 </div>
 
 - **Nombre completo:** Duvan Felipe Pacheco Rodríguez
