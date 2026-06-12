@@ -428,7 +428,7 @@ Fend
 
 ## Video de simulación
 
-> **Video de simulación en EPSON RC+ 7.0** mostrando la trayectoria completa de los dos huevos con el patrón de caballo. *(El video comienza con la introducción oficial del laboratorio — Intro LabSIR.)*
+> **Video de simulación en EPSON RC+ 7.0** mostrando la trayectoria completa de los dos huevos con el patrón de caballo.
 
 <div align="center">
 
