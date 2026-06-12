@@ -259,10 +259,6 @@ On 1
 Off 1
 ```
 
-### Diagrama esquemático
-
-> *Adjuntar imagen del diagrama neumático y eléctrico del gripper. Incluir: compresor → electroválvula → eyector de vacío → ventosa, con las conexiones eléctricas al RC90.*
-
 ---
 
 ## Diagrama de flujo — patrón de caballo de ajedrez
