@@ -54,7 +54,7 @@ Aquí se documentan los laboratorios, avances, resultados y la presentación de 
 
 ### Integrante 1
 <div align="center">
-  <img src="./assets/Gustavo_pinilla(1).jpeg" alt="Foto integrante 1" style="border-radius: 50%; width: 180px;"><br>
+  <img src="./assets/Gustavo_pinilla.jpeg" alt="Foto integrante 1" style="border-radius: 50%; width: 180px;"><br>
 </div>
 
 - **Nombre completo:** Andrés Gustavo Pinilla Martínez
