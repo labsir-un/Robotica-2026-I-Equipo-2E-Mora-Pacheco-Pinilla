@@ -795,7 +795,7 @@ Esta topología refleja el patrón publicador-suscriptor de ROS 2, donde los nod
 
 ## Video de implementacion
 
-> Video de maximo 10 minutos mostrando la ejecucion completa del nodo en ROS 2 Jazzy Jalisco con turtlesim, incluyendo control manual, trayectorias automaticas, dibujo de letras personalizadas y sistema lider-seguidor.
+> Video mostrando la ejecucion completa del nodo en ROS 2 Jazzy Jalisco con turtlesim, incluyendo control manual, trayectorias automaticas, dibujo de letras personalizadas y sistema lider-seguidor.
 
 <div align="center">
 
