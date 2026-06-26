@@ -793,19 +793,9 @@ Esta topología refleja el patrón publicador-suscriptor de ROS 2, donde los nod
 
 ---
 
-## Video de simulacion e implementacion
+## Video de implementacion
 
-> **Video de simulacion** mostrando la ejecucion completa del nodo en ROS 2 Jazzy Jalisco.
-
-<div align="center">
-
-<a href="https://www.youtube.com/watch?v=PLACEHOLDER">
-  <img src="https://img.shields.io/badge/%E2%96%B6%20Ver%20video-YouTube-FF0000?style=for-the-badge&logo=youtube&logoColor=white&labelColor=0a0a1a" />
-</a>
-
-</div>
-
-> **Video de implementacion** mostrando la puesta en marcha del sistema en el laboratorio.
+> Video de maximo 10 minutos mostrando la ejecucion completa del nodo en ROS 2 Jazzy Jalisco con turtlesim, incluyendo control manual, trayectorias automaticas, dibujo de letras personalizadas y sistema lider-seguidor.
 
 <div align="center">
 
