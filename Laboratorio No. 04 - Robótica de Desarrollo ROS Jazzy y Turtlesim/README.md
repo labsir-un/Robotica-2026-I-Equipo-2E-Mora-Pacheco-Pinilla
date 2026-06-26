@@ -206,18 +206,18 @@ El paquete `my_turtle_controller` se configuró con el tipo de compilación `ame
 
 El nodo se implementó en el archivo `move_turtle.py` siguiendo el patrón canónico de nodos ROS 2 en Python establecido en las guías de referencia. La clase `TurtleKeyboardController` hereda de `rclpy.node.Node` y contiene los siguientes elementos:
 
-**Constructor (`__init__`):** Se inicializa el nodo con el nombre `turtle_keyboard_controller`. Se crea un publicador asociado al tópico `/turtle1/cmd_vel` con una cola de calidad de servicio (QoS) de profundidad 10. Se almacena la configuración actual del terminal mediante `termios.tcgetattr` para poder restaurarla al finalizar la ejecución. Se definen las velocidades lineal (`linear_speed = 2.0`) y angular (`angular_speed = 1.5`) que se aplicarán al presionar las teclas de dirección. Finalmente, se inicializan los atributos `lin_x` y `ang_z` en cero, de modo que la tortuga permanezca detenida hasta que se presione una tecla.
+**Constructor (`__init__`):** Se inicializa el nodo con el nombre `turtle_keyboard_controller`. Se crea un publicador asociado al tópico `/turtle1/cmd_vel` con una cola de calidad de servicio (QoS) de profundidad 10. Se almacena la configuración actual del terminal mediante `termios.tcgetattr` para poder restaurarla al finalizar la ejecución. Se definen las velocidades lineal (`linear_speed = 2.5`) y angular (`angular_speed = 2.0`) que se aplicarán al presionar las teclas de dirección. Finalmente, se inicializan los atributos `lin_x` y `ang_z` en cero, de modo que la tortuga permanezca detenida hasta que se presione una tecla.
 
-**Método `get_key`:** Implementa la lectura de teclado de forma no bloqueante utilizando las bibliotecas estándar `sys`, `select`, `termios` y `tty`. El método coloca el terminal en modo raw (`tty.setraw`) para capturar las secuencias de escape correspondientes a las flechas del teclado. Mediante `select.select` se verifica si hay datos disponibles en la entrada estándar con un tiempo de espera de 10 milisegundos. Si se detecta una tecla, se evalúa el primer carácter: si es `\x1b` (escape), se leen los dos caracteres siguientes para distinguir entre las flechas arriba (`[A`), abajo (`[B`), derecha (`[C`) e izquierda (`[D`). Al finalizar, se restaura la configuración original del terminal.
+**Método `read_key_nonblocking`:** Implementa la lectura de teclado de forma no bloqueante utilizando las bibliotecas estándar `sys`, `select`, `termios` y `tty`. El método coloca el terminal en modo raw (`tty.setraw`) para capturar las secuencias de escape correspondientes a las flechas del teclado. Mediante `select.select` se verifica si hay datos disponibles en la entrada estándar con un tiempo de espera de 10 milisegundos. Si se detecta una tecla, se evalúa el primer carácter: si es `\x1b` (escape), se leen los dos caracteres siguientes para distinguir entre las flechas arriba (`[A`), abajo (`[B`), derecha (`[C`) e izquierda (`[D`). Al finalizar, se restaura la configuración original del terminal.
 
-**Método `run`:** Constituye el bucle principal del nodo. Mientras `rclpy.ok()` sea verdadero, el método lee una tecla mediante `get_key` y, según el valor retornado, actualiza los atributos `lin_x` y `ang_z` conforme a la siguiente correspondencia:
+**Método `run`:** Constituye el bucle principal del nodo. Mientras `rclpy.ok()` sea verdadero, el método lee una tecla mediante `read_key_nonblocking` y, según el valor retornado, actualiza los atributos `lin_x` y `ang_z` conforme a la siguiente correspondencia:
 
 | Tecla | Velocidad lineal (`lin_x`) | Velocidad angular (`ang_z`) | Acción |
 |-------|---------------------------|----------------------------|--------|
-| ↑ | +2.0 | 0.0 | Avanzar hacia adelante |
-| ↓ | -2.0 | 0.0 | Retroceder |
-| ← | 0.0 | +1.5 | Girar a la izquierda |
-| → | 0.0 | -1.5 | Girar a la derecha |
+| ↑ | +2.5 | 0.0 | Avanzar hacia adelante |
+| ↓ | -2.5 | 0.0 | Retroceder |
+| ← | 0.0 | +2.0 | Girar a la izquierda |
+| → | 0.0 | -2.0 | Girar a la derecha |
 | Ninguna | 0.0 | 0.0 | Detenerse |
 
 A continuación, se construye un mensaje `Twist` con los valores actualizados y se publica en el tópico `/turtle1/cmd_vel`. Se invoca `rclpy.spin_once` para permitir que ROS 2 procese eventos pendientes sin bloquear el bucle. El método incluye manejo de la excepción `KeyboardInterrupt` para una finalización ordenada y, en el bloque `finally`, restaura la configuración del terminal y publica un mensaje de velocidad cero para asegurar que la tortuga se detenga.
@@ -326,7 +326,7 @@ Una vez implementado el control manual, el script `move_turtle.py` se extiende c
 
 **Método `draw_triangle`:** Implementa el dibujo de un triángulo equilátero. Calcula el ángulo de giro en cada vértice como `2π/3` radianes (120 grados). Ejecuta un ciclo de tres iteraciones, cada una con un avance y un giro a la izquierda, excepto la última iteración que solo avanza. La longitud de lado es de 2.0 unidades. El giro de 120 grados tiene una duración de aproximadamente 1.4 segundos a la velocidad angular configurada.
 
-**Método `auto_explore`:** Implementa una trayectoria automática con evasión de bordes. La tortuga avanza hacia adelante en intervalos de 0.5 segundos. Después de cada avance, consulta el atributo `current_pose` (actualizado por el suscriptor a `/turtle1/pose`) y verifica si la posición se encuentra cerca de algún borde de la ventana de turtlesim (x < 1.0, x > 10.0, y < 1.0 o y > 10.0). Si se detecta la proximidad a un borde, la tortuga rota 180 grados (π radianes) y continúa avanzando en la dirección opuesta. La exploración tiene una duración máxima de 30 segundos para evitar que se ejecute indefinidamente.
+**Método `auto_explore`:** Implementa una trayectoria automática con evasión de bordes. La tortuga avanza hacia adelante en intervalos de 0.5 segundos. Después de cada avance, consulta el atributo `current_pose` (actualizado por el suscriptor a `/turtle1/pose`) y verifica si la posición se encuentra cerca de algún borde de la ventana de turtlesim (x < 1.0, x > 10.0, y < 1.0 o y > 10.0). Si se detecta la proximidad a un borde, la tortuga rota 180 grados (π radianes) y continúa avanzando en la dirección opuesta. La exploración tiene una duración máxima de 60 segundos para evitar que se ejecute indefinidamente.
 
 #### Integración con el bucle principal
 
@@ -350,7 +350,7 @@ Para cumplir con la restricción de que las funciones automáticas no bloqueen p
 - Los bucles de movimiento utilizan `rclpy.spin_once(self, timeout_sec=0.01)` en lugar de `time.sleep()`. Esto permite que ROS 2 procese eventos (como llamadas a servicios o actualizaciones de tópicos) durante la ejecución de las trayectorias.
 - Cada iteración del bucle verifica `rclpy.ok()` para detectar señales de terminación del sistema.
 - El atributo `auto_mode` actúa como mecanismo de interrupción: si se desactiva externamente, los bucles internos detectan el cambio y finalizan anticipadamente.
-- La trayectoria automática (`auto_explore`) incorpora un límite de tiempo máximo de 30 segundos para evitar que se ejecute indefinidamente.
+- La trayectoria automática (`auto_explore`) incorpora un límite de tiempo máximo de 60 segundos para evitar que se ejecute indefinidamente.
 
 ### Resultados
 
@@ -364,7 +364,7 @@ Al ejecutar el nodo `move_turtle` y presionar las teclas de función, se observa
 
 - Al presionar la tecla P por primera vez, el lápiz se desactiva y la tortuga se desplaza sin dejar trazo. Al presionarla nuevamente, el lápiz se reactiva y la tortuga vuelve a dibujar.
 
-- Al presionar la tecla A, la tortuga comienza a explorar el entorno de forma autónoma. Cuando se aproxima a un borde de la ventana, rota 180 grados y continúa en la dirección opuesta. La exploración se detiene automáticamente después de 30 segundos.
+- Al presionar la tecla A, la tortuga comienza a explorar el entorno de forma autónoma. Cuando se aproxima a un borde de la ventana, rota 180 grados y continúa en la dirección opuesta. La exploración se detiene automáticamente después de 60 segundos.
 
 - Al presionar la tecla Q, la tortuga se detiene de inmediato, independientemente de si se encuentra en modo manual o automático.
 
@@ -829,7 +829,7 @@ A continuacion se presentan las evidencias que verifican la correcta ejecucion d
 
 <div align="center"><img src="screenshots/auto_explore.png" alt="auto_explore" width="600"></div>
 
-*Al presionar la tecla `A`, la tortuga ejecuta la función `auto_explore()` que realiza un desplazamiento aleatorio con detección de bordes durante un máximo de 30 segundos. La imagen muestra una trayectoria irregular con cambios de dirección al aproximarse a los bordes de la ventana (x < 1.0, x > 10.0, y < 1.0, y > 10.0).*
+*Al presionar la tecla `A`, la tortuga ejecuta la función `auto_explore()` que realiza un desplazamiento aleatorio con detección de bordes durante un máximo de 60 segundos. La imagen muestra una trayectoria irregular con cambios de dirección al aproximarse a los bordes de la ventana (x < 1.0, x > 10.0, y < 1.0, y > 10.0).*
 
 ### Dibujo de letras personalizadas
 
