@@ -793,9 +793,33 @@ Esta topología refleja el patrón publicador-suscriptor de ROS 2, donde los nod
 
 ---
 
-## Evidencias de ejecución
+## Video de simulacion e implementacion
 
-A continuación se presentan las evidencias que verifican la correcta ejecución del programa en ROS 2 Jazzy Jalisco.
+> **Video de simulacion** mostrando la ejecucion completa del nodo en ROS 2 Jazzy Jalisco.
+
+<div align="center">
+
+<a href="https://www.youtube.com/watch?v=PLACEHOLDER">
+  <img src="https://img.shields.io/badge/%E2%96%B6%20Ver%20video-YouTube-FF0000?style=for-the-badge&logo=youtube&logoColor=white&labelColor=0a0a1a" />
+</a>
+
+</div>
+
+> **Video de implementacion** mostrando la puesta en marcha del sistema en el laboratorio.
+
+<div align="center">
+
+<a href="https://youtu.be/PLACEHOLDER">
+  <img src="https://img.shields.io/badge/%E2%96%B6%20Ver%20video-YouTube-FF0000?style=for-the-badge&logo=youtube&logoColor=white&labelColor=0a0a1a" />
+</a>
+
+</div>
+
+---
+
+## Evidencias de ejecucion
+
+A continuacion se presentan las evidencias que verifican la correcta ejecucion del programa en ROS 2 Jazzy Jalisco.
 
 ### Movimiento manual de la tortuga
 
