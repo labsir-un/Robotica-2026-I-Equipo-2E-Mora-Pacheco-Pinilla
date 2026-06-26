@@ -16,13 +16,13 @@
 ```
 ╔══════════════════════════════════════════════════════════════════╗
 ║     Control de Turtlesim con ROS 2 Jazzy Jalisco                ║
-║  Teclado  ·  Figuras  ·  Letras Hershey  ·  Líder-Seguidor       ║
+║  Teclado  ·  Figuras  ·  Iniciales Vectorizadas  ·  Líder-Seguidor       ║
 ╚══════════════════════════════════════════════════════════════════╝
 ```
 
 </div>
 
-> **Resumen del laboratorio:** Práctica de laboratorio del curso *Robótica 2026-I* donde se implementa un nodo en Python para ROS 2 Jazzy Jalisco que controla el simulador *turtlesim* mediante teclado, integrando control manual, trayectorias automáticas (cuadrado, triángulo, exploración), dibujo de letras personalizadas con fuentes vectoriales Hershey y un sistema líder-seguidor con dos tortugas. Todo el control se realiza sin utilizar el nodo predefinido `turtle_teleop_key`, empleando lectura de teclado no bloqueante con las bibliotecas estándar de Python.
+> **Resumen del laboratorio:** Práctica de laboratorio del curso *Robótica 2026-I* donde se implementa un nodo en Python para ROS 2 Jazzy Jalisco que controla el simulador *turtlesim* mediante teclado, integrando control manual, trayectorias automáticas (cuadrado, triángulo, exploración), dibujo de letras personalizadas con fuentes vectoriales y un sistema líder-seguidor con dos tortugas. Todo el control se realiza sin utilizar el nodo predefinido `turtle_teleop_key`, empleando lectura de teclado no bloqueante con las bibliotecas estándar de Python.
 
 ---
 
@@ -44,7 +44,7 @@
 
 ## Descripción general
 
-El presente laboratorio tiene como objetivo implementar un nodo en Python para ROS 2 Jazzy Jalisco que controle el simulador *turtlesim* mediante teclado, integrando control manual, trayectorias automáticas, dibujo de letras personalizadas con fuentes vectoriales Hershey y un sistema líder-seguidor con dos tortugas.
+El presente laboratorio tiene como objetivo implementar un nodo en Python para ROS 2 Jazzy Jalisco que controle el simulador *turtlesim* mediante teclado, integrando control manual, trayectorias automáticas, dibujo de letras personalizadas con fuentes vectoriales y un sistema líder-seguidor con dos tortugas.
 
 El nodo `TurtleKeyboardController`, implementado en `move_turtle.py`, se comunica exclusivamente a través de los mecanismos de ROS 2: publica mensajes `Twist` en los tópicos `/turtle1/cmd_vel` y `/turtle2/cmd_vel`, se suscribe a `/turtle1/pose` y `/turtle2/pose`, e invoca servicios como `/spawn`, `/reset` y `/turtle1/set_pen`. Todo el control se realiza sin utilizar el nodo predefinido `turtle_teleop_key`, empleando en su lugar lectura de teclado no bloqueante mediante las bibliotecas estándar de Python (`termios`, `tty`, `select`).
 
@@ -61,7 +61,7 @@ flowchart TD
     INIT --> INIT_PUB[Crear publicadores<br/>/turtle1/cmd_vel<br/>/turtle2/cmd_vel]
     INIT_PUB --> INIT_SUB[Crear suscriptores<br/>/turtle1/pose<br/>/turtle2/pose]
     INIT_SUB --> INIT_SRV[Crear clientes de servicio<br/>/reset, /turtle1/set_pen, /spawn<br/>Esperar disponibilidad]
-    INIT_SRV --> INIT_HERSHEY[Cargar fuente Hershey<br/>futural]
+    INIT_SRV --> INIT_HERSHEY[Cargar fuentes vectoriales<br/>futural]
     INIT_HERSHEY --> INIT_FLAGS[Inicializar flags y variables<br/>lin_x=0, ang_z=0, auto_mode=no<br/>initials_mode=no, follow_mode=no]
     INIT_FLAGS --> INIT_TIMER[Crear timer seguidor 20 Hz<br/>follower_callback]
     INIT_TIMER --> MENU[Imprimir menú de comandos]
@@ -435,11 +435,11 @@ Para evitar la colisión entre las teclas de iniciales y los comandos existentes
 - Cualquier tecla que no corresponda a una inicial (incluyendo Escape y flechas) desactiva el modo y retorna el control al bucle principal. Al salir, se reimprime el menú principal para orientación del usuario.
 - La tecla Q dentro del modo detiene la tortuga y desactiva el modo.
 
-#### 1. Motor de dibujo basado en fuentes Hershey
+#### 1. Motor de dibujo basado en fuentes vectoriales
 
 A diferencia del enfoque tradicional de codificar manualmente cada letra como secuencias de trazos (lo que requeriría decenas de métodos independientes y sería propenso a errores de escalado y posicionamiento), se optó por utilizar las **fuentes vectoriales Hershey**, específicamente la variante `futural` (Futura Light). Las fuentes Hershey fueron diseñadas en la década de 1960 para plotters de pluma y representan cada carácter como un conjunto de **trazos únicos** (single-stroke), sin contornos interiores ni exteriores.
 
-##### 1.1. Instalación de la biblioteca `hershey-fonts`
+##### 1.1. Instalación de la biblioteca de fuentes vectoriales
 
 La biblioteca `hershey-fonts` (Hershey-Fonts 2.1.0) se instaló mediante `pip3`:
 
@@ -540,7 +540,7 @@ En el método `run`, se agregó la detección de la tecla I. Al presionarla, se 
 | Tecla | Método invocado | Acción |
 |-------|-----------------|--------|
 | I | `enter_initials_mode()` | Activar modo iniciales |
-| A, D, F, G, H, J, M, P, R | `draw_letter_by_path(key)` | Dibujar letra mediante fuente Hershey |
+| A, D, F, G, H, J, M, P, R | `draw_letter_by_path(key)` | Dibujar letra mediante fuente vectorial |
 | Q | `stop_turtle()` + salir | Detener y salir del modo |
 
 ### Resultados
