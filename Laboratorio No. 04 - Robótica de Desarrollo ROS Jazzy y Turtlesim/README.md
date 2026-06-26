@@ -15,7 +15,7 @@
 
 ```
 ╔══════════════════════════════════════════════════════════════════╗
-║  🐢  Control de Turtlesim con ROS 2 Jazzy Jalisco                ║
+║     Control de Turtlesim con ROS 2 Jazzy Jalisco                ║
 ║  Teclado  ·  Figuras  ·  Letras Hershey  ·  Líder-Seguidor       ║
 ╚══════════════════════════════════════════════════════════════════╝
 ```
@@ -26,23 +26,23 @@
 
 ---
 
-## 📋 Tabla de contenidos
+## Tabla de contenidos
 
 | # | Sección |
 |---|---------|
-| 1 | [📘 Descripción general](#-descripción-general) |
-| 2 | [🔁 Diagrama de flujo](#-diagrama-de-flujo) |
-| 3 | [🐢 Control manual de la tortuga](#-control-manual-de-la-tortuga) |
-| 4 | [⚙️ Funciones automáticas](#️-funciones-automáticas) |
-| 5 | [✏️ Dibujo de letras personalizadas](#️-dibujo-de-letras-personalizadas) |
-| 6 | [🤖 Sistema líder-seguidor](#-sistema-líder-seguidor) |
-| 7 | [📡 Descripción de nodos, tópicos y servicios](#-descripción-de-nodos-tópicos-y-servicios) |
-| 8 | [🖼 Evidencias de ejecución](#-evidencias-de-ejecución) |
-| 9 | [📚 Referencias](#-referencias) |
+| 1 | [Descripción general](#descripción-general) |
+| 2 | [Diagrama de flujo](#diagrama-de-flujo) |
+| 3 | [Control manual de la tortuga](#control-manual-de-la-tortuga) |
+| 4 | [Funciones automáticas](#funciones-automáticas) |
+| 5 | [Dibujo de letras personalizadas](#dibujo-de-letras-personalizadas) |
+| 6 | [Sistema líder-seguidor](#sistema-líder-seguidor) |
+| 7 | [Descripción de nodos, tópicos y servicios](#descripción-de-nodos-tópicos-y-servicios) |
+| 8 | [Evidencias de ejecución](#evidencias-de-ejecución) |
+| 9 | [Referencias](#referencias) |
 
 ---
 
-## 📘 Descripción general
+## Descripción general
 
 El presente laboratorio tiene como objetivo implementar un nodo en Python para ROS 2 Jazzy Jalisco que controle el simulador *turtlesim* mediante teclado, integrando control manual, trayectorias automáticas, dibujo de letras personalizadas con fuentes vectoriales Hershey y un sistema líder-seguidor con dos tortugas.
 
@@ -52,7 +52,7 @@ El código está organizado en métodos modulares, documentado con docstrings en
 
 ---
 
-## 🔁 Diagrama de flujo
+## Diagrama de flujo
 
 ```mermaid
 flowchart TD
@@ -174,7 +174,7 @@ flowchart TD
 
 ---
 
-## 🐢 Control manual de la tortuga
+## Control manual de la tortuga
 
 ### Funcionamiento
 
@@ -293,7 +293,7 @@ La estructura modular del código, con métodos independientes para la inicializ
 
 ---
 
-## ⚙️ Funciones automáticas
+## Funciones automáticas
 
 ### Funcionamiento
 
@@ -409,7 +409,7 @@ La implementación de las acciones complementarias y trayectorias automáticas d
 
 ---
 
-## ✏️ Dibujo de letras personalizadas
+## Dibujo de letras personalizadas
 
 ### Funcionamiento
 
@@ -583,7 +583,7 @@ El controlador de lazo cerrado con corrección angular continua y tolerancia de 
 
 ---
 
-## 🤖 Sistema líder-seguidor con dos tortugas
+## Sistema líder-seguidor con dos tortugas
 
 ### Funcionamiento
 
@@ -695,7 +695,7 @@ El controlador proporcional, a pesar de su simplicidad, demostró ser suficiente
 
 ---
 
-## 📡 Descripción de nodos, tópicos y servicios utilizados
+## Descripción de nodos, tópicos y servicios utilizados
 
 A continuación se describen los nodos, tópicos y servicios que conforman la arquitectura de comunicación del laboratorio. Cada sección incluye el comando de inspección de ROS 2 utilizado para verificarlo, su salida y una explicación de la información que permite observar.
 
@@ -793,7 +793,7 @@ Esta topología refleja el patrón publicador-suscriptor de ROS 2, donde los nod
 
 ---
 
-## 🖼 Evidencias de ejecución
+## Evidencias de ejecución
 
 A continuación se presentan las evidencias que verifican la correcta ejecución del programa en ROS 2 Jazzy Jalisco.
 
@@ -846,7 +846,7 @@ A continuación se presentan las evidencias que verifican la correcta ejecución
 
 ---
 
-## 📚 Referencias
+## Referencias
 
 [1] LabSIR UN. *Intro Turtlesim con ROS 2 Jazzy Jalisco* [Repositorio en GitHub]. Disponible en: https://github.com/labsir-un/03_Rob_2026_I_ROS2_Jazzy_Turtlesim.git
 
@@ -857,6 +857,18 @@ A continuación se presentan las evidencias que verifican la correcta ejecución
 [4] Open Robotics. *ROS 2 Jazzy Jalisco Installation Guide*. Disponible en: https://docs.ros.org/en/jazzy/Installation.html
 
 [5] Kolinger, A. *HersheyFonts - Vector font package* [Repositorio en GitHub]. Disponible en: https://github.com/apshu/HersheyFonts
+
+## Autores
+
+<div align="center">
+
+| Integrante | GitHub |
+|---|---|
+| **Duvan Felipe Pacheco Rodriguez** | <a href="https://github.com/dupachecor"><img src="https://img.shields.io/badge/GitHub-%40dupachecor-00F5FF?style=for-the-badge&amp;logo=github&amp;logoColor=white&amp;labelColor=0a0a1a" /></a> |
+| **Juan Andres Mora Henao** | <a href="https://github.com/JuanMora345"><img src="https://img.shields.io/badge/GitHub-%40JuanMora345-7B2FBE?style=for-the-badge&amp;logo=github&amp;logoColor=white&amp;labelColor=0a0a1a" /></a> |
+| **Andres Gustavo Pinilla Martinez** | <a href="https://github.com/AndresPinilla20"><img src="https://img.shields.io/badge/GitHub-%40AndresPinilla20-002FBE?style=for-the-badge&amp;logo=github&amp;logoColor=white&amp;labelColor=0a0a1a" /></a> |
+
+</div>
 
 ---
 
