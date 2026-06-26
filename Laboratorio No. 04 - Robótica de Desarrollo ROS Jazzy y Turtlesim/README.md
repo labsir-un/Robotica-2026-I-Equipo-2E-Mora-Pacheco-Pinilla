@@ -1,44 +1,48 @@
+
 <div align="center">
-<picture>
-    <source srcset="https://imgur.com/5bYAzsb.png" media="(prefers-color-scheme: dark)">
-    <source srcset="https://imgur.com/Os03JoE.png" media="(prefers-color-scheme: light)">
-    <img src="https://imgur.com/Os03JoE.png" alt="Escudo UNAL" width="350px">
-</picture>
 
-<h3>Curso de Robótica 2026-I</h3>
+<img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&height=180&section=header&text=Robótica-LAB04%20%E2%80%A2%20ROS%202%20Jazzy&fontSize=36&desc=Práctica%20de%20Laboratorio%20%E2%80%A2%20Turtlesim&descSize=14&animation=fadeIn" width="100%" />
 
-<h1>Laboratorio 04 - Robótica de Desarrollo</h1>
-
-<h2>Intro a ROS 2 Jazzy Jalisco - Turtlesim</h2>
-
-<h4>Duvan Felipe Pacheco Rodriguez<br>
-    Juan Andres Mora Henao<br>
-    Andres Gustavo Pinilla Martinez</h4>
-
-<p>
-  <img alt="Ubuntu 24.04 LTS" src="https://img.shields.io/badge/Ubuntu-24.04%20LTS-E95420?logo=ubuntu&logoColor=white">
-  <img alt="ROS 2 Jazzy" src="https://img.shields.io/badge/ROS%202-Jazzy-22314E?logo=ros&logoColor=white">
-  <img alt="Nivel" src="https://img.shields.io/badge/Nivel-Avanzado-2ea44f">
-</p>
+<a href="https://docs.ros.org/en/jazzy/"><img src="https://img.shields.io/badge/ROS%202-Jazzy-00F5FF?style=for-the-badge&logo=ros&logoColor=white&labelColor=0a0a1a" /></a>
+<a href="https://www.python.org/"><img src="https://img.shields.io/badge/Python-3.10-7B2FBE?style=for-the-badge&logo=python&logoColor=white&labelColor=0a0a1a" /></a>
+<a href="./LICENSE"><img src="https://img.shields.io/badge/License-MIT-00F5FF?style=for-the-badge&labelColor=0a0a1a" /></a>
 
 </div>
 
-<div align="justify">
+---
 
-## Tabla de contenidos
-- [Descripción general](#descripción-general)
-- [Diagrama de flujo](#diagrama-de-flujo)
-- [Control manual de la tortuga](#control-manual-de-la-tortuga)
-- [Funciones automáticas](#funciones-automáticas)
-- [Dibujo de letras personalizadas](#dibujo-de-letras-personalizadas)
-- [Sistema líder-seguidor](#sistema-líder-seguidor)
-- [Descripción de nodos, tópicos y servicios](#descripción-de-nodos-tópicos-y-servicios)
-- [Evidencias de ejecución](#evidencias-de-ejecución)
-- [Referencias](#referencias)
+<div align="center">
+
+```
+╔══════════════════════════════════════════════════════════════════╗
+║  🐢  Control de Turtlesim con ROS 2 Jazzy Jalisco                ║
+║  Teclado  ·  Figuras  ·  Letras Hershey  ·  Líder-Seguidor       ║
+╚══════════════════════════════════════════════════════════════════╝
+```
+
+</div>
+
+> **Resumen del laboratorio:** Práctica de laboratorio del curso *Robótica 2026-I* donde se implementa un nodo en Python para ROS 2 Jazzy Jalisco que controla el simulador *turtlesim* mediante teclado, integrando control manual, trayectorias automáticas (cuadrado, triángulo, exploración), dibujo de letras personalizadas con fuentes vectoriales Hershey y un sistema líder-seguidor con dos tortugas. Todo el control se realiza sin utilizar el nodo predefinido `turtle_teleop_key`, empleando lectura de teclado no bloqueante con las bibliotecas estándar de Python.
 
 ---
 
-## Descripción general
+## 📋 Tabla de contenidos
+
+| # | Sección |
+|---|---------|
+| 1 | [📘 Descripción general](#-descripción-general) |
+| 2 | [🔁 Diagrama de flujo](#-diagrama-de-flujo) |
+| 3 | [🐢 Control manual de la tortuga](#-control-manual-de-la-tortuga) |
+| 4 | [⚙️ Funciones automáticas](#️-funciones-automáticas) |
+| 5 | [✏️ Dibujo de letras personalizadas](#️-dibujo-de-letras-personalizadas) |
+| 6 | [🤖 Sistema líder-seguidor](#-sistema-líder-seguidor) |
+| 7 | [📡 Descripción de nodos, tópicos y servicios](#-descripción-de-nodos-tópicos-y-servicios) |
+| 8 | [🖼 Evidencias de ejecución](#-evidencias-de-ejecución) |
+| 9 | [📚 Referencias](#-referencias) |
+
+---
+
+## 📘 Descripción general
 
 El presente laboratorio tiene como objetivo implementar un nodo en Python para ROS 2 Jazzy Jalisco que controle el simulador *turtlesim* mediante teclado, integrando control manual, trayectorias automáticas, dibujo de letras personalizadas con fuentes vectoriales Hershey y un sistema líder-seguidor con dos tortugas.
 
@@ -48,7 +52,7 @@ El código está organizado en métodos modulares, documentado con docstrings en
 
 ---
 
-## Diagrama de flujo
+## 🔁 Diagrama de flujo
 
 ```mermaid
 flowchart TD
@@ -168,7 +172,9 @@ flowchart TD
     DESTROY --> FIN([FIN])
 ```
 
-## Control manual de la tortuga
+---
+
+## 🐢 Control manual de la tortuga
 
 ### Funcionamiento
 
@@ -287,7 +293,7 @@ La estructura modular del código, con métodos independientes para la inicializ
 
 ---
 
-## Funciones automáticas
+## ⚙️ Funciones automáticas
 
 ### Funcionamiento
 
@@ -403,7 +409,7 @@ La implementación de las acciones complementarias y trayectorias automáticas d
 
 ---
 
-## Dibujo de letras personalizadas
+## ✏️ Dibujo de letras personalizadas
 
 ### Funcionamiento
 
@@ -577,7 +583,7 @@ El controlador de lazo cerrado con corrección angular continua y tolerancia de 
 
 ---
 
-## Sistema líder-seguidor con dos tortugas
+## 🤖 Sistema líder-seguidor con dos tortugas
 
 ### Funcionamiento
 
@@ -689,7 +695,7 @@ El controlador proporcional, a pesar de su simplicidad, demostró ser suficiente
 
 ---
 
-## Descripción de nodos, tópicos y servicios utilizados
+## 📡 Descripción de nodos, tópicos y servicios utilizados
 
 A continuación se describen los nodos, tópicos y servicios que conforman la arquitectura de comunicación del laboratorio. Cada sección incluye el comando de inspección de ROS 2 utilizado para verificarlo, su salida y una explicación de la información que permite observar.
 
@@ -787,41 +793,41 @@ Esta topología refleja el patrón publicador-suscriptor de ROS 2, donde los nod
 
 ---
 
-## Evidencias de ejecución
+## 🖼 Evidencias de ejecución
 
-A continuación se presentan las evidencias que verifican la correcta ejecución del programa en ROS 2 Jazzy Jalisco. Cada sección incluye un espacio reservado para la imagen o captura de consola correspondiente.
+A continuación se presentan las evidencias que verifican la correcta ejecución del programa en ROS 2 Jazzy Jalisco.
 
 ### Movimiento manual de la tortuga
 
 <div align="center"><img src="screenshots/manual_control_turtlesim.png" alt="manual_control_turtlesim" width="600"></div>
 
-*Descripción:* La tortuga se desplaza por la ventana de turtlesim utilizando las flechas direccionales del teclado (↑ avanza, ↓ retrocede, ← gira a la izquierda, → gira a la derecha). La imagen muestra la trayectoria dibujada por la tortuga como resultado del movimiento manual, evidenciando que el lápiz está activo y que los comandos `Twist` se publican correctamente en el tópico `/turtle1/cmd_vel`.
+*La tortuga se desplaza por la ventana de turtlesim utilizando las flechas direccionales del teclado (↑ avanza, ↓ retrocede, ← gira a la izquierda, → gira a la derecha). La imagen muestra la trayectoria dibujada por la tortuga como resultado del movimiento manual, evidenciando que el lápiz está activo y que los comandos `Twist` se publican correctamente en el tópico `/turtle1/cmd_vel`.*
 
 ### Dibujo de figuras geométricas
 
 <div align="center"><img src="screenshots/square_drawn.png" alt="square_drawn" width="600"></div>
 
-*Descripción:* Al presionar la tecla `S`, la tortuga ejecuta la función `draw_square()` que dibuja un cuadrado de lado 2.0 unidades. La imagen muestra el cuadrado completo con sus cuatro lados visibles y ángulos rectos bien definidos.
+*Al presionar la tecla `S`, la tortuga ejecuta la función `draw_square()` que dibuja un cuadrado de lado 2.0 unidades. La imagen muestra el cuadrado completo con sus cuatro lados visibles y ángulos rectos bien definidos.*
 
 <div align="center"><img src="screenshots/triangle_drawn.png" alt="triangle_drawn" width="600"></div>
 
-*Descripción:* Al presionar la tecla `T`, la tortuga ejecuta la función `draw_triangle()` que dibuja un triángulo equilátero de lado 2.0 unidades. La imagen muestra el triángulo con sus tres lados visibles y ángulos de 60° bien definidos.
+*Al presionar la tecla `T`, la tortuga ejecuta la función `draw_triangle()` que dibuja un triángulo equilátero de lado 2.0 unidades. La imagen muestra el triángulo con sus tres lados visibles y ángulos de 60° bien definidos.*
 
 <div align="center"><img src="screenshots/auto_explore.png" alt="auto_explore" width="600"></div>
 
-*Descripción:* Al presionar la tecla `A`, la tortuga ejecuta la función `auto_explore()` que realiza un desplazamiento aleatorio con detección de bordes durante un máximo de 30 segundos. La imagen muestra una trayectoria irregular con cambios de dirección al aproximarse a los bordes de la ventana (x < 1.0, x > 10.0, y < 1.0, y > 10.0).
+*Al presionar la tecla `A`, la tortuga ejecuta la función `auto_explore()` que realiza un desplazamiento aleatorio con detección de bordes durante un máximo de 30 segundos. La imagen muestra una trayectoria irregular con cambios de dirección al aproximarse a los bordes de la ventana (x < 1.0, x > 10.0, y < 1.0, y > 10.0).*
 
 ### Dibujo de letras personalizadas
 
 <div align="center"><img src="screenshots/letters_drawn.png" alt="letters_drawn" width="600"></div>
 
-*Descripción:* Al presionar la tecla `I` se activa el modo iniciales. Luego, al presionar cualquiera de las teclas `A`, `D`, `F`, `G`, `H`, `J`, `M`, `P` o `R`, la tortuga dibuja la letra correspondiente utilizando la fuente vectorial Hershey (futural) de un solo trazo. La imagen muestra una o más letras dibujadas con trazos continuos y bien formados, con una separación de 3.5 unidades entre letras.
+*Al presionar la tecla `I` se activa el modo iniciales. Luego, al presionar cualquiera de las teclas `A`, `D`, `F`, `G`, `H`, `J`, `M`, `P` o `R`, la tortuga dibuja la letra correspondiente utilizando la fuente vectorial Hershey (futural) de un solo trazo. La imagen muestra una o más letras dibujadas con trazos continuos y bien formados, con una separación de 3.5 unidades entre letras.*
 
 ### Funcionamiento del sistema líder-seguidor
 
 <div align="center"><img src="screenshots/follower_turtlesim.png" alt="follower_turtlesim" width="600"></div>
 
-*Descripción:* Al presionar la tecla `L` se activa el modo líder-seguidor. Se crea turtle2 en la posición (5.5, 2.0) mediante el servicio `/spawn`. La imagen muestra ambas tortugas en la ventana, con turtle2 manteniendo una distancia de aproximadamente 1.0 unidad detrás de turtle1 mientras esta se desplaza. La trayectoria de turtle2 evidencia el seguimiento continuo, incluso durante la ejecución de funciones automáticas (cuadrado, triángulo, exploración).
+*Al presionar la tecla `L` se activa el modo líder-seguidor. Se crea turtle2 en la posición (5.5, 2.0) mediante el servicio `/spawn`. La imagen muestra ambas tortugas en la ventana, con turtle2 manteniendo una distancia de aproximadamente 1.0 unidad detrás de turtle1 mientras esta se desplaza. La trayectoria de turtle2 evidencia el seguimiento continuo, incluso durante la ejecución de funciones automáticas (cuadrado, triángulo, exploración).*
 
 ### Salida de comandos de inspección de nodos, tópicos y servicios
 
@@ -830,24 +836,17 @@ A continuación se presentan las evidencias que verifican la correcta ejecución
   <img src="screenshots/terminal_commands2.png" alt="terminal_commands2" width="600">
 </div>
 
-*Descripción:* La captura muestra la ejecución de los comandos de inspección de ROS 2 en una terminal, evidenciando:
-- `ros2 node list`: Muestra `/turtlesim` y `/turtle_keyboard_controller`.
-- `ros2 topic list`: Muestra los tópicos `/turtle1/cmd_vel`, `/turtle1/pose`, `/turtle2/cmd_vel`, `/turtle2/pose`.
-- `ros2 topic echo /turtle1/pose`: Muestra mensajes en tiempo real con la pose de turtle1.
-- `ros2 topic info /turtle1/cmd_vel`: Muestra el tipo de mensaje, cantidad de publicadores y suscriptores.
-- `ros2 service list`: Muestra los servicios `/reset`, `/spawn` y `/turtle1/set_pen`.
+*La captura muestra la ejecución de los comandos de inspección de ROS 2 en una terminal, evidenciando `ros2 node list`, `ros2 topic list`, `ros2 topic echo /turtle1/pose`, `ros2 topic info /turtle1/cmd_vel` y `ros2 service list`.*
 
 ### Visualización de la arquitectura mediante `rqt_graph`
 
 <div align="center"><img src="screenshots/rqt_graph.png" alt="rqt_graph" width="600"></div>
 
-*Descripción:* La imagen muestra el grafo generado por `rqt_graph` con los nodos `/turtlesim` y `/turtle_keyboard_controller` como óvalos, y los tópicos `/turtle1/cmd_vel`, `/turtle1/pose`, `/turtle2/cmd_vel` y `/turtle2/pose` como rectángulos. Las flechas indican claramente la dirección del flujo de datos: desde el nodo controlador hacia los tópicos `cmd_vel` (publicación) y desde los tópicos `pose` hacia el nodo controlador (suscripción).
+*La imagen muestra el grafo generado por `rqt_graph` con los nodos `/turtlesim` y `/turtle_keyboard_controller` como óvalos, y los tópicos `/turtle1/cmd_vel`, `/turtle1/pose`, `/turtle2/cmd_vel` y `/turtle2/pose` como rectángulos.*
 
 ---
 
----
-
-## Referencias
+## 📚 Referencias
 
 [1] LabSIR UN. *Intro Turtlesim con ROS 2 Jazzy Jalisco* [Repositorio en GitHub]. Disponible en: https://github.com/labsir-un/03_Rob_2026_I_ROS2_Jazzy_Turtlesim.git
 
@@ -858,5 +857,14 @@ A continuación se presentan las evidencias que verifican la correcta ejecución
 [4] Open Robotics. *ROS 2 Jazzy Jalisco Installation Guide*. Disponible en: https://docs.ros.org/en/jazzy/Installation.html
 
 [5] Kolinger, A. *HersheyFonts - Vector font package* [Repositorio en GitHub]. Disponible en: https://github.com/apshu/HersheyFonts
+
+---
+
+<div align="center">
+
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:0d003b,30:1a0533,60:0d0d2b,100:0a0a1a&height=120&section=footer&text=LabSIR%20%E2%80%A2%20Rob%C3%B3tica%202026-I&fontSize=18&fontColor=7B2FBE&animation=twinkling" width="100%" />
+
+<img src="https://img.shields.io/badge/Last%20updated-2026-FF006E?style=flat-square&labelColor=0a0a1a" />
+<img src="https://img.shields.io/badge/Universidad%20Nacional%20de%20Colombia-FFD700?style=flat-square&labelColor=0a0a1a" />
 
 </div>
