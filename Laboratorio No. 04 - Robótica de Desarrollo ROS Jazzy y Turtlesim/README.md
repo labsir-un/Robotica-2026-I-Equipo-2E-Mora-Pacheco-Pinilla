@@ -1,4 +1,3 @@
-
 <div align="center">
 
 <img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&height=180&section=header&text=Robótica-LAB04%20%E2%80%A2%20ROS%202%20Jazzy&fontSize=36&desc=Práctica%20de%20Laboratorio%20%E2%80%A2%20Turtlesim&descSize=14&animation=fadeIn" width="100%" />
@@ -14,10 +13,10 @@
 <div align="center">
 
 ```
-╔══════════════════════════════════════════════════════════════════╗
-║     Control de Turtlesim con ROS 2 Jazzy Jalisco                ║
-║  Teclado  ·  Figuras  ·  Iniciales Vectorizadas  ·  Líder-Seguidor       ║
-╚══════════════════════════════════════════════════════════════════╝
+╔════════════════════════════════════════════════════════════════════╗
+║          Control de Turtlesim con ROS 2 Jazzy Jalisco               ║
+║    Teclado · Figuras · Iniciales Vectorizadas · Líder-Seguidor      ║
+╚════════════════════════════════════════════════════════════════════╝
 ```
 
 </div>
@@ -109,7 +108,7 @@ flowchart TD
     subgraph TRAYECTORIAS[Funciones automáticas]
         DRAW_SQ_DETAIL[auto_mode = True<br/>4 lados:<br/>avance + giro 90°] --> STOP_SQ[auto_mode = False<br/>stop_turtle]
         DRAW_TR_DETAIL[auto_mode = True<br/>3 lados:<br/>avance + giro 120°] --> STOP_TR[auto_mode = False<br/>stop_turtle]
-        AUTO_EXP_DETAIL[auto_mode = True<br/>Loop hasta 30s:<br/>¿Borde? → girar 180°<br/>move_forward 0.5s] --> STOP_AUTO[auto_mode = False<br/>stop_turtle]
+        AUTO_EXP_DETAIL[auto_mode = True<br/>Loop hasta 60s:<br/>¿Borde? → retroceder 0.3s<br/>+ girar 90° o 180° aleatorio<br/>move_forward 0.5s] --> STOP_AUTO[auto_mode = False<br/>stop_turtle]
     end
 
     DRAW_SQ --> DRAW_SQ_DETAIL
@@ -206,9 +205,9 @@ El paquete `my_turtle_controller` se configuró con el tipo de compilación `ame
 
 El nodo se implementó en el archivo `move_turtle.py` siguiendo el patrón canónico de nodos ROS 2 en Python establecido en las guías de referencia. La clase `TurtleKeyboardController` hereda de `rclpy.node.Node` y contiene los siguientes elementos:
 
-**Constructor (`__init__`):** Se inicializa el nodo con el nombre `turtle_keyboard_controller`. Se crea un publicador asociado al tópico `/turtle1/cmd_vel` con una cola de calidad de servicio (QoS) de profundidad 10. Se almacena la configuración actual del terminal mediante `termios.tcgetattr` para poder restaurarla al finalizar la ejecución. Se definen las velocidades lineal (`linear_speed = 2.5`) y angular (`angular_speed = 2.0`) que se aplicarán al presionar las teclas de dirección. Finalmente, se inicializan los atributos `lin_x` y `ang_z` en cero, de modo que la tortuga permanezca detenida hasta que se presione una tecla.
+**Constructor (`__init__`):** Se inicializa el nodo con el nombre `turtle_keyboard_controller`. Se crea un publicador asociado al tópico `/turtle1/cmd_vel` con una cola de calidad de servicio (QoS) de profundidad 10. Se definen las velocidades lineal (`linear_speed = 2.5`) y angular (`angular_speed = 2.0`) que se aplicarán al presionar las teclas de dirección. Finalmente, se inicializan los atributos `lin_x` y `ang_z` en cero, de modo que la tortuga permanezca detenida hasta que se presione una tecla.
 
-**Método `read_key_nonblocking`:** Implementa la lectura de teclado de forma no bloqueante utilizando las bibliotecas estándar `sys`, `select`, `termios` y `tty`. El método coloca el terminal en modo raw (`tty.setraw`) para capturar las secuencias de escape correspondientes a las flechas del teclado. Mediante `select.select` se verifica si hay datos disponibles en la entrada estándar con un tiempo de espera de 10 milisegundos. Si se detecta una tecla, se evalúa el primer carácter: si es `\x1b` (escape), se leen los dos caracteres siguientes para distinguir entre las flechas arriba (`[A`), abajo (`[B`), derecha (`[C`) e izquierda (`[D`). Al finalizar, se restaura la configuración original del terminal.
+**Método `read_key_nonblocking`:** Implementa la lectura de teclado de forma no bloqueante utilizando las bibliotecas estándar `sys`, `select` y `termios`. La terminal se configura una única vez en modo raw (`tty.setraw`, mediante el método `set_raw_mode` invocado al inicio de `run`) para capturar las secuencias de escape correspondientes a las flechas del teclado. Mediante `select.select` con tiempo de espera cero se verifica si hay datos disponibles en la entrada estándar sin bloquear el bucle; si no hay tecla, el método retorna `None` inmediatamente. Si se detecta una tecla, se evalúa el primer carácter: si es `\x1b` (escape), se leen los dos caracteres siguientes (con esperas cortas de 20 ms) para distinguir entre las flechas arriba (`[A`), abajo (`[B`), derecha (`[C`) e izquierda (`[D`). La configuración original de la terminal, almacenada con `termios.tcgetattr` al inicio de `run`, se restaura en el bloque `finally` al finalizar la ejecución.
 
 **Método `run`:** Constituye el bucle principal del nodo. Mientras `rclpy.ok()` sea verdadero, el método lee una tecla mediante `read_key_nonblocking` y, según el valor retornado, actualiza los atributos `lin_x` y `ang_z` conforme a la siguiente correspondencia:
 
@@ -220,7 +219,7 @@ El nodo se implementó en el archivo `move_turtle.py` siguiendo el patrón canó
 | → | 0.0 | -2.0 | Girar a la derecha |
 | Ninguna | 0.0 | 0.0 | Detenerse |
 
-A continuación, se construye un mensaje `Twist` con los valores actualizados y se publica en el tópico `/turtle1/cmd_vel`. Se invoca `rclpy.spin_once` para permitir que ROS 2 procese eventos pendientes sin bloquear el bucle. El método incluye manejo de la excepción `KeyboardInterrupt` para una finalización ordenada y, en el bloque `finally`, restaura la configuración del terminal y publica un mensaje de velocidad cero para asegurar que la tortuga se detenga.
+A continuación, se construye un mensaje `Twist` con los valores actualizados y se publica en el tópico `/turtle1/cmd_vel`. Se invoca `rclpy.spin_once` para permitir que ROS 2 procese eventos pendientes sin bloquear el bucle. El método incluye manejo de la excepción `KeyboardInterrupt` para una finalización ordenada y, en el bloque `finally`, detiene ambas tortugas publicando velocidad cero en `/turtle1/cmd_vel` y `/turtle2/cmd_vel`, y restaura la configuración del terminal.
 
 #### 3. Compilación y ejecución
 
@@ -307,14 +306,14 @@ Una vez implementado el control manual, el script `move_turtle.py` se extiende c
 | T | Dibujar triángulo equilátero |
 | R | Reiniciar posición |
 | P | Activar/desactivar lápiz |
-| A | Exploración automática (30s) |
+| A | Exploración automática (60s) |
 | Q | Detener movimiento |
 
 ### Métodos implementados
 
 **Método `stop_turtle`:** Publica un mensaje `Twist` con velocidad cero en ambos ejes, reinicia los atributos `lin_x` y `ang_z`, y desactiva el modo automático. Es invocado al presionar la tecla Q.
 
-**Método `reset_turtle`:** Detiene la tortuga mediante `stop_turtle` y envía una solicitud vacía al servicio `/reset`. Al completarse, el simulador restablece la tortuga a su posición inicial (x = 5.54, y = 5.54, theta = 0.0) y limpia el rastro de dibujo. La llamada al servicio se realiza de forma asíncrona mediante `call_async`, y el método espera la respuesta con `rclpy.spin_until_future_complete`.
+**Método `reset_turtle`:** Detiene la tortuga mediante `stop_turtle` y envía una solicitud vacía al servicio `/reset`. Al completarse, el simulador restablece la tortuga a su posición inicial (x = 5.54, y = 5.54, theta = 0.0) y limpia el rastro de dibujo. Dado que el reinicio elimina todas las tortugas del simulador, el método también restablece el estado del sistema líder-seguidor (`turtle2_spawned`, `turtle2_pose` y `follow_mode`). La llamada al servicio se realiza de forma asíncrona mediante `call_async`, y el método espera la respuesta con `rclpy.spin_until_future_complete`.
 
 **Método `toggle_pen`:** Construye una solicitud al servicio `/turtle1/set_pen` con el campo `off` igual a 1 si el lápiz está activo (para desactivarlo) o 0 si está inactivo (para activarlo). Los campos de color (`r`, `g`, `b`) se mantienen en 255 (blanco) y el ancho en 3. Al completarse la llamada, se invierte el estado del atributo `pen_down` y se registra el cambio.
 
@@ -322,11 +321,11 @@ Una vez implementado el control manual, el script `move_turtle.py` se extiende c
 
 **Método `turn(angular_speed, duration)`:** Análogo a `move_forward`, pero publica una velocidad angular constante durante un tiempo determinado. Se utiliza para los giros en las esquinas de las figuras geométricas.
 
-**Método `draw_square`:** Implementa el dibujo de un cuadrado. Define una longitud de lado de 2.0 unidades y calcula la duración del avance como `lado / velocidad_lineal` y la duración del giro de 90 grados como `(π/2) / velocidad_angular`. Ejecuta un ciclo de cuatro iteraciones, cada una compuesta por un avance y un giro a la izquierda. Entre cada lado se publica un mensaje informativo. La velocidad lineal se fijó en 2.0 unidades/s y la angular en 1.5 rad/s, lo que resulta en lados de 1.0 segundo y giros de aproximadamente 1.05 segundos. El cuadrado resultante tiene aproximadamente 2 unidades de lado.
+**Método `draw_square`:** Implementa el dibujo de un cuadrado. Define una longitud de lado de 2.0 unidades y calcula la duración del avance como `lado / velocidad_lineal` y la duración del giro de 90 grados como `(π/2) / velocidad_angular`. Ejecuta un ciclo de cuatro iteraciones, cada una compuesta por un avance y un giro a la izquierda (el último lado no requiere giro). Las velocidades empleadas son las mismas del control manual: lineal de 2.5 unidades/s y angular de 2.0 rad/s, lo que resulta en avances de 0.8 segundos por lado y giros de aproximadamente 0.79 segundos. El cuadrado resultante tiene aproximadamente 2 unidades de lado.
 
-**Método `draw_triangle`:** Implementa el dibujo de un triángulo equilátero. Calcula el ángulo de giro en cada vértice como `2π/3` radianes (120 grados). Ejecuta un ciclo de tres iteraciones, cada una con un avance y un giro a la izquierda, excepto la última iteración que solo avanza. La longitud de lado es de 2.0 unidades. El giro de 120 grados tiene una duración de aproximadamente 1.4 segundos a la velocidad angular configurada.
+**Método `draw_triangle`:** Implementa el dibujo de un triángulo equilátero. Calcula el ángulo de giro en cada vértice como `2π/3` radianes (120 grados). Ejecuta un ciclo de tres iteraciones, cada una con un avance y un giro a la izquierda, excepto la última iteración que solo avanza. La longitud de lado es de 2.0 unidades. El giro de 120 grados tiene una duración de aproximadamente 1.05 segundos a la velocidad angular configurada (2.0 rad/s).
 
-**Método `auto_explore`:** Implementa una trayectoria automática con evasión de bordes. La tortuga avanza hacia adelante en intervalos de 0.5 segundos. Después de cada avance, consulta el atributo `current_pose` (actualizado por el suscriptor a `/turtle1/pose`) y verifica si la posición se encuentra cerca de algún borde de la ventana de turtlesim (x < 1.0, x > 10.0, y < 1.0 o y > 10.0). Si se detecta la proximidad a un borde, la tortuga rota 180 grados (π radianes) y continúa avanzando en la dirección opuesta. La exploración tiene una duración máxima de 60 segundos para evitar que se ejecute indefinidamente.
+**Método `auto_explore`:** Implementa una trayectoria automática con evasión de bordes. La tortuga avanza hacia adelante en intervalos de 0.5 segundos a 2.0 unidades/s. Después de cada avance, consulta el atributo `current_pose` (actualizado por el suscriptor a `/turtle1/pose`) y verifica si la posición se encuentra cerca de algún borde de la ventana de turtlesim (x < 1.0, x > 10.0, y < 1.0 o y > 10.0). Si se detecta la proximidad a un borde, la tortuga primero retrocede brevemente (0.3 segundos) para alejarse del límite y luego gira aleatoriamente 90 o 180 grados, lo que evita trayectorias repetitivas y garantiza que la tortuga no salga de los límites de la ventana. La exploración tiene una duración máxima de 60 segundos para evitar que se ejecute indefinidamente.
 
 #### Integración con el bucle principal
 
@@ -356,15 +355,15 @@ Para cumplir con la restricción de que las funciones automáticas no bloqueen p
 
 Al ejecutar el nodo `move_turtle` y presionar las teclas de función, se observan los siguientes comportamientos:
 
-- Al presionar la tecla S, la tortuga dibuja un cuadrado de aproximadamente 2 unidades de lado. La figura se completa en aproximadamente 8 segundos. El cuadrado se forma mediante cuatro segmentos rectos conectados por giros de 90 grados a la izquierda.
+- Al presionar la tecla S, la tortuga dibuja un cuadrado de aproximadamente 2 unidades de lado. La figura se completa en aproximadamente 6 segundos. El cuadrado se forma mediante cuatro segmentos rectos conectados por giros de 90 grados a la izquierda.
 
-- Al presionar la tecla T, la tortuga dibuja un triángulo equilátero de aproximadamente 2 unidades de lado. La figura se completa en aproximadamente 7 segundos. El triángulo se forma mediante tres segmentos rectos conectados por giros de 120 grados a la izquierda.
+- Al presionar la tecla T, la tortuga dibuja un triángulo equilátero de aproximadamente 2 unidades de lado. La figura se completa en aproximadamente 5 segundos. El triángulo se forma mediante tres segmentos rectos conectados por giros de 120 grados a la izquierda.
 
 - Al presionar la tecla R, la tortuga regresa instantáneamente a la posición inicial (x = 5.54, y = 5.54) y se elimina cualquier trazo previo en el simulador.
 
 - Al presionar la tecla P por primera vez, el lápiz se desactiva y la tortuga se desplaza sin dejar trazo. Al presionarla nuevamente, el lápiz se reactiva y la tortuga vuelve a dibujar.
 
-- Al presionar la tecla A, la tortuga comienza a explorar el entorno de forma autónoma. Cuando se aproxima a un borde de la ventana, rota 180 grados y continúa en la dirección opuesta. La exploración se detiene automáticamente después de 60 segundos.
+- Al presionar la tecla A, la tortuga comienza a explorar el entorno de forma autónoma. Cuando se aproxima a un borde de la ventana, retrocede brevemente, gira aleatoriamente 90 o 180 grados y continúa en la nueva dirección. La exploración se detiene automáticamente después de 60 segundos.
 
 - Al presionar la tecla Q, la tortuga se detiene de inmediato, independientemente de si se encuentra en modo manual o automático.
 
@@ -603,30 +602,34 @@ El sistema líder-seguidor se implementó dentro del mismo nodo `TurtleKeyboardC
 
 #### Controlador de seguimiento
 
-El método `follower_callback` implementa un controlador proporcional (P) que calcula las velocidades lineal y angular de `turtle2` en cada iteración:
+El método `follower_callback` implementa un controlador proporcional (P) que dirige a `turtle2` hacia un **punto objetivo ubicado detrás de `turtle1`**, a una distancia `follow_dist = 1.0` unidad sobre su eje de orientación. De esta forma, la separación se mantiene de manera natural: cuando `turtle2` alcanza el punto objetivo, el error de posición tiende a cero y la velocidad comandada también, sin necesidad de una condición de parada explícita.
 
-1. **Cálculo del vector relativo:**
+1. **Cálculo del punto objetivo detrás del líder:**
    ```python
-   dx = turtle1.x - turtle2.x
-   dy = turtle1.y - turtle2.y
+   desired_x = turtle1.x - follow_dist × cos(turtle1.theta)
+   desired_y = turtle1.y - follow_dist × sin(turtle1.theta)
+   ```
+
+2. **Cálculo del vector de error:**
+   ```python
+   dx = desired_x - turtle2.x
+   dy = desired_y - turtle2.y
    dist = sqrt(dx² + dy²)
    ```
 
-2. **Distancia de seguimiento:** Se define una distancia mínima de `follow_dist = 1.0` unidad. Si `dist < follow_dist`, `turtle2` se detiene para evitar superponerse a `turtle1`.
+3. **Orientación deseada:** La dirección hacia el punto objetivo se calcula como `ang_target = atan2(dy, dx)`. El error angular `ang_diff = ang_target - turtle2.theta` se normaliza al rango `[-π, π]` mediante `atan2(sin(ang_diff), cos(ang_diff))`.
 
-3. **Orientación deseada:** La dirección hacia `turtle1` se calcula como `target_theta = atan2(dy, dx)`. El error angular se normaliza al rango `[-π, π]`.
-
-4. **Velocidad lineal:** Proporcional a la distancia restante más allá de `follow_dist`:
+4. **Velocidad lineal:** Proporcional a la distancia restante hasta el punto objetivo, con saturación:
    ```python
-   lin_speed = min(kp_lin × (dist - follow_dist), max_lin_speed)
+   lin_speed = min(kp_lin × dist, max_lin_speed)
    ```
-   con `kp_lin = 1.0` y `max_lin_speed = 2.0`.
+   con `kp_lin = 2.0` y `max_lin_speed = 3.0`.
 
-5. **Velocidad angular:** Proporcional al error angular:
+5. **Velocidad angular:** Proporcional al error angular, con saturación simétrica:
    ```python
-   ang_speed = clamp(kp_ang × dtheta, -max_ang, +max_ang)
+   ang_speed = clamp(kp_ang × ang_diff, -max_ang_speed, +max_ang_speed)
    ```
-   con `kp_ang = 2.0` y `max_ang = 3.0`.
+   con `kp_ang = 3.0` y `max_ang_speed = 4.0`.
 
 #### Modo de operación
 
@@ -661,11 +664,11 @@ En el bloque `finally` del método `run`, se publica un mensaje de velocidad cer
 
 ### Resultados
 
-Al presionar la tecla L, se crea `turtle2` en la parte inferior de la ventana de turtlesim. La tortuga seguidora comienza a desplazarse hacia `turtle1`, orientándose hacia ella y reduciendo la distancia hasta alcanzar aproximadamente 1 unidad de separación.
+Al presionar la tecla L, se crea `turtle2` en la parte inferior de la ventana de turtlesim. La tortuga seguidora comienza a desplazarse hacia el punto ubicado detrás de `turtle1`, orientándose hacia él y reduciendo la distancia hasta situarse aproximadamente a 1 unidad de separación del líder.
 
 Cuando `turtle1` se desplaza mediante las flechas del teclado o mediante las trayectorias automáticas (S, T, A), `turtle2` la sigue manteniendo la distancia de seguridad. El seguimiento es fluido gracias a la frecuencia de 20 Hz del temporizador y a la naturaleza proporcional del controlador.
 
-Si `turtle1` se detiene, `turtle2` también se detiene al alcanzar la distancia de 1 unidad. Si `turtle1` se aleja, `turtle2` acelera proporcionalmente hasta un máximo de 2.0 unidades/s.
+Si `turtle1` se detiene, `turtle2` converge al punto objetivo detrás del líder y su velocidad tiende a cero de forma natural. Si `turtle1` se aleja, `turtle2` acelera proporcionalmente hasta un máximo de 3.0 unidades/s.
 
 <div align="center"><img src="screenshots/follower_turtlesim.png" alt="follower_turtlesim" width="600"></div>
 
@@ -691,7 +694,7 @@ La implementación del sistema líder-seguidor demostró la capacidad de ROS 2 p
 
 El uso de un temporizador para el control de seguimiento resultó ser una solución elegante y no intrusiva que permite que el seguidor opere en paralelo con el control manual de la tortuga líder, sin necesidad de hilos adicionales ni mecanismos complejos de sincronización.
 
-El controlador proporcional, a pesar de su simplicidad, demostró ser suficiente para un seguimiento suave y estable en el entorno simulado de turtlesim. La distancia de seguridad de 1 unidad evita colisiones entre las tortugas, mientras que la ganancia proporcional asegura una respuesta rápida sin oscilaciones apreciables.
+El controlador proporcional, a pesar de su simplicidad, demostró ser suficiente para un seguimiento suave y estable en el entorno simulado de turtlesim. El uso de un punto objetivo situado detrás del líder mantiene una separación de 1 unidad y evita colisiones entre las tortugas, mientras que las ganancias proporcionales aseguran una respuesta rápida sin oscilaciones apreciables.
 
 ---
 
@@ -829,7 +832,7 @@ A continuacion se presentan las evidencias que verifican la correcta ejecucion d
 
 <div align="center"><img src="screenshots/auto_explore.png" alt="auto_explore" width="600"></div>
 
-*Al presionar la tecla `A`, la tortuga ejecuta la función `auto_explore()` que realiza un desplazamiento aleatorio con detección de bordes durante un máximo de 60 segundos. La imagen muestra una trayectoria irregular con cambios de dirección al aproximarse a los bordes de la ventana (x < 1.0, x > 10.0, y < 1.0, y > 10.0).*
+*Al presionar la tecla `A`, la tortuga ejecuta la función `auto_explore()` que realiza un desplazamiento con detección de bordes durante un máximo de 60 segundos. La imagen muestra una trayectoria irregular con cambios de dirección al aproximarse a los bordes de la ventana (x < 1.0, x > 10.0, y < 1.0, y > 10.0): la tortuga retrocede brevemente y gira aleatoriamente 90° o 180° para continuar la exploración.*
 
 ### Dibujo de letras personalizadas
 
