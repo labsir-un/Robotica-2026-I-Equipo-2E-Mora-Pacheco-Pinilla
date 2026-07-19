@@ -1016,7 +1016,7 @@ Las gráficas de calibración (Actividad 5) están incluidas en la sección 5.3,
 
 ### Juan Andres Mora Henao
 
-*Pendiente.*
+El desarrollo de este laboratorio me permitió consolidar competencias fundamentales en el control y programación de manipuladores seriales mediante ROS 2, integrando conceptos teóricos de cinemática con su implementación sobre un sistema robótico real. La construcción de nodos propios, la comunicación mediante tópicos y servicios, la validación de trayectorias y el trabajo con el modelo del Phantom X Pincher X100 fortalecieron mi comprensión de la arquitectura de software utilizada en aplicaciones modernas de robótica, así como la importancia de diseñar soluciones seguras, modulares y escalables para el control de sistemas mecatrónicos.
 
 ### Andres Gustavo Pinilla Martinez
 
