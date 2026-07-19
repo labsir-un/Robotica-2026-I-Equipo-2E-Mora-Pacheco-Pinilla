@@ -22,7 +22,7 @@
 
 </div>
 
-> **Resumen del laboratorio:** Práctica de laboratorio del curso *Robótica 2026-I* en la que se controla el manipulador Phantom X Pincher X100 mediante ROS 2 Jazzy Jalisco, integrando movimiento articular individual, calibración de cero, movimiento simultáneo y secuencial, interpolación de trayectorias, trayectoria sinusoidal, cinemática directa e inversa, un modo de enseñanza y repetición de poses, trazado de figuras y una coreografía robótica sincronizada con audio. El control se implementa mediante nodos propios en ROS 2 que se comunican con el controlador `pincher_controller` a través de tópicos y servicios, sin depender de herramientas externas de teleoperación.
+> **Resumen del laboratorio:** Práctica de laboratorio del curso *Robótica 2026-I* en la que se controla el manipulador Phantom X Pincher X100 mediante ROS 2 Jazzy Jalisco, integrando movimiento articular individual, calibración de cero, movimiento simultáneo y secuencial, interpolación de trayectorias, trayectoria sinusoidal, cinemática directa e inversa, un modo de enseñanza y repetición de poses, trazado de figuras y una coreografía robótica sincronizada con audio. El control se implementa mediante nodos propios en ROS 2 que se comunican con el nodo controlador `pincher_controller` a través de tópicos y servicios, sin depender de herramientas externas de teleoperación.
 
 ---
 
@@ -31,7 +31,7 @@
 | # | Sección |
 |---|---------|
 | 1 | [Información general](#1-información-general) |
-| 2 | [Caracterización del robot](#2-caracterización-del-robot) |
+| 2 | [Caracterización del robot (Act. 1, 2 y 3)](#2-caracterización-del-robot-actividades-1-2-y-3) |
 | 3 | [Configuración inicial del sistema](#3-configuración-inicial-del-sistema) |
 | 4 | [Arquitectura general y diagrama de flujo maestro](#4-arquitectura-general-y-diagrama-de-flujo-maestro) |
 | 5 | [Bloque 1 — Control articular básico (Act. 4, 5 y 6)](#5-bloque-1--control-articular-básico-actividades-4-5-y-6) |
@@ -41,7 +41,7 @@
 | 9 | [Bloque 5 — Coreografía robótica (Act. 15)](#9-bloque-5--coreografía-robótica-actividad-15) |
 | 10 | [Plano de planta](#10-plano-de-planta) |
 | 11 | [Estructura del repositorio](#11-estructura-del-repositorio) |
-| 12 | [Evidencias de ejecución](#12-evidencias-de-ejecución) |
+| 12 | [Video y evidencias de ejecución](#12-video-y-evidencias-de-ejecución) |
 | 13 | [Conclusiones individuales](#13-conclusiones-individuales) |
 | 14 | [Referencias](#14-referencias) |
 
@@ -59,7 +59,7 @@
 | **Middleware** | ROS 2 Jazzy Jalisco |
 | **Sistema operativo** | Ubuntu 24.04 LTS |
 | **Lenguaje** | Python 3.12 |
-| **Controlador de motores** | DYNAMIXEL AX-12A (Protocolo 1.0) |
+| **Servomotores** | DYNAMIXEL AX-12A (Protocolo 1.0, resolución 0–1023 sobre 300°) |
 
 ### 1.2. Objetivos generales
 
@@ -93,7 +93,7 @@ Las siguientes condiciones aplican a todas las actividades del laboratorio:
 
 ---
 
-## 2. Caracterización del robot
+## 2. Caracterización del robot (Actividades 1, 2 y 3)
 
 Esta sección corresponde a las Actividades 1, 2 y 3 de la guía: preparación del robot, identificación de motores y articulaciones, y medición de la geometría del manipulador. A diferencia de los bloques posteriores, no requiere un nodo de ROS 2 propio; es trabajo de identificación física y documental que alimenta directamente los parámetros usados en el Bloque 3 (cinemática).
 
@@ -101,9 +101,14 @@ Esta sección corresponde a las Actividades 1, 2 y 3 de la guía: preparación d
 
 *Pendiente por diligenciar.* Se debe registrar el procedimiento de verificación de conexión de los servomotores, energización del sistema y comprobación de correspondencia entre el modelo en RViz y la posición física del manipulador (posición de home, todas las articulaciones en 0°).
 
+Herramientas del kit que apoyan esta actividad:
+
+- `ros2 run pincher_control scan_dynamixel` — escanea el bus DYNAMIXEL por *ping* (IDs 0–20, protocolo 1.0 o 2.0 configurable) y reporta los IDs y números de modelo detectados. Útil para verificar la conexión de los 5 servos antes de energizar movimientos.
+- `ros2 launch pincher_description display_gui.launch.py` — levanta el modelo URDF en RViz con `joint_state_publisher_gui` (sliders), lo que permite inspeccionar el modelo sin hardware y comparar posturas contra el robot físico.
+
 ### 2.2. Actividad 2 — Identificación de motores y articulaciones
 
-Los identificadores DYNAMIXEL se numeran de manera consecutiva desde la base hasta la pinza (Base = ID 1 ... Pinza = ID 5), en correspondencia con el arreglo `dxl_ids: [1, 2, 3, 4, 5]` definido en `pincher_control/config/ax12a.yaml`.
+Los identificadores DYNAMIXEL se numeran de manera consecutiva desde la base hasta la pinza (Base = ID 1 … Pinza = ID 5), en correspondencia con el arreglo `dxl_ids: [1, 2, 3, 4, 5]` definido en `pincher_control/config/ax12a.yaml` y con los valores por defecto del nodo controlador.
 
 | Articulación | ID DYNAMIXEL | Posición de referencia (home) | Sentido positivo de movimiento | Función |
 |-------------|:------------:|:------------------------------:|:-------------------------------:|---------|
@@ -113,32 +118,30 @@ Los identificadores DYNAMIXEL se numeran de manera consecutiva desde la base has
 | Muñeca (`wrist`)    | 4 | *Pendiente* | *Pendiente* | Orientación del efector final |
 | Pinza (`gripper`)   | 5 | *Pendiente* | *Pendiente* | Apertura y cierre de las falanges |
 
-> Nota: las columnas "Posición de referencia" y "Sentido positivo" deben verificarse físicamente sobre el robot real (girando cada articulación manualmente sin energizar, o comandando pequeños desplazamientos positivos y observando el sentido de giro) y luego completarse aquí.
+> **Nota:** las columnas "Posición de referencia" y "Sentido positivo" deben verificarse físicamente sobre el robot real (comandando pequeños desplazamientos positivos y observando el sentido de giro) y luego completarse aquí. Como referencia del modelo: en el URDF la base gira sobre `+z`, mientras que hombro, codo y muñeca tienen eje `-z`; esa inversión es exactamente la que compensa el parámetro `joint_signs: [1, -1, -1, -1, 1]` del controlador para que los comandos en radianes sean coherentes con el modelo.
 
 ### 2.3. Actividad 3 — Medición del robot
 
-Las dimensiones del manipulador se obtuvieron a partir de los parámetros cinemáticos definidos en el archivo `pincher_description/urdf/robot.xacro` del modelo tridimensional del kit. Estas medidas corresponden a la alternativa de "medición de los archivos STL / modelo CAD" contemplada en la guía, y deben contrastarse con una medición directa sobre el robot físico usando calibrador antes de darlas como definitivas.
+Las dimensiones del manipulador se obtuvieron a partir de los parámetros cinemáticos definidos en el archivo `pincher_description/urdf/robot.xacro` del modelo del kit. Estas medidas corresponden a la alternativa de "medición de los archivos STL / modelo CAD" contemplada en la guía (las mallas STL están en milímetros y el xacro las escala con `scale="0.001 0.001 0.001"`), y deben contrastarse con una medición directa sobre el robot físico usando calibrador antes de darlas como definitivas.
 
-**Parámetros extraídos del modelo (`robot.xacro`):**
+**Parámetros del modelo (`robot.xacro`, verificados contra el archivo):**
 
 | Parámetro | Valor (m) | Descripción |
 |-----------|:---------:|-------------|
-| `H0` | 0.0450 | Altura desde la base hasta el eje de la articulación `waist` |
+| `H0` (derivado) | 0.0450 | Altura desde la base hasta el eje de `waist`. No existe como propiedad en el xacro: el origen del joint `waist` se define como `z = 0.08945 − L1 = 0.045` |
 | `L1` | 0.0445 | Distancia entre el eje de `waist` y el eje de `shoulder` |
 | `L2` | 0.1010 | Longitud del brazo superior (`shoulder` → `elbow`) |
 | `L3` | 0.1010 | Longitud del antebrazo (`elbow` → `wrist`) |
-| `L4` | 0.1190 | Distancia desde `wrist` hasta el punto de montaje de la pinza |
-| `Lm` | 0.0000 | Desplazamiento horizontal del brazo superior (ajustado a 0 en este robot; el modelo CAD de referencia trae 0.0315 m, pero el robot físico asignado no presenta ese offset — ver sección 3.6) |
-| Offset muñeca-pinza | 0.0660 | Distancia adicional desde `link4` hasta la barra de la pinza (`gripper_bar`) |
-| Carrera de cada dedo | 0.015 a 0.040 | Recorrido prismático de apertura/cierre por dedo (`joint6`/`joint7`) |
+| `L4` | 0.1190 | Distancia desde `wrist` hasta el punto de montaje de la barra de la pinza (`gripper_bar`, joint fijo `joint4`) |
+| `Lm` | 0.0000 | Desplazamiento horizontal del brazo superior. Se fijó en 0 para este robot (el modelo CAD de referencia trae 0.0315 m, pero el robot físico asignado no presenta ese offset — ver sección 3.5) |
+| Offset del servo de pinza | 0.0660 | Origen del joint rotativo `gripper` (link `prop`) medido desde `link4`. **No** es la distancia a `gripper_bar` (esa es `L4`) |
+| Carrera de cada dedo | 0.015 a 0.040 | Recorrido prismático de apertura/cierre por dedo. Los dedos son joints prismáticos `joint6`/`joint7` con `mimic` acoplado a `gripper` (multiplicador −0.008, offset −0.0265) |
 
-**Distancia total base-TCP aproximada (brazo extendido, sin contar apertura de pinza):**
+Un valor útil para la cinemática: la altura del eje del hombro respecto al plano de la mesa es `H0 + L1 = 0.08945 m`, que es exactamente el parámetro `d₁` de la tabla DH del Bloque 3.
 
-```
-H0 + L1 + L2 + L3 + L4 + 0.066 ≈ 0.045 + 0.0445 + 0.101 + 0.101 + 0.119 + 0.066 ≈ 0.4765 m
-```
+> **Sobre el alcance total:** una suma directa `H0 + L1 + L2 + L3 + L4 + 0.066 ≈ 0.4765 m` solo debe tomarse como cota aproximada de orden de magnitud, porque mezcla tramos que no son colineales en la cadena cinemática (el offset de 0.066 m es el eje del servo de la pinza y no se apila al final de `L4`; los dedos se montan sobre `gripper_bar` en `z = 0.08605 − L4` de su propio marco). El alcance real depende de la configuración articular y se obtiene con la cinemática directa.
 
-*Pendiente:* validar estos valores con calibrador sobre el robot físico y generar el diagrama con las dimensiones, los ejes de movimiento y los sistemas coordenados (ver plantilla de referencia en la guía, Figura 2). Este diagrama debe incluirse como imagen en esta sección una vez elaborado, y reutilizarse como base para la tabla de parámetros DH del Bloque 3.
+*Pendiente:* validar estos valores con calibrador sobre el robot físico y generar el diagrama con las dimensiones, los ejes de movimiento y los sistemas coordenados (ver plantilla de referencia en la guía, Figura 2). El display de `TF` en la configuración `pincher.rviz` incluida en el kit muestra los ejes de cada eslabón y sirve de apoyo visual para ese diagrama.
 
 ---
 
@@ -150,8 +153,8 @@ El workspace de ROS 2 se encuentra en `~/ros2_jazzy/phantom_ws/` y contiene los 
 
 | Paquete | Descripción |
 |---------|-------------|
-| `pincher_control` | Controlador de los servomotores DYNAMIXEL (publicación de estados y recepción de comandos) |
-| `pincher_description` | Modelo URDF del robot, mallas STL y archivos de visualización para RViz |
+| `pincher_control` | Controlador de los servomotores DYNAMIXEL (publicación de estados, recepción de comandos y servicios de seguridad), GUI Tkinter y escáner de bus |
+| `pincher_description` | Modelo URDF/Xacro del robot, mallas STL, configuración de RViz y launch de visualización |
 | `lab05_code` | Código fuente de las actividades del laboratorio (presente repositorio) |
 
 ### 3.2. Conexión del robot
@@ -171,7 +174,7 @@ El workspace de ROS 2 se encuentra en `~/ros2_jazzy/phantom_ws/` y contiene los 
 
    Es necesario cerrar sesión y volver a iniciarla para que el cambio surta efecto.
 
-4. Energizar el robot con su fuente de alimentación.
+4. Energizar el robot con su fuente de alimentación. Opcionalmente, verificar la comunicación con los 5 servos mediante `ros2 run pincher_control scan_dynamixel --ros-args -p protocol_version:=1.0`.
 
 ### 3.3. Lanzamiento del sistema
 
@@ -185,15 +188,29 @@ ros2 launch pincher_control pincher_system.launch.py use_hardware:=true motor_mo
 
 Este comando realiza las siguientes acciones:
 
-1. Inicia el nodo `pincher_controller`, que se comunica con los servomotores AX-12A a través del puerto serie `/dev/ttyUSB0` a 1 000 000 baudios.
-2. Publica el estado de las articulaciones en el tópico `/joint_states` a 20 Hz.
-3. Escucha comandos de posición en el tópico `/pincher/command` (tipo `JointState`, unidades en radianes).
-4. Expone los servicios `/pincher/home`, `/pincher/software_stop` y `/pincher/torque_enable`.
-5. Inicia la visualización del modelo URDF en RViz2.
+1. Incluye `pincher_description/display.launch.py`, que procesa el `robot.xacro` y levanta `robot_state_publisher` y RViz2 (con las 8 mallas STL si están instaladas; en caso contrario usa cajas).
+2. Inicia el ejecutable `control_servo` bajo el nombre de nodo **`pincher_controller`**, que se comunica con los servos AX-12A por el puerto serie `/dev/ttyUSB0` a 1 000 000 baudios.
+3. Lanza también la GUI de escritorio `pincher_gui` (Tkinter). Si no se desea, agregar `start_gui:=false` al comando.
 
-### 3.4. Parámetros del controlador
+> **Importante:** los argumentos `use_hardware:=true` y `motor_model:=ax12a` son obligatorios en este montaje, porque los valores por defecto del launch son `use_hardware:=false` (modo simulación) y `motor_model:=xl430`.
 
-Los parámetros del controlador se definen en el archivo `pincher_control/config/ax12a.yaml`:
+### 3.4. Interfaz ROS 2 del controlador
+
+El nodo `pincher_controller` (ejecutable `control_servo`) expone la siguiente interfaz, verificada en el código fuente:
+
+| Interfaz | Tipo | Dirección | Descripción |
+|----------|------|:---------:|-------------|
+| `/joint_states` | `sensor_msgs/JointState` | publica | Estado de las 5 articulaciones en radianes. El timer corre a `read_rate_hz = 20 Hz`, pero con hardware real la tasa efectiva observada es ~13 Hz, porque la lectura serial de cada motor añade una pausa de 10 ms (5 motores ≈ 50 ms por ciclo) |
+| `/pincher/status` | `std_msgs/String` | publica | Mensajes de estado legibles (conexión, torque, parada, home) |
+| `/pincher/command` | `sensor_msgs/JointState` | se suscribe | Comandos de posición en radianes. Acepta mensajes **parciales** (solo las articulaciones nombradas) o los 5 valores a la vez; esta propiedad es la base de la comparación simultáneo vs. secuencial del Bloque 2 |
+| `/pincher/profile_velocity` | `std_msgs/UInt32` | se suscribe | Cambia en caliente la velocidad (`Moving Speed`, 0–1023) de todos los servos |
+| `/pincher/home` | `std_srvs/Trigger` | servicio | Envía todas las articulaciones a su posición de referencia (`home_positions`) |
+| `/pincher/software_stop` | `std_srvs/Trigger` | servicio | Parada de software: deshabilita el torque y bloquea nuevos comandos hasta reactivar torque |
+| `/pincher/torque_enable` | `std_srvs/SetBool` | servicio | Habilita/deshabilita el torque de todos los motores; habilitar torque además libera la parada de software |
+
+### 3.5. Parámetros del controlador (y una precisión importante)
+
+El archivo `pincher_control/config/ax12a.yaml` define el perfil AX-12A:
 
 ```yaml
 pincher_controller:
@@ -206,79 +223,96 @@ pincher_controller:
     joint_names: [waist, shoulder, elbow, wrist, gripper]
     joint_signs: [1.0, -1.0, -1.0, -1.0, 1.0]
     home_positions: [512, 512, 512, 512, 512]
-    moving_speed: 100
+    moving_speed: 50
     torque_limit: 800
     read_rate_hz: 20.0
     home_on_startup: false
     disable_torque_on_shutdown: true
 ```
 
+> **Precisión (verificada en `pincher_system.launch.py` y `control_servo.py`):** el launch del sistema **no carga este YAML**; solo pasa por línea de argumentos `motor_model`, `use_hardware`, `port`, `baudrate`, `read_rate_hz` y `home_on_startup`. El resto de parámetros toma los **valores por defecto declarados en el código** del controlador, que son: `home_positions = [-1,…,-1]` (todo valor negativo se sustituye por el centro del perfil, 512 en AX-12A), `moving_speed = 100`, `torque_limit = -1`, `joint_signs = [1,-1,-1,-1,1]`. En consecuencia, con el lanzamiento estándar la velocidad efectiva de los servos es **100** (no el 50 del YAML), y **editar `home_positions` en el YAML no tiene efecto**. Para que el YAML sí se aplique (por ejemplo, para la corrección de cero de la Actividad 5) debe lanzarse el nodo con el archivo de parámetros:
+>
+> ```bash
+> ros2 run pincher_control control_servo --ros-args --params-file \
+>   ~/ros2_jazzy/phantom_ws/src/pincher_control/config/ax12a.yaml \
+>   -r __node:=pincher_controller -p use_hardware:=true
+> ```
+>
+> o bien modificar `pincher_system.launch.py` para incluir el YAML en la lista `parameters` del nodo.
+
 | Parámetro | Descripción |
 |-----------|-------------|
-| `motor_model` | Perfil del motor (`ax12a` o `xl430`) |
-| `use_hardware` | Si es `true`, abre el puerto serie y comanda los motores reales |
-| `port` | Dispositivo serie del robot |
-| `baudrate` | Velocidad de comunicación en baudios |
-| `dxl_ids` | Identificadores DYNAMIXEL de cada motor |
-| `joint_names` | Nombres lógicos de las articulaciones |
-| `joint_signs` | Signo de la relación rad/raw (inversión de sentido) |
-| `home_positions` | Valor raw correspondiente a 0° para cada articulación |
+| `motor_model` | Perfil del motor (`ax12a` o `xl430`; el perfil define protocolo, rango raw y direcciones de registro) |
+| `use_hardware` | Si es `true`, abre el puerto serie y comanda los motores reales; si es `false`, el estado espeja instantáneamente los comandos (modo simulación) |
+| `dxl_ids` / `joint_names` | Mapeo ID ↔ nombre lógico de cada articulación |
+| `joint_signs` | Signo de la relación rad/raw. Compensa que en el URDF hombro, codo y muñeca giran sobre eje `-z` |
+| `home_positions` | Valor raw correspondiente a 0° por articulación (512 = centro del AX-12A) |
+| `moving_speed` | Velocidad de los servos (0–1023). También modificable en caliente vía `/pincher/profile_velocity` |
+| `torque_limit` | Límite de torque del AX-12A (registro 34); −1 = no escribir |
+| `read_rate_hz` | Frecuencia objetivo del timer de publicación de `/joint_states` |
 
-### 3.5. Articulaciones del robot
+### 3.6. Articulaciones del robot y límites
 
-| Índice | Nombre | ID DYNAMIXEL | Función | Rango seguro |
-|:------:|--------|:------------:|---------|:------------:|
+Los límites usados por el software del laboratorio coinciden con los declarados en el URDF (`robot.xacro`):
+
+| Índice | Nombre | ID | Función | Límites |
+|:------:|--------|:--:|---------|:-------:|
 | 0 | `waist` | 1 | Rotación de la base | ±150° |
 | 1 | `shoulder` | 2 | Elevación del hombro | ±150° |
 | 2 | `elbow` | 3 | Flexión del codo | ±150° |
 | 3 | `wrist` | 4 | Rotación de la muñeca | ±150° |
-| 4 | `gripper` | 5 | Apertura y cierre de la pinza | -90° a +90° |
+| 4 | `gripper` | 5 | Apertura y cierre de la pinza | −90° a +90° |
 
-### 3.6. Modificación del modelo URDF
+### 3.7. Modificaciones al modelo URDF
 
-Para que el modelo en RViz coincidiera con la posición física del robot en reposo (todas las articulaciones en 0°), se realizaron las siguientes modificaciones al archivo `pincher_description/urdf/robot.xacro`:
+Para que el modelo en RViz coincidiera con la posición física del robot en reposo (todas las articulaciones en 0°), se realizaron las siguientes modificaciones al archivo `pincher_description/urdf/robot.xacro` (ambas verificables en el archivo del repositorio):
 
-1. **Offset del codo**: Se agregó un desplazamiento de +90° al origen de la articulación `elbow` para que la posición de referencia (0° en el controlador) corresponda a un brazo vertical y no en forma de L.
-2. **Parámetro `Lm`**: Se estableció `Lm = 0.0` (originalmente 0.0315 m) debido a que el robot físico no presenta el offset que sí existe en el modelo CAD de referencia.
+1. **Offset del codo:** el origen de la articulación `elbow` incluye un término adicional de −90° en su rpy — la expresión completa es `rpy z = −atan2(L2, Lm) − π/2`, y el joint `wrist` compensa con `+atan2(L2, Lm)` — de modo que la posición de referencia (0° en el controlador) corresponde a un brazo vertical y no en forma de L.
+2. **Parámetro `Lm`:** se estableció `Lm = 0.0` (el modelo CAD de referencia trae 0.0315 m) porque el robot físico asignado no presenta ese desplazamiento horizontal.
 
 ---
 
 ## 4. Arquitectura general y diagrama de flujo maestro
 
-El sistema completo se apoya en un único nodo externo, `pincher_controller` (entregado por el repositorio base), que se comunica con los servomotores AX-12A y expone la interfaz de ROS 2 (tópicos y servicios) usada por todos los nodos propios del laboratorio. Sobre esa base se construyeron los siguientes nodos, cada uno asociado a uno o varios entry points declarados en `setup.py`:
+El sistema completo se apoya en un único nodo externo, `pincher_controller` (entregado por el repositorio base como ejecutable `control_servo` del paquete `pincher_control`), que se comunica con los servomotores AX-12A y expone la interfaz de ROS 2 descrita en la sección 3.4. Sobre esa base se construyeron los nodos propios del paquete `lab05_code`:
 
 | Nodo / entry point | Actividades que cubre | Archivo fuente | Estado |
 |---------------------|------------------------|----------------|:------:|
 | `individual_movement` | 4, 7, 8, 9 (interfaz web), 13, 15 (interfaz web) | `individual_movement.py` | Implementado |
 | `calibration` | 5 | `calibration.py` | Implementado |
-| `safe_limits` | 6 | *(pendiente)* | Pendiente |
-| `simultaneous_movement` | 7 (script independiente) | *(pendiente, cubierto por `individual_movement`)* | Cubierto vía interfaz web |
-| `sequential_movement` | 8 (script independiente) | *(pendiente, cubierto por `individual_movement`)* | Cubierto vía interfaz web |
 | `interpolation` | 9 (script autónomo con gráficas) | `interpolation.py` | Implementado |
-| `sinusoidal` | 10 | *(pendiente)* | Pendiente |
-| `fk_dh` | 11 | *(pendiente)* | Pendiente |
-| `ik` | 12 | *(pendiente)* | Pendiente |
-| `teach_and_repeat` | 13 | Cubierto por `individual_movement.py` | Implementado |
-| `tracing` | 14 | *(pendiente)* | Pendiente |
 | `choreography` | 15 (script autónomo) | `choreography.py` | Implementado |
+| `teach_and_repeat` | 13 (alias de `individual_movement`) | `individual_movement.py` | Implementado |
+| `safe_limits` | 6 | *(módulo pendiente)* | Pendiente |
+| `simultaneous_movement` / `sequential_movement` | 7 / 8 como scripts independientes | *(módulos pendientes; funcionalidad cubierta por la interfaz web)* | Cubierto vía web |
+| `sinusoidal` | 10 | *(módulo pendiente)* | Pendiente |
+| `fk_dh` | 11 | *(módulo pendiente)* | Pendiente |
+| `ik` | 12 | *(módulo pendiente)* | Pendiente |
+| `tracing` | 14 | *(módulo pendiente)* | Pendiente |
+
+> **Nota sobre los entry points pendientes:** los comandos marcados como pendientes están declarados en `setup.py` pero sus módulos aún no existen, por lo que invocarlos con `ros2 run` producirá un error de importación hasta que se implementen.
 
 ### 4.1. Diagrama de arquitectura general
 
 ```mermaid
 flowchart TD
     subgraph EXT["Nodo externo (repositorio base)"]
-        PC["pincher_controller<br/>Comunicación con servomotores AX-12A"]
+        PC["pincher_controller<br/>(ejecutable control_servo)<br/>Comunicación con servos AX-12A"]
     end
 
     subgraph ROS["Interfaz ROS 2"]
         JS["/joint_states<br/>sensor_msgs/JointState"]
+        ST["/pincher/status<br/>std_msgs/String"]
         CMD["/pincher/command<br/>sensor_msgs/JointState"]
-        HOME["/pincher/home<br/>std_srvs/Trigger"]
+        VEL["/pincher/profile_velocity<br/>std_msgs/UInt32"]
+        HOME["/pincher/home · /pincher/software_stop<br/>/pincher/torque_enable"]
     end
 
     PC -- publica --> JS
+    PC -- publica --> ST
     CMD -- recibido por --> PC
-    HOME -- servido por --> PC
+    VEL -- recibido por --> PC
+    HOME -- servidos por --> PC
 
     subgraph NODOS["Nodos propios (lab05_code)"]
         IM["individual_movement<br/>Act. 4, 7, 8, 9, 13, 15<br/>(servidor HTTP puerto 5050)"]
@@ -294,7 +328,6 @@ flowchart TD
 
     CAL -- publica --> CMD
     CAL -- se suscribe --> JS
-    CAL -- invoca --> HOME
     CAL -- genera --> RES["Gráficas y YAML de calibración"]
 
     INTERP -- publica --> CMD
@@ -303,13 +336,13 @@ flowchart TD
     DANCE -- publica --> CMD
     DANCE -- reproduce audio --> AUDIO["Archivo MP3 (librosa + simpleaudio)"]
 
-    USER["Usuario"] -- selecciona actividad --> IM
+    USER["Usuario"] -- interfaz web --> IM
     USER -- ejecuta script --> CAL
     USER -- ejecuta script --> INTERP
     USER -- ejecuta script --> DANCE
 ```
 
-Este diagrama es el mapa general del sistema: todos los nodos comparten la misma interfaz de comunicación con `pincher_controller` (un publicador en `/pincher/command`, un suscriptor a `/joint_states` y un cliente del servicio `/pincher/home`), y se diferencian en la lógica que aplican antes de publicar el comando. Los diagramas de detalle de cada bloque, presentados en las secciones siguientes, desarrollan esa lógica interna.
+Este diagrama es el mapa general del sistema: todos los nodos comparten la misma interfaz de comunicación con `pincher_controller` (un publicador en `/pincher/command`, un suscriptor a `/joint_states` y, cuando aplica, un cliente del servicio `/pincher/home`), y se diferencian en la lógica que aplican antes de publicar el comando. Los diagramas de detalle de cada bloque desarrollan esa lógica interna.
 
 ---
 
@@ -331,18 +364,18 @@ flowchart TD
     HOME4 -->|No| FEED[Leer /joint_states<br/>para retroalimentación]
 
     SEL -->|Act. 5: calibración| LOOP[Para cada articulación:<br/>enviar 5 posiciones de prueba]
-    LOOP --> WAIT[Esperar 1.5 s<br/>y leer /joint_states]
+    LOOP --> WAIT[Espera activa wait_settle:<br/>tolerancia ±2°, timeout 3 s]
     WAIT --> ERR[Calcular error<br/>e_q = deseado - medido]
     ERR --> MORE{¿Quedan<br/>posiciones?}
     MORE -->|Sí| LOOP
     MORE -->|No| STATS[Calcular error máximo,<br/>error promedio y offset de cero]
-    STATS --> HOMEJ[Regresar articulación a 0°]
+    STATS --> HOMEJ[Regresar articulación a 0°<br/>y esperar 1.5 s]
     HOMEJ --> NEXTJ{¿Quedan<br/>articulaciones?}
     NEXTJ -->|Sí| LOOP
     NEXTJ -->|No| PLOTS[Generar gráficas individuales<br/>y gráfica resumen]
     PLOTS --> SAVE[Guardar YAML de resultados<br/>y offsets recomendados]
 
-    SEL -->|Act. 6: límites| CHECKLIM["Pendiente de implementación:<br/>rutina de determinación experimental<br/>de límites sin tope mecánico"]
+    SEL -->|Act. 6: límites| CHECKLIM["Pendiente de implementación:<br/>determinación experimental<br/>de límites sin tope mecánico"]
 ```
 
 ### 5.2. Actividad 4 — Movimiento individual de articulaciones
@@ -355,27 +388,20 @@ flowchart TD
 
 - `cmd_pub`: publicador en `/pincher/command` (tipo `sensor_msgs/JointState`).
 - `state_sub`: suscriptor a `/joint_states`, cuyos datos se almacenan en `current_state` protegido por `state_lock`.
-- `home_cli`: cliente del servicio `/pincher/home` (tipo `std_srvs/Trigger`).
-- `command_queue`: cola de tipo `queue.Queue` que desacopla el servidor HTTP (hilo secundario) del bucle principal de ROS 2. En cada iteración de `rclpy.spin_once`, el método `process_queue` retira un comando de la cola: si es de tipo `move`, construye un `JointState` y lo publica; si es `home`, invoca el servicio de forma asíncrona.
+- `home_cli`: cliente del servicio `/pincher/home` (tipo `std_srvs/Trigger`). Al iniciar, el nodo espera hasta 15 s a que el servicio esté disponible; si no aparece, continúa operando sin la función Home (con advertencia en consola).
+- `command_queue`: cola `queue.Queue` que desacopla el servidor HTTP (hilo secundario) del bucle principal de ROS 2. En cada iteración de `rclpy.spin_once`, `process_queue` retira un comando: si es de tipo `move`, construye un `JointState` y lo publica; si es `home`, invoca el servicio de forma asíncrona. Este patrón **cola + sondeo** evita condiciones de carrera entre hilos.
 
-**Servidor HTTP (hilo `daemon`):** implementado con `http.server.HTTPServer` de la biblioteca estándar (sin dependencias externas), corre en el puerto 5050 y expone, entre otros, los endpoints:
+**Servidor HTTP (hilo `daemon`, puerto 5050):** implementado con `http.server` de la biblioteca estándar (sin dependencias externas). La interfaz web se organiza en seis pestañas, en este orden: *Actividad 4 — Movimiento Individual*, *Actividad 7 — Movimiento Simultáneo*, *Actividad 8 — Secuencial*, *Actividad 9 — Interpolación*, *Actividad 13 — Enseñanza* y *Baile — Coreografía*. La página consulta `GET /api/state` cada 300 ms y muestra por articulación un slider, un campo numérico, un sparkline con el historial y la posición reportada por el motor.
+
+**Endpoints básicos:**
 
 | Endpoint | Método | Descripción |
 |----------|:------:|--------------|
-| `/api/state` | GET | Retorna la posición actual de cada articulación en radianes |
+| `/api/state` | GET | Posición actual de cada articulación (radianes), a partir de `/joint_states` |
 | `/api/command` | POST | Recibe `{name: [...], position: [...]}`, valida contra `JOINT_LIMITS_DEG` y encola el comando |
+| `/api/home` | POST | Encola la invocación del servicio `/pincher/home` |
 
-La validación de límites se realiza en `APIHandler.do_POST` antes de encolar el comando; si un valor excede los límites definidos en `JOINT_LIMITS_DEG`, se responde con HTTP 400 y el comando nunca llega al tópico de ROS 2.
-
-**Límites de seguridad aplicados:**
-
-| Articulación | Límite inferior | Límite superior |
-|-------------|:---------------:|:---------------:|
-| Base | -150° | +150° |
-| Hombro | -150° | +150° |
-| Codo | -150° | +150° |
-| Muñeca | -150° | +150° |
-| Pinza | -90° | +90° |
+La validación de límites se realiza en el backend, en `APIHandler.do_POST`, **antes** de encolar: si un valor excede los límites (±150° brazo, ±90° pinza), se responde HTTP 400 y el comando nunca llega al tópico de ROS 2.
 
 **Instrucciones de uso:**
 
@@ -390,17 +416,13 @@ ros2 run lab05_code individual_movement
 
 Abrir `http://localhost:5050`, pestaña *Actividad 4*. Cada articulación tiene un slider que envía la posición al soltarlo o al presionar Enter. El botón *Home* invoca el servicio `/pincher/home`.
 
-**Análisis:** el patrón cola de comandos más sondeo en `rclpy.spin_once` permite que el nodo ROS 2 y el servidor HTTP coexistan sin bloqueos. La retroalimentación de `/joint_states` (~13-20 Hz) se usa para visualización; el control de posición real es responsabilidad de `pincher_controller`. La validación de límites en el backend evita que posiciones peligrosas lleguen siquiera al tópico de ROS 2.
-
-*Video de esta actividad:* ver sección 12 (Evidencias de ejecución), video "Movimiento individual, simultáneo y secuencial".
+**Análisis:** el patrón cola de comandos + sondeo permite que el nodo ROS 2 y el servidor HTTP coexistan sin bloqueos. La retroalimentación de `/joint_states` (~13–20 Hz según carga del bus serial) se usa para visualización; el control de posición real es responsabilidad de `pincher_controller`. La validación de límites en el backend evita que posiciones peligrosas lleguen siquiera al tópico de ROS 2.
 
 ### 5.3. Actividad 5 — Calibración de cero y error articular
 
 **Objetivo específico:** cuantificar el error sistemático de cada articulación enviando posiciones angulares conocidas y comparándolas con la posición reportada por el servomotor, y calcular el desplazamiento de cero necesario para corregir la calibración.
 
-**Fundamento teórico:**
-
-El error articular se define como:
+**Fundamento teórico.** El error articular se define como:
 
 $$e_q = q_{\text{deseado}} - q_{\text{medido}}$$
 
@@ -412,75 +434,80 @@ Para aplicar la corrección en los servomotores AX-12A (rango de 0 a 1023 unidad
 
 $$\text{raw\_offset} = \text{offset}_{\text{grados}} \times \frac{1024}{300}$$
 
-**Metodología:** el nodo `calibration.py` (`CalibrationNode`) automatiza el proceso completo. Para cada articulación, en el orden base -> hombro -> codo -> muñeca -> pinza:
+**Metodología (según la implementación real de `calibration.py`):** el nodo `CalibrationNode` automatiza el proceso completo. Para cada articulación, en el orden base → hombro → codo → muñeca → pinza:
 
-1. Se envían 5 posiciones angulares distribuidas en el rango seguro, con paso aproximado de 45°.
-2. Después de cada comando se espera hasta 3 s (con verificación activa mediante `wait_settle`, tolerancia de ±2°) a que el motor alcance la posición.
-3. Se lee la posición reportada desde `/joint_states`.
-4. Se calcula el error, y al finalizar las 5 pruebas de una articulación se determina error máximo, error promedio y offset de cero.
-5. La articulación regresa a 0° antes de continuar con la siguiente.
+1. Se valida que la posición de prueba esté dentro de los límites seguros y se publica un `JointState` de **una sola articulación** en `/pincher/command`.
+2. Se ejecuta `wait_settle`: una **espera activa** que hace *spin* del nodo y monitorea `/joint_states` hasta que la posición medida entre en una tolerancia de **±2°** respecto al objetivo, con un **timeout de 3 s**. Al vencer el tiempo o alcanzar la tolerancia, se toma la última lectura como posición medida.
+3. Se calcula el error del punto, y al completar las 5 pruebas de la articulación se determinan error máximo, error promedio y offset de cero.
+4. La articulación regresa a 0° y se espera `SETTLE_TIME = 1.5 s` antes de continuar con la siguiente.
 
-**Posiciones de prueba:**
+**Posiciones de prueba** (reducidas respecto al rango máximo para evitar colisiones con la mesa; el hombro se limitó a [0°, +60°] por la misma razón):
 
 | Articulación | Posiciones de prueba |
 |-------------|:---------------------:|
-| Base | -60°, -30°, 0°, +30°, +60° |
+| Base | −60°, −30°, 0°, +30°, +60° |
 | Hombro | 0°, +15°, +30°, +45°, +60° |
-| Codo | -60°, -30°, 0°, +30°, +60° |
-| Muñeca | -60°, -30°, 0°, +30°, +60° |
-| Pinza | -30°, -15°, 0°, +15°, +30° |
+| Codo | −60°, −30°, 0°, +30°, +60° |
+| Muñeca | −60°, −30°, 0°, +30°, +60° |
+| Pinza | −30°, −15°, 0°, +15°, +30° |
 
-*Nota:* los rangos se redujeron respecto a la capacidad máxima de cada servo para evitar colisiones con la mesa de trabajo; el hombro se limitó a [0°, +60°] por la misma razón.
-
-**Resultados obtenidos (sesión del 2026-07-08 23:04):**
+**Resultados obtenidos (sesión del 2026-07-08 23:04, robot físico):**
 
 | Articulación | Error máx (°) | Error prom (°) | Offset cero (°) |
 |-------------|:------------:|:--------------:|:---------------:|
 | Base | 1.64 | +0.76 | +0.76 |
-| Hombro | 1.29 | -0.85 | -0.85 |
-| Codo | 1.00 | -0.29 | -0.29 |
-| Muñeca | 0.50 | -0.29 | -0.29 |
+| Hombro | 1.29 | −0.85 | −0.85 |
+| Codo | 1.00 | −0.29 | −0.29 |
+| Muñeca | 0.50 | −0.29 | −0.29 |
 | Pinza | 0.38 | +0.29 | +0.29 |
 
 **Gráficas de calibración:**
 
-![Calibración - Base](results/calibracion_waist.png)
+![Calibración - Base](calibration_results/calibracion_waist.png)
 *Figura 5.1: Calibración de la articulación Base. Panel superior: posición deseada vs. medida. Panel inferior: error por punto de prueba.*
 
-![Calibración - Hombro](results/calibracion_shoulder.png)
+![Calibración - Hombro](calibration_results/calibracion_shoulder.png)
 *Figura 5.2: Calibración de la articulación Hombro.*
 
-![Calibración - Codo](results/calibracion_elbow.png)
+![Calibración - Codo](calibration_results/calibracion_elbow.png)
 *Figura 5.3: Calibración de la articulación Codo.*
 
-![Calibración - Muñeca](results/calibracion_wrist.png)
+![Calibración - Muñeca](calibration_results/calibracion_wrist.png)
 *Figura 5.4: Calibración de la articulación Muñeca.*
 
-![Calibración - Pinza](results/calibracion_gripper.png)
+![Calibración - Pinza](calibration_results/calibracion_gripper.png)
 *Figura 5.5: Calibración de la articulación Pinza.*
 
-![Resumen de calibración](results/calibracion_resumen.png)
+![Resumen de calibración](calibration_results/calibracion_resumen.png)
 *Figura 5.6: Resumen comparativo de todas las articulaciones.*
 
-**Aplicación de la corrección de cero:** una vez calculados los offsets, se deben aplicar en `pincher_control/config/ax12a.yaml` sumándolos al parámetro `home_positions`. Por ejemplo, para un offset de hombro de -0.85°:
+**Offsets recomendados y home corregido:**
+
+| Articulación | Offset (°) | Offset (raw) | home actual | home corregido |
+|-------------|:----------:|:------------:|:-----------:|:--------------:|
+| Base | +0.76 | +3 | 512 | 515 |
+| Hombro | −0.85 | −3 | 512 | 509 |
+| Codo | −0.29 | −1 | 512 | 511 |
+| Muñeca | −0.29 | −1 | 512 | 511 |
+| Pinza | +0.29 | +1 | 512 | 513 |
+
+**Aplicación de la corrección de cero:** los offsets se aplican modificando `home_positions` en `pincher_control/config/ax12a.yaml`:
 
 ```yaml
-home_positions: [512 + 3, 512 - 3, 512, 512, 512]
+home_positions: [515, 509, 511, 511, 513]
 ```
 
-(la conversión exacta grados -> raw se calcula como `offset_grados × 1024 / 300`; ver `offsets_recomendados.yaml` para los valores ya calculados de esta sesión).
+> **Importante:** como se explicó en la sección 3.5, el launch estándar no carga el YAML, por lo que además de editar el archivo es necesario lanzar el controlador con `--params-file` (o modificar `pincher_system.launch.py` para incluirlo). Después de aplicar la corrección, repetir la calibración para verificar que el error promedio se reduzca.
 
-**Archivos generados:** `calibracion_resultados.yaml`, `offsets_recomendados.yaml` y `README_calibracion.md`, disponibles en el directorio `results/` de este paquete.
+**Interpretación:** el error máximo se mantuvo por debajo de ±1.7° en todas las articulaciones (comparable con la resolución del encoder del AX-12A, ~0.29°/unidad). El signo del error promedio indica la dirección del sesgo: con la convención $e_q = q_{deseado} - q_{medido}$, un promedio negativo (como el del hombro, −0.85°) significa que el motor tiende a reportar posiciones *más allá* del objetivo, y uno positivo (base, +0.76°) que tiende a quedarse *antes* del objetivo, en el sentido positivo del eje. El mayor sesgo corresponde al hombro, consistente con ser la articulación que soporta mayor carga gravitacional en las posturas de prueba.
 
-**Interpretación:** el error máximo se mantuvo por debajo de ±1.7° en todas las articulaciones, y el mayor sesgo sistemático corresponde al hombro (-0.85° en promedio), lo cual es consistente con ser la articulación que soporta mayor carga mecánica en la mayoría de las posiciones de prueba. Se recomienda aplicar los offsets calculados y repetir la calibración para verificar que el error promedio se reduzca.
-
-*Video de esta actividad:* la ejecución de la calibración puede incluirse como evidencia adicional en la sección 12, o documentarse únicamente mediante las gráficas generadas (la guía no exige video específico para esta actividad).
+**Archivos generados:** `calibracion_resultados.yaml`, `offsets_recomendados.yaml`, las 6 gráficas PNG y un reporte `README_calibracion.md` autogenerado, disponibles en `calibration_results/`.
 
 ### 5.4. Actividad 6 — Determinación de límites seguros
 
-*Pendiente de implementación.* Esta actividad requiere determinar experimentalmente, sin alcanzar los topes mecánicos, el límite inferior y superior real de cada articulación, y un margen de seguridad. Se planea implementar como una rutina dentro de `safe_limits.py` (entry point ya declarado en `setup.py`) que:
+*Pendiente de implementación.* Esta actividad requiere determinar experimentalmente, sin alcanzar los topes mecánicos, el límite inferior y superior real de cada articulación, y un margen de seguridad. Se planea implementar como una rutina en `safe_limits.py` (entry point ya declarado en `setup.py`) que:
 
-- Incremente progresivamente el valor comandado hasta detectar resistencia mecánica o saturación de corriente (o hasta el límite indicado por el operador desde la interfaz).
+- Incremente progresivamente el valor comandado hasta detectar el límite indicado por el operador o la saturación del movimiento.
 - Registre el valor límite alcanzado y calcule un margen de seguridad respecto al tope mecánico real.
 - Alimente la tabla `JOINT_LIMITS_DEG` usada por `individual_movement.py` y `calibration.py`, de modo que el sistema impida el envío de valores fuera de estos límites (requisito explícito de la guía).
 
@@ -492,7 +519,7 @@ home_positions: [512 + 3, 512 - 3, 512, 512, 512]
 | Muñeca | *Pendiente* | *Pendiente* | *Pendiente* |
 | Pinza | *Pendiente* | *Pendiente* | *Pendiente* |
 
-Mientras tanto, el sistema opera con los límites conservadores ya declarados en `JOINT_LIMITS_DEG` (±150° para las cuatro articulaciones del brazo y ±90° para la pinza), que cumplen el requisito de no enviar comandos fuera de rango, aunque todavía no han sido determinados de forma experimental según pide la actividad.
+Mientras tanto, el sistema opera con los límites conservadores ya declarados en `JOINT_LIMITS_DEG` (±150° para las cuatro articulaciones del brazo y ±90° para la pinza, idénticos a los del URDF), que cumplen el requisito de no enviar comandos fuera de rango, aunque todavía no han sido determinados de forma experimental según pide la actividad.
 
 ---
 
@@ -535,14 +562,14 @@ flowchart TD
 | Config | Base | Hombro | Codo | Muñeca | Pinza |
 |:------:|:----:|:------:|:----:|:------:|:-----:|
 | 1 (Home) | 0 | 0 | 0 | 0 | 0 |
-| 2 | 25 | 25 | 20 | -20 | 0 |
-| 3 | -35 | 35 | -30 | 30 | 0 |
-| 4 | 85 | -20 | 55 | 25 | 0 |
-| 5 | 80 | -35 | 55 | -45 | 0 |
+| 2 | 25 | 25 | 20 | −20 | 0 |
+| 3 | −35 | 35 | −30 | 30 | 0 |
+| 4 | 85 | −20 | 55 | 25 | 0 |
+| 5 | 80 | −35 | 55 | −45 | 0 |
 
 *Nota:* si alguna configuración no resulta segura para el robot asignado, debe modificarse y justificarse en el informe una vez se realicen las pruebas físicas.
 
-**Implementación:** se reutiliza el mismo `MovementNode` de la Actividad 4 y su endpoint `POST /api/command`. La diferencia clave es que aquí se envían los 5 valores en un único mensaje `JointState`, lo que hace que `pincher_controller` los interprete como un comando simultáneo:
+**Implementación:** se reutiliza el mismo `MovementNode` de la Actividad 4 y su endpoint `POST /api/command`. La diferencia clave es que aquí se envían los 5 valores en un único mensaje `JointState`. En `pincher_controller`, el callback de comando itera sobre todas las articulaciones presentes en el mensaje y escribe los 5 valores raw en los DYNAMIXEL antes de la siguiente lectura de posiciones, lo que produce el movimiento simultáneo:
 
 ```
 POST /api/command {name: [waist,shoulder,elbow,wrist,gripper],
@@ -551,13 +578,13 @@ POST /api/command {name: [waist,shoulder,elbow,wrist,gripper],
        -> /pincher/command -> pincher_controller
 ```
 
-**Interfaz web:** pestaña con las 5 configuraciones predefinidas mostradas en inputs editables, cada una con botón *Ejecutar* que envía un único `POST /api/command`.
+**Interfaz web:** pestaña *Actividad 7* con las 5 configuraciones predefinidas mostradas en inputs editables, cada una con botón *Ejecutar* que envía un único `POST /api/command`, más una sección de configuración personalizada y botón Home.
 
 ### 6.3. Actividad 8 — Movimiento secuencial
 
-**Objetivo:** ejecutar una de las configuraciones anteriores moviendo las articulaciones una tras otra (Base -> Hombro -> Codo -> Muñeca -> Pinza) y comparar el resultado con el movimiento simultáneo.
+**Objetivo:** ejecutar una de las configuraciones anteriores moviendo las articulaciones una tras otra (Base → Hombro → Codo → Muñeca → Pinza) y comparar el resultado con el movimiento simultáneo.
 
-**Implementación:** en contraste con la Actividad 7, aquí se generan 5 publicaciones independientes en `/pincher/command`, cada una con una sola articulación, separadas por un delay configurable (0.5-3 s):
+**Implementación:** en contraste con la Actividad 7, aquí se generan 5 publicaciones independientes en `/pincher/command`, cada una con una sola articulación, separadas por un delay configurable (0.5–3 s). Esto aprovecha que el controlador acepta mensajes `JointState` parciales:
 
 ```
 POST /api/command {name:[waist],   position:[0.44]} -> sleep(delay)
@@ -577,36 +604,34 @@ El tiempo total de la secuencia es `5 × delay` más el tiempo de procesamiento 
 | Trayectoria del TCP | *Pendiente de observar* | *Pendiente de observar* |
 | Suavidad del movimiento | *Pendiente de observar* | *Pendiente de observar* |
 
-**Interfaz web:** pestaña con selector de configuración (las de la Actividad 7), slider de delay y tres botones: *Ejecutar secuencial*, *Ejecutar simultáneo* y *Home*, mostrando el progreso (1/5 ... 5/5) y el tiempo transcurrido de cada modo.
-
-*Video de estas actividades:* ver sección 12, video "Movimiento individual, simultáneo y secuencial".
+**Interfaz web:** pestaña *Actividad 8* con selector de configuración (las de la Actividad 7), slider de delay y tres botones: *Ejecutar secuencial*, *Ejecutar simultáneo* y *Home*, mostrando el progreso (1/5 … 5/5) y el tiempo transcurrido de cada modo.
 
 ### 6.4. Actividad 9 — Interpolación de trayectorias
 
 **Objetivo:** implementar interpolación lineal y cúbica para mover el robot entre dos configuraciones alejadas, y comparar la suavidad mediante gráficas de `q(t)`.
 
-**Algoritmo:**
+**Algoritmo.** Interpolación lineal:
 
-Interpolación lineal:
 $$q(t) = q_A + (q_B - q_A) \cdot \frac{t}{T}$$
 
 Interpolación cúbica (velocidad cero en ambos extremos):
-$$q(t) = q_A + (q_B - q_A) \cdot \left(3\left(\frac{t}{T}\right)^2 - 2\left(\frac{t}{T}\right)^3\right)$$
+
+$$q(t) = q_A + (q_B - q_A) \cdot \left(3\left(\tfrac{t}{T}\right)^2 - 2\left(\tfrac{t}{T}\right)^3\right)$$
 
 **Implementación:** el script autónomo `interpolation.py` define dos configuraciones de prueba:
 
 - Configuración A (inicio): home, `[0, 0, 0, 0, 0]`.
-- Configuración B (final): `[85, -20, 55, 25, 0]` grados.
+- Configuración B (final): `[85, −20, 55, 25, 0]` grados.
 
-Se generan **N = 150 puntos** a **50 Hz** (T = 3 s) para cada método, y se calculan velocidad y aceleración por diferencias finitas (`np.gradient`). El script pregunta si se desea ejecutar la trayectoria en el robot (lineal primero, luego cúbica) y en cualquier caso genera una gráfica comparativa de 5 articulaciones × 3 magnitudes (posición, velocidad, aceleración), guardada en `~/ros2_jazzy/phantom_ws/interpolation_results/`.
+Se generan **N = 150 puntos** a **50 Hz** (T = 3 s) para cada método, y se calculan velocidad, aceleración y jerk por diferencias finitas (`np.gradient`). El script imprime las métricas de suavidad, pregunta si se desea ejecutar la trayectoria en el robot (lineal primero, luego cúbica, con pausa intermedia) y en cualquier caso genera una gráfica comparativa de 5 articulaciones × 3 magnitudes (posición, velocidad, aceleración), guardada en `~/ros2_jazzy/phantom_ws/interpolation_results/`.
 
 **Métricas de suavidad esperadas:**
 
 | Métrica | Lineal | Cúbica |
 |---------|--------|--------|
-| Velocidad máxima | Mayor (cambio brusco al inicio/fin) | Menor (suave en extremos) |
+| Velocidad máxima | Mayor (cambio brusco al inicio/fin) | Menor en extremos (arranque y frenado suaves) |
 | Aceleración máxima | Discontinua en t=0 y t=T | Continua |
-| Jerk máximo | Teóricamente infinito | Finito |
+| Jerk máximo | Teóricamente infinito en los extremos | Finito |
 
 **Instrucciones de uso:**
 
@@ -615,7 +640,7 @@ source ~/ros2_jazzy/phantom_ws/install/setup.zsh
 ros2 run lab05_code interpolation
 ```
 
-Adicionalmente, la quinta pestaña de la interfaz web (`individual_movement.py`) permite seleccionar configuraciones A/B, duración, método (lineal, cúbico o ambos) y visualizar las curvas de posición/velocidad/aceleración en Canvas antes de ejecutar en el robot con confirmación previa.
+Adicionalmente, la pestaña *Actividad 9* de la interfaz web permite seleccionar configuraciones A/B, duración, método (lineal, cúbico o ambos) y visualizar las curvas de posición/velocidad/aceleración en Canvas antes de ejecutar en el robot con confirmación previa.
 
 *Gráfica generada:* `interpolacion_config_a_a_b.png` — a incluir en el repositorio una vez ejecutada la prueba física completa.
 
@@ -634,7 +659,7 @@ sobre una articulación seleccionada, realizando cuatro pruebas combinando dos a
 | 3 | 60 | 0.25 |
 | 4 | 60 | 0.50 |
 
-Se planea generar puntos a 50 Hz durante al menos 2 periodos, registrar posición deseada y medida, graficar ambas curvas por prueba, y calcular el error máximo y el error cuadrático medio (RMSE), siguiendo el mismo patrón de publicación y lectura ya usado en `calibration.py` e `interpolation.py`.
+Se planea generar puntos a 50 Hz durante al menos 2 periodos, registrar posición deseada y medida, graficar ambas curvas por prueba, y calcular el error máximo y el error cuadrático medio (RMSE), siguiendo el mismo patrón de publicación y lectura ya usado en `calibration.py` e `interpolation.py`. Debe tenerse en cuenta que la retroalimentación efectiva de `/joint_states` con hardware es de ~13 Hz, por lo que la señal medida quedará submuestreada respecto a la deseada.
 
 ---
 
@@ -670,23 +695,23 @@ flowchart TD
 
 ### 7.2. Actividad 11 — Cinemática directa
 
-**Parámetros Denavit-Hartenberg propuestos** (a validar y ajustar con las medidas de la sección 2.3 una vez desarrollado `fk_dh.py`):
+**Parámetros Denavit–Hartenberg propuestos** (a validar con las medidas físicas de la sección 2.3 al desarrollar `fk_dh.py`):
 
-| i | α(i-1) | a(i-1) | d(i) | θ(i) |
+| i | α(i−1) | a(i−1) | d(i) | θ(i) |
 |:-:|:------:|:------:|:----:|:----:|
-| 1 | 0° | 0 | H0 + L1 | q1 |
-| 2 | -90° | 0 | 0 | q2 |
-| 3 | 0° | L2 | 0 | q3 |
-| 4 | 0° | L3 | 0 | q4 |
-| 5 | 0° | L4 | 0 | 0 |
+| 1 | 0° | 0 | H0 + L1 = 0.08945 | q1 |
+| 2 | −90° | 0 | 0 | q2 |
+| 3 | 0° | L2 = 0.1010 | 0 | q3 |
+| 4 | 0° | L3 = 0.1010 | 0 | q4 |
+| 5 | 0° | L4 = 0.1190 | 0 | 0 |
 
-Donde `H0`, `L1`, `L2`, `L3` y `L4` corresponden a los valores medidos en la sección 2.3 (extraídos de `robot.xacro`; pendientes de validación física con calibrador).
+Donde los valores corresponden a los extraídos de `robot.xacro` en la sección 2.3 (pendientes de validación física con calibrador). El valor `d₁ = 0.08945 m` coincide con la constante de altura del hombro del propio xacro.
 
 **Pendiente:** implementar `fk_dh.py`, que debe recibir `q1, q2, q3, q4` y calcular `x, y, z, roll, pitch, yaw`, evaluando las 5 configuraciones de la Actividad 7 y comparando la posición calculada con la observada en RViz.
 
 ### 7.3. Actividad 12 — Cinemática inversa
 
-**Pendiente:** implementar `ik.py`, que debe recibir `x, y, z, theta` y calcular una configuración articular válida, siguiendo la especificación de la guía:
+**Pendiente:** implementar `ik.py`, que debe recibir `x, y, z, θ` y calcular una configuración articular válida, siguiendo la especificación de la guía:
 
 1. Calcular las soluciones posibles (codo arriba / codo abajo).
 2. Descartar soluciones fuera de los límites articulares (usar los límites de la sección 5.4 una vez determinados experimentalmente).
@@ -723,23 +748,24 @@ flowchart TD
 
 ### 8.2. Actividad 13 — Enseñanza y repetición de poses
 
-**Objetivo:** desarrollar un modo de enseñanza que permita mover el robot a una configuración deseada, guardarla con un nombre, almacenar múltiples poses y reproducirlas secuencialmente con tiempo de transición ajustable, persistiendo las poses en un archivo YAML.
+**Objetivo:** desarrollar un modo de enseñanza que permita mover el robot a una configuración deseada, guardarla con un nombre, almacenar al menos 8 poses y reproducirlas secuencialmente con tiempo de transición ajustable, persistiendo las poses en un archivo YAML.
 
 **Implementación:** se extiende el mismo `MovementNode` de la Actividad 4, agregando:
 
 - **Persistencia de poses en YAML** (`~/.ros/teach_repeat_poses.yaml`), cargada automáticamente al iniciar el nodo (`load_poses()`) y reescrita con cada modificación (`save_poses()`). Si el módulo `yaml` no está instalado, las poses solo persisten en memoria durante la sesión.
-- **Reproductor en segundo plano:** hilo `daemon` (`playback_worker`) que itera sobre las poses guardadas y las publica una a una en `/pincher/command`, con un tiempo de transición configurable entre 0.5 y 5 s.
-- **Control de reproducción** mediante `threading.Event` (`playback_stop`), que permite detener el hilo reproductor en cualquier momento.
+- **Reproductor en segundo plano:** hilo `daemon` (`playback_worker`) que itera sobre las poses guardadas y publica cada una como `JointState` completo en `/pincher/command`, con un tiempo de transición configurable entre 0.5 y 5 s. La espera entre poses se divide en pasos de 0.1 s que verifican la señal de parada, de modo que la detención sea casi inmediata.
+- **Control de reproducción** mediante `threading.Event` (`playback_stop`).
 
-**API de poses (HTTP):**
+**API HTTP del modo de enseñanza:**
 
 | Método | Endpoint | Descripción |
 |--------|----------|-------------|
 | `GET` | `/api/poses` | Lista completa de poses guardadas |
 | `GET` | `/api/status` | Estado actual: `playing`, `current`, `total`, `pose_name` |
-| `POST` | `/api/poses` | Guarda nueva pose. Body `{name, positions: {joint: deg,...}}` |
+| `POST` | `/api/poses` | Guarda nueva pose. Body `{name, positions: {joint: deg, ...}}` |
+| `DELETE` | `/api/poses` | Elimina todas las poses |
 | `DELETE` | `/api/poses/{idx}` | Elimina la pose en el índice `idx` |
-| `POST` | `/api/play` | Inicia reproducción. Body `{transition_time: segundos}` |
+| `POST` | `/api/play` | Inicia reproducción. Body `{transition_time: segundos}`. Rechaza (HTTP 400) si no hay poses o si ya está reproduciendo |
 | `POST` | `/api/stop` | Detiene la reproducción |
 
 **Formato de persistencia (`teach_repeat_poses.yaml`):**
@@ -764,18 +790,13 @@ flowchart TD
 **Instrucciones de uso:**
 
 1. Lanzar el controlador y ejecutar `ros2 run lab05_code individual_movement`.
-2. Abrir `http://localhost:5050`, pestaña *Actividad 13 — Enseñanza y Repetición*.
+2. Abrir `http://localhost:5050`, pestaña *Actividad 13 — Enseñanza*.
 3. Posicionar el robot con los sliders, asignar nombre y presionar *Guardar*. Repetir hasta tener al menos 8 poses, según pide la guía.
-4. Ajustar tiempo de transición y presionar *Reproducir*.
-5. Para detener, presionar *Detener*.
-
-*Video de esta actividad:* ver sección 12, video "Enseñanza y repetición de poses".
+4. Ajustar tiempo de transición y presionar *Reproducir*. Para detener, presionar *Detener*.
 
 ### 8.3. Actividad 14 — Trazado de una figura
 
-*Pendiente de implementación.* Debe usarse un soporte liviano para marcador (o trazado virtual en RViz), definiendo la trayectoria en coordenadas cartesianas y resolviendo cada punto mediante la cinemática inversa desarrollada en el Bloque 3 (`ik.py`). Se planea implementar `tracing.py`, que reciba el tipo de figura (triángulo, cuadrado, círculo aproximado por puntos, o iniciales del equipo), la dimensión y la resolución deseada, calcule los puntos vía IK y ejecute la secuencia resultante reutilizando la lógica de interpolación del Bloque 2 entre puntos consecutivos.
-
-*Video de esta actividad:* ver sección 12, video "Trazado de figuras" (pendiente de grabar hasta que se implemente el código).
+*Pendiente de implementación.* Debe usarse un soporte liviano para marcador aprobado por el docente (o trazado virtual en RViz), definiendo la trayectoria en coordenadas cartesianas y resolviendo cada punto mediante la cinemática inversa del Bloque 3 (`ik.py`). Se planea implementar `tracing.py`, que reciba el tipo de figura (triángulo, cuadrado, círculo aproximado por puntos, o iniciales del equipo), la dimensión y la resolución deseada, calcule los puntos vía IK y ejecute la secuencia resultante reutilizando la interpolación del Bloque 2 entre puntos consecutivos.
 
 ---
 
@@ -791,7 +812,7 @@ flowchart TD
     TIMES --> HOME15["Enviar robot a posición HOME"]
     HOME15 --> PLAYAUDIO["Reproducir audio<br/>(navegador o simpleaudio)"]
     PLAYAUDIO --> LOOP15{"Para cada beat"}
-    LOOP15 --> POSE["Calcular pose(beat_idx)<br/>por interpolación entre configuraciones"]
+    LOOP15 --> POSE["Calcular pose(beat_idx)"]
     POSE --> SYNC["Esperar hasta el instante<br/>beat_time correspondiente"]
     SYNC --> PUBDANCE["Publicar JointState<br/>en /pincher/command"]
     PUBDANCE --> DRIFT["Medir drift de sincronización"]
@@ -802,20 +823,22 @@ flowchart TD
 
 ### 9.2. Objetivo y especificaciones
 
-Programar una coreografía sincronizada con una obra musical para el Phantom X Pincher X100, utilizando todas las articulaciones del robot, con detección automática de beats. La coreografía debe iniciar y finalizar en posición segura, utilizar base, hombro, codo, muñeca y pinza, sincronizar los cambios de pose con los beats detectados, respetar los límites seguros durante toda la ejecución, y ejecutarse sin intervención manual una vez iniciada (duración mínima de 45 s según el enunciado del proyecto; la implementación actual cubre la canción completa, de aproximadamente 144 s).
+Programar una coreografía sincronizada con una obra musical para el Phantom X Pincher X100, utilizando todas las articulaciones del robot, con detección automática de beats. La coreografía inicia y finaliza en posición segura (home), utiliza base, hombro, codo, muñeca y pinza, sincroniza los cambios de pose con los beats detectados, se mantiene dentro de configuraciones seguras y se ejecuta sin intervención manual una vez iniciada. La guía exige una duración mínima de 45 s; la implementación cubre la canción completa (~144 s).
 
 ### 9.3. Implementación
 
 La coreografía combina el análisis de audio con `librosa` (detección de beats) y la publicación de poses en `/pincher/command` sincronizada con el ritmo. Se implementaron dos modalidades:
 
-**Modalidad A — Interfaz web** (pestaña *Baile — Coreografía* dentro de `individual_movement.py`): el servidor HTTP expone `POST /api/dance/start` (analiza el MP3 o recupera el análisis de una caché `_dance_cache`) y `GET /api/dance/audio` (sirve el archivo al navegador). El audio se reproduce localmente en el navegador con `HTMLAudioElement`; cada 40 ms el JavaScript compara `audio.currentTime` contra `beat_times` y, al alcanzar un beat, envía `POST /api/command` con la pose correspondiente, generada por interpolación sinusoidal entre las 5 configuraciones seguras de la Actividad 7:
+**Modalidad A — Interfaz web** (pestaña *Baile — Coreografía* dentro de `individual_movement.py`): el servidor HTTP expone `POST /api/dance/start` (analiza el MP3 con `librosa` o recupera el análisis de la caché `_dance_cache`, devolviendo `{tempo, total_beats, beat_times, duration, song}`), `GET /api/dance/status` (progreso del análisis) y `GET /api/dance/audio` (sirve el archivo MP3 al navegador). El audio se reproduce localmente con `HTMLAudioElement`; cada 40 ms el JavaScript compara `audio.currentTime` contra `beat_times` y, al alcanzar un beat, envía `POST /api/command` con la pose correspondiente, generada por interpolación sinusoidal entre las 5 configuraciones seguras de la Actividad 7:
 
 ```javascript
 blend = 0.5 + 0.5 * sin(beatIdx / 5 * 2π)
 pose[i] = lerp(presets[rawIdx].vals[i], presets[nextIdx].vals[i], blend)
 ```
 
-**Modalidad B — Script autónomo** (`choreography.py`, nodo `DanceNode`): recibe la ruta al MP3 por línea de comandos, con parámetros opcionales `--start-offset` y `--duration`. Carga el audio con `librosa`, detecta beats con `beat_track`, reproduce el audio con `simpleaudio`, y publica una pose por beat según la función `make_pose(beat_idx)`, que rota entre 8 configuraciones fijas (alternando home con configuraciones de ±30°, ±45° y ±60° en hombro/codo). El *drift* de sincronización entre el tiempo real y el tiempo del beat se mide en cada iteración y se reporta si supera 50 ms:
+> La ruta del MP3 está definida en la constante `DANCE_MP3` al inicio de `individual_movement.py` con una ruta absoluta del equipo de desarrollo; al replicar la práctica en otra máquina debe editarse esa constante (o mover el archivo a la misma ruta).
+
+**Modalidad B — Script autónomo** (`choreography.py`, nodo `DanceNode`): recibe la ruta al MP3 por línea de comandos, con parámetros opcionales `--start-offset` y `--duration`. Carga el audio con `librosa`, detecta beats con `beat_track`, reproduce el audio con `simpleaudio`, y publica una pose por beat según `make_pose(beat_idx)`, que rota cíclicamente entre 8 configuraciones fijas: home y combinaciones simétricas de ±30°/±45°/±60° en base, con hombro, codo, muñeca y pinza acompañando en amplitudes crecientes. El *drift* de sincronización entre el tiempo real y el tiempo del beat se mide en cada iteración y se reporta si supera 50 ms:
 
 ```python
 for i, t in enumerate(beat_times):
@@ -826,14 +849,14 @@ for i, t in enumerate(beat_times):
     drift = (time.time() - start_real) - t
 ```
 
-Al finalizar la canción, el script espera a que termine la reproducción de audio (`play_obj.wait_done()`) y regresa el robot a HOME.
+Al finalizar la canción, el script espera a que termine la reproducción de audio (`play_obj.wait_done()`) y regresa el robot a HOME. Las 8 poses del script están definidas dentro de los límites articulares seguros por construcción.
 
 ### 9.4. Canción utilizada
 
 | Campo | Valor |
 |-------|-------|
 | **Título** | Pedro — Raffaella Carrà, Jaxomy, Agatino Romero (Remix) |
-| **Ubicación** | `~/ros2_jazzy/` |
+| **Ubicación** | `~/ros2_jazzy/` (ver constante `DANCE_MP3`) |
 | **Tempo detectado** | ~152 BPM |
 | **Beats detectados** | ~359 |
 | **Duración** | ~144 s |
@@ -850,6 +873,8 @@ pip install librosa simpleaudio
 | `numpy` | Procesamiento de arreglos de audio |
 | `simpleaudio` | Reproducción de audio (solo script autónomo) |
 
+Estas dependencias no forman parte del `package.xml` del paquete (se instalan por `pip`), por lo que deben instalarse manualmente antes de usar la coreografía.
+
 ### 9.6. Instrucciones de uso
 
 **Interfaz web:**
@@ -859,7 +884,7 @@ ros2 launch pincher_control pincher_system.launch.py use_hardware:=true motor_mo
 ros2 run lab05_code individual_movement
 ```
 
-Abrir `http://localhost:5050`, pestaña *Baile — Coreografía*, presionar *Iniciar Baile* y esperar el análisis del audio (~5 s). El audio se reproduce en el navegador y el robot se mueve al ritmo; el botón *Detener* pausa la ejecución.
+Abrir `http://localhost:5050`, pestaña *Baile — Coreografía*, presionar *Iniciar Baile* y esperar el análisis del audio (~5 s la primera vez; instantáneo después gracias a la caché). El audio se reproduce en el navegador y el robot se mueve al ritmo; el botón *Detener* pausa la ejecución.
 
 **Script autónomo:**
 
@@ -867,15 +892,13 @@ Abrir `http://localhost:5050`, pestaña *Baile — Coreografía*, presionar *Ini
 ros2 run lab05_code choreography ~/ros2_jazzy/pedro.mp3
 ```
 
-*Video de esta actividad:* ver sección 12, video completo de la coreografía robótica (obligatorio como entrega independiente, según la guía).
-
 ---
 
 ## 10. Plano de planta
 
 *Espacio reservado — pendiente de adjuntar.*
 
-Debe incluirse aquí el plano de planta de la ubicación del robot dentro del espacio de trabajo del laboratorio: posición del robot sobre la mesa, zona de alcance del brazo (radio aproximado según la sección 2.3), ubicación del soporte de marcador usado en la Actividad 14, y disposición del computador/fuente de alimentación respecto al robot. Puede elaborarse a partir del mismo diagrama geométrico solicitado en la Actividad 3 (sección 2.3), agregando la vista en planta (proyección sobre el plano de la mesa) en lugar de la vista lateral de eslabones.
+Debe incluirse aquí el plano de planta de la ubicación del robot dentro del espacio de trabajo del laboratorio: posición del robot sobre la mesa, zona de alcance del brazo (según la geometría de la sección 2.3), ubicación del soporte de marcador usado en la Actividad 14, y disposición del computador/fuente de alimentación respecto al robot. Puede elaborarse a partir del mismo diagrama geométrico solicitado en la Actividad 3, agregando la vista en planta (proyección sobre el plano de la mesa).
 
 ```
 [ Imagen / diagrama del plano de planta pendiente de insertar aquí ]
@@ -886,12 +909,9 @@ Debe incluirse aquí el plano de planta de la ubicación del robot dentro del es
 ## 11. Estructura del repositorio
 
 ```
-lab05_code/
-├── README.md                          # Este documento (informe completo del laboratorio)
-├── package.xml                        # Manifiesto del paquete ROS 2
-├── setup.py                           # Configuración del paquete Python (entry points)
-├── setup.cfg                          # Configuración de instalación
-├── results/                           # Resultados de calibración (Actividad 5)
+Laboratorio No. 05/
+├── README.MD                          # Este documento (informe completo del laboratorio)
+├── calibration_results/               # Resultados válidos de calibración (Actividad 5, sesión 2026-07-08)
 │   ├── calibracion_waist.png
 │   ├── calibracion_shoulder.png
 │   ├── calibracion_elbow.png
@@ -900,23 +920,31 @@ lab05_code/
 │   ├── calibracion_resumen.png
 │   ├── calibracion_resultados.yaml
 │   ├── offsets_recomendados.yaml
-│   └── README_calibracion.md
-├── interpolation_results/             # Gráficas de interpolación (Actividad 9)
-│   └── interpolacion_config_a_a_b.png
-├── docs/
-│   ├── diagrama_geometrico.png        # Actividad 3 (pendiente)
-│   └── plano_planta.png               # Sección 10 (pendiente)
-└── lab05_code/
-    ├── __init__.py
-    ├── individual_movement.py         # Actividades 4, 7, 8, 9, 13, 15: interfaz web unificada
-    ├── calibration.py                 # Actividad 5: calibración de cero y error
-    ├── interpolation.py               # Actividad 9: interpolación de trayectorias (script)
-    ├── choreography.py                # Actividad 15: coreografía robótica (script autónomo)
-    ├── safe_limits.py                 # Actividad 6 (pendiente)
-    ├── sinusoidal.py                  # Actividad 10 (pendiente)
-    ├── fk_dh.py                       # Actividad 11 (pendiente)
-    ├── ik.py                          # Actividad 12 (pendiente)
-    └── tracing.py                     # Actividad 14 (pendiente)
+│   └── README_calibracion.md          # Reporte autogenerado por calibration.py
+├── lab05_code/                        # Paquete ROS 2 con el código propio del laboratorio
+│   ├── package.xml
+│   ├── setup.py                       # Entry points (incluye los pendientes; ver nota en sección 4)
+│   ├── setup.cfg
+│   ├── results/                       # Copia de los resultados de calibración usada por el paquete
+│   └── lab05_code/
+│       ├── __init__.py
+│       ├── individual_movement.py     # Act. 4, 7, 8, 9, 13, 15: nodo + interfaz web unificada
+│       ├── calibration.py             # Act. 5: calibración de cero y error articular
+│       ├── interpolation.py           # Act. 9: interpolación de trayectorias (script)
+│       └── choreography.py            # Act. 15: coreografía robótica (script autónomo)
+├── pincher_control/                   # Paquete base: controlador, GUI y utilidades DYNAMIXEL
+│   ├── config/                        # ax12a.yaml, xl430.yaml (ver nota de la sección 3.5)
+│   ├── launch/pincher_system.launch.py
+│   └── pincher_control/
+│       ├── control_servo.py           # Nodo pincher_controller
+│       ├── dynamixel_profiles.py      # Perfiles AX-12A / XL430 (registros y conversión rad<->raw)
+│       ├── pincher_gui.py             # GUI Tkinter (sliders, HOME, torque, parada de software)
+│       └── scan_dynamixel.py          # Escáner de IDs del bus DYNAMIXEL
+└── pincher_description/               # Paquete base: modelo del robot
+    ├── urdf/robot.xacro               # Modelo con las modificaciones de la sección 3.7
+    ├── meshes/                        # 8 mallas STL (px100_1_base ... px100_8_gripper_finger)
+    ├── rviz/pincher.rviz
+    └── launch/                        # display.launch.py, display_gui.launch.py
 ```
 
 ### 11.1. Entry points (scripts ejecutables)
@@ -925,65 +953,52 @@ lab05_code/
 |:---------:|---------|-----------------|:------:|
 | 4 | `ros2 run lab05_code individual_movement` (pestaña 1) | `individual_movement.py` | Implementado |
 | 5 | `ros2 run lab05_code calibration` | `calibration.py` | Implementado |
-| 6 | `ros2 run lab05_code safe_limits` | `safe_limits.py` | Pendiente |
-| 7 | `ros2 run lab05_code individual_movement` (pestaña 3) | `individual_movement.py` | Implementado |
-| 8 | `ros2 run lab05_code individual_movement` (pestaña 4) | `individual_movement.py` | Implementado |
-| 9 | `ros2 run lab05_code individual_movement` (pestaña 5) + `ros2 run lab05_code interpolation` | `individual_movement.py` + `interpolation.py` | Implementado |
-| 10 | `ros2 run lab05_code sinusoidal` | `sinusoidal.py` | Pendiente |
-| 11 | `ros2 run lab05_code fk_dh` | `fk_dh.py` | Pendiente |
-| 12 | `ros2 run lab05_code ik` | `ik.py` | Pendiente |
-| 13 | `ros2 run lab05_code individual_movement` (pestaña 2) | `individual_movement.py` | Implementado |
-| 14 | `ros2 run lab05_code tracing` | `tracing.py` | Pendiente |
+| 6 | `ros2 run lab05_code safe_limits` | *(pendiente)* | Pendiente |
+| 7 | `ros2 run lab05_code individual_movement` (pestaña 2) | `individual_movement.py` | Implementado |
+| 8 | `ros2 run lab05_code individual_movement` (pestaña 3) | `individual_movement.py` | Implementado |
+| 9 | `ros2 run lab05_code individual_movement` (pestaña 4) + `ros2 run lab05_code interpolation` | `individual_movement.py` + `interpolation.py` | Implementado |
+| 10 | `ros2 run lab05_code sinusoidal` | *(pendiente)* | Pendiente |
+| 11 | `ros2 run lab05_code fk_dh` | *(pendiente)* | Pendiente |
+| 12 | `ros2 run lab05_code ik` | *(pendiente)* | Pendiente |
+| 13 | `ros2 run lab05_code individual_movement` (pestaña 5) | `individual_movement.py` | Implementado |
+| 14 | `ros2 run lab05_code tracing` | *(pendiente)* | Pendiente |
 | 15 | `ros2 run lab05_code individual_movement` (pestaña 6) + `ros2 run lab05_code choreography` | `individual_movement.py` + `choreography.py` | Implementado |
 
 ---
 
-## 12. Evidencias de ejecución
+## 12. Video y evidencias de ejecución
 
-De acuerdo con la guía, los videos se organizan por bloque funcional (no uno por cada actividad suelta) y todos deben iniciar con la introducción oficial del laboratorio LabSIR. Dentro de cada video se recomienda marcar en pantalla o indicar aquí los minutos donde inicia cada actividad, para facilitar la revisión.
+### 12.1. Video del laboratorio
 
-### 12.1. Video — Movimiento individual, simultáneo y secuencial (Actividades 4, 7 y 8)
+> Por indicación del docente, todas las actividades se presentan en **un único video**, que inicia con la introducción oficial del laboratorio LabSIR e incluye la presentación del equipo, el desarrollo de cada actividad y las conclusiones. Las marcas de tiempo de la tabla facilitan la revisión de cada actividad dentro del video.
 
-*Espacio reservado — pendiente de enlazar.*
+<div align="center">
 
-| Marca de tiempo | Actividad |
+<a href="#">
+  <img src="https://img.shields.io/badge/%E2%96%B6%20Ver%20video-YouTube-FF0000?style=for-the-badge&logo=youtube&logoColor=white&labelColor=0a0a1a" />
+</a>
+
+*(Enlace pendiente de publicar)*
+
+</div>
+
+| Marca de tiempo | Contenido |
 |:---------------:|-----------|
 | 0:00 | Introducción oficial LabSIR |
+| *Pendiente* | Presentación del equipo |
+| *Pendiente* | Actividades 1–3 — Preparación, identificación y medición |
 | *Pendiente* | Actividad 4 — Movimiento individual |
+| *Pendiente* | Actividad 5 — Calibración de cero |
 | *Pendiente* | Actividad 7 — Movimiento simultáneo |
 | *Pendiente* | Actividad 8 — Movimiento secuencial |
+| *Pendiente* | Actividad 9 — Interpolación de trayectorias |
+| *Pendiente* | Actividad 13 — Enseñanza y repetición de poses |
+| *Pendiente* | Actividad 15 — Coreografía robótica |
+| *Pendiente* | Conclusiones |
 
-```
-[ Enlace de video pendiente ]
-```
+### 12.2. Capturas y gráficas
 
-### 12.2. Video — Enseñanza y repetición de poses (Actividad 13)
-
-*Espacio reservado — pendiente de enlazar.*
-
-```
-[ Enlace de video pendiente ]
-```
-
-### 12.3. Video — Trazado de figuras (Actividad 14)
-
-*Espacio reservado — pendiente de enlazar (depende de la implementación de la Actividad 14).*
-
-```
-[ Enlace de video pendiente ]
-```
-
-### 12.4. Video — Coreografía robótica (Actividad 15)
-
-*Espacio reservado — pendiente de enlazar.*
-
-```
-[ Enlace de video pendiente ]
-```
-
-### 12.5. Capturas y gráficas
-
-Las gráficas de calibración (Actividad 5) y de interpolación (Actividad 9) ya están incluidas como imágenes en las secciones 5.3 y 6.4 respectivamente. Las capturas de terminal (`ros2 topic list`, `ros2 node list`, `rqt_graph`, etc.) que se hayan tomado durante las pruebas deben añadirse aquí como evidencia adicional.
+Las gráficas de calibración (Actividad 5) están incluidas en la sección 5.3, y las de interpolación (Actividad 9) se añadirán en la sección 6.4 una vez ejecutada la prueba física completa. Las capturas de terminal (`ros2 topic list`, `ros2 node list`, `rqt_graph`, etc.) tomadas durante las pruebas deben añadirse aquí como evidencia adicional.
 
 ```
 [ Capturas de terminal y rqt_graph pendientes de insertar ]
