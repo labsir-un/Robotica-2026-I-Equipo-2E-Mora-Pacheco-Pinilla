@@ -970,8 +970,6 @@ Laboratorio No. 05/
 
 ### 12.1. Video del laboratorio
 
-> Por indicación del docente, todas las actividades se presentan en **un único video**, que inicia con la introducción oficial del laboratorio LabSIR e incluye la presentación del equipo, el desarrollo de cada actividad y las conclusiones. Las marcas de tiempo de la tabla facilitan la revisión de cada actividad dentro del video.
-
 <div align="center">
 
 <a href="#">
