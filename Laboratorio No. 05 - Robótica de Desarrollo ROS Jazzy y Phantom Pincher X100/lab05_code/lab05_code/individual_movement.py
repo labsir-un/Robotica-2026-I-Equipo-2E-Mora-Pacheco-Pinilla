@@ -2249,7 +2249,7 @@ function buildTracing() {
       fetch('/api/state').then(function(r) { return r.json(); }).then(function(s) {
         var qDeg = JOINTS.map(function(j) { return (s[j]||0) * 180 / Math.PI; });
         var tcp = trFk(qDeg);
-        actuals.push([tcp.y, tcp.z]);
+        actuals.push([tcp.y, tcp.z, tcp.x]);
       }).catch(function() {});
     }
 
@@ -2276,8 +2276,8 @@ function buildTracing() {
                 trDraw(pts, actuals);
                 var ts2 = new Date().toTimeString().slice(0,8);
                 logEl.innerHTML = '<div><span class="time">' + ts2 + '</span> Trazado completado (' + total + ' puntos)</div>' + logEl.innerHTML;
-                // Publish trajectory to RViz
-                var worldPts = actuals.map(function(a) { return [0.13, a[0], a[1]]; });
+                // Publish trajectory to RViz (actual world coords from FK)
+                var worldPts = actuals.map(function(a) { return [a[2], a[0], a[1]]; });
                 fetch('/api/trajectory', {
                   method: 'POST',
                   headers: {'Content-Type':'application/json'},
