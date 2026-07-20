@@ -2823,15 +2823,13 @@ class MovementNode(Node):
             self.traj_pub.publish(marker)
             return
 
-        # Try to get the actual end_effector transform from TF
+        # Use TF to get actual TCP relative to base_link
         try:
             now = rclpy.time.Time()
-            t = self.tf_buffer.lookup_transform('base_link', 'end_effector', now, timeout=rclpy.duration.Duration(seconds=1.0))
-            x, y, z = t.transform.translation.x, t.transform.translation.y, t.transform.translation.z
-            self.get_logger().info(f'TCP from TF: ({x:.3f}, {y:.3f}, {z:.3f})')
-        except Exception as e:
-            self.get_logger().warn(f'TF lookup failed: {e}')
-            x, y, z = 0.321, 0.0, 0.089
+            t = self.tf_buffer.lookup_transform('base_link', 'end_effector', now, timeout=rclpy.duration.Duration(seconds=0.5))
+            ex, ey, ez = t.transform.translation.x, t.transform.translation.y, t.transform.translation.z
+        except Exception:
+            ex, ey, ez = 0.0, 0.0, 0.251
 
         marker.type = Marker.LINE_STRIP
         marker.action = Marker.ADD
@@ -2841,14 +2839,16 @@ class MovementNode(Node):
         marker.color.g = 0.1
         marker.color.b = 0.1
         marker.color.a = 1.0
+        # Compute offset from FK coords (arm frame) to TF coords (base_link)
+        dx, dy, dz = ex - 0.321, ey - 0.0, ez - 0.089
         for p in points:
             pt = Point()
-            pt.x = float(p[0]) if isinstance(p, list) else float(p.get('x', 0))
-            pt.y = float(p[1]) if isinstance(p, list) else float(p.get('y', 0))
-            pt.z = (float(p[2]) if isinstance(p, list) else float(p.get('z', 0))) + 0.07
+            pt.x = float(p[0]) if isinstance(p, list) else float(p.get('x', 0)) + dx
+            pt.y = float(p[1]) if isinstance(p, list) else float(p.get('y', 0)) + dy
+            pt.z = float(p[2]) if isinstance(p, list) else float(p.get('z', 0)) + dz
             marker.points.append(pt)
         self.traj_pub.publish(marker)
-        self.get_logger().info(f'Trajectory: {len(marker.points)} pts, TCP from TF: ({x:.3f}, {y:.3f}, {z:.3f})')
+        self.get_logger().info(f'Trajectory: {len(marker.points)} pts, offset=({dx:.3f},{dy:.3f},{dz:.3f}), TCP TF=({ex:.3f},{ey:.3f},{ez:.3f})')
 
 def main():
     rclpy.init()
