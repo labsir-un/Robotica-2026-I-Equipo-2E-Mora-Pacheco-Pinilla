@@ -936,9 +936,8 @@ ros2 run lab05_code choreography ~/ros2_jazzy/pedro.mp3
 
 El plano del Robot Phantom Pincher X100, es el siguiente:
 
-```
 ![Phantom Pincher X100](Plano_Lab5/PincherX-100.jpg)
-```
+
 
 ---
 
