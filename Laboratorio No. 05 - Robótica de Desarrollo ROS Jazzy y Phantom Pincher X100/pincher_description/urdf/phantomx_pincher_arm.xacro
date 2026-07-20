@@ -74,7 +74,7 @@
     <!-- Gripper -->
     <xacro:dynamixel_ax12_fixed prefix="${prefix}" parent="arm_wrist_F3_0_link" name="gripper_servo" joint_origin_xyz="0.0 0.0 ${-ax12_width/2}" joint_origin_rpy="${pi/2} ${pi} ${pi/2}" collision="${collision}" gazebo_preserve_fixed_joint="${gazebo_preserve_fixed_joint}"/>
     <xacro:gripper_finger_base prefix="${prefix}" parent="gripper_servo_link" name="gripper_finger_base" joint_origin_xyz="0 ${ax12_width/2} 0.0" joint_origin_rpy="${pi} 0.0 ${pi/2}" collision="${collision}" gazebo_preserve_fixed_joint="${gazebo_preserve_fixed_joint}"/>
-    <xacro:pincher_finger prefix="${prefix}" parent="gripper_finger_base_link" name="gripper_finger1" joint_origin_xyz="${finger_centre_offset_x} ${finger_centre_offset_y} 0.0" joint_origin_rpy="${pi/2} 0.0 ${pi/2}" collision="${collision}" gazebo_preserve_fixed_joint="${gazebo_preserve_fixed_joint}"/>
+    <xacro:pincher_finger prefix="${prefix}" parent="gripper_finger_base_link" name="gripper_finger1" joint_origin_xyz="${finger_centre_offset_x} ${finger_centre_offset_y} 0.0" joint_origin_rpy="${pi/2} 0.0 ${pi/2}" collision="${collision}" gazebo_preserve_fixed_joint="${gazebo_preserve_fixed_joint}" mimic_joint="${prefix}gripper" mimic_multiplier="0.00503" mimic_offset="0.0079"/>
     <!-- If enabled, mimic finger joints -->
     <xacro:if value="${mimic_finger_joints}">
       <xacro:pincher_finger prefix="${prefix}" parent="gripper_finger_base_link" name="gripper_finger2" joint_origin_xyz="${finger_centre_offset_x} ${-finger_centre_offset_y} 0.0" joint_origin_rpy="${pi/2} ${pi} ${pi/2}" collision="${collision}" gazebo_preserve_fixed_joint="${gazebo_preserve_fixed_joint}" mimic_joint="${prefix}gripper_finger1"/>

@@ -40,7 +40,7 @@
   <xacro:arg name="ros2_controller_parameters" default=""/>
 
   <!-- Flag to enable mimicking of the finger joints -->
-  <xacro:arg name="mimic_finger_joints" default="false"/>
+  <xacro:arg name="mimic_finger_joints" default="true"/>
 
   <!-- Flag to preserve fixed joints and prevent lumping when generating SDF for Gazebo -->
   <xacro:arg name="gazebo_preserve_fixed_joint" default="false"/>

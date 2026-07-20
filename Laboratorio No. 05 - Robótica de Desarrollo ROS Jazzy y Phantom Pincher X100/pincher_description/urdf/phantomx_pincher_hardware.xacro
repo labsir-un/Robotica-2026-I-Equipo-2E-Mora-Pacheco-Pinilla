@@ -189,7 +189,7 @@
   <!--       -->
   <xacro:property name="pincher_finger_joint_type" value="prismatic"/>
   <xacro:property name="pincher_finger_joint_axis_xyz" value="1.0 0.0 0.0"/>
-  <xacro:property name="pincher_finger_joint_lower_limit" value="0.001"/>
+  <xacro:property name="pincher_finger_joint_lower_limit" value="0.0"/>
   <xacro:property name="pincher_finger_joint_upper_limit" value="0.0158"/>
   <xacro:property name="pincher_finger_joint_velocity_limit" value="0.01"/>
   <xacro:property name="pincher_finger_joint_torque_limit" value="30"/>
