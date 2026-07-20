@@ -1917,6 +1917,45 @@ function buildTracing() {
     return [q1, q2, q3, q4, 0];
   }
 
+  /* FK for Phantom X Pincher (returns world x,y,z from joint angles in degrees) */
+  function trFk(qDeg) {
+    var q = qDeg.map(function(v) { return v * Math.PI / 180; });
+    var T = [[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]];
+    var params = [
+      {a:0, alpha:0, d:L0, theta:q[0]},
+      {a:0, alpha:-Math.PI/2, d:0, theta:q[1]},
+      {a:L1, alpha:0, d:0, theta:q[2]},
+      {a:L2, alpha:0, d:0, theta:q[3]},
+      {a:L3, alpha:0, d:0, theta:0},
+    ];
+    function dh(a, alpha, d, theta) {
+      var ct = Math.cos(theta), st = Math.sin(theta);
+      var ca = Math.cos(alpha), sa = Math.sin(alpha);
+      return [
+        [ct, -st, 0, a],
+        [st*ca, ct*ca, -sa, -d*sa],
+        [st*sa, ct*sa, ca, d*ca],
+        [0, 0, 0, 1]
+      ];
+    }
+    function mul(A, B) {
+      var R = [];
+      for (var i = 0; i < 4; i++) {
+        R[i] = [];
+        for (var j = 0; j < 4; j++) {
+          var s = 0;
+          for (var k = 0; k < 4; k++) s += A[i][k] * B[k][j];
+          R[i][j] = s;
+        }
+      }
+      return R;
+    }
+    for (var p = 0; p < params.length; p++) {
+      T = mul(T, dh(params[p].a, params[p].alpha, params[p].d, params[p].theta));
+    }
+    return { x: T[0][3], y: T[1][3], z: T[2][3] };
+  }
+
   function trGenFig(shape, size, nEdge) {
     var pts = [];
     var verts;
@@ -2080,7 +2119,9 @@ function buildTracing() {
       setTimeout(function() {
         if (!trStopFlag) {
           fetch('/api/state').then(function(r) { return r.json(); }).then(function(s) {
-            actuals.push([s['waist']||0, s['shoulder']||0]);
+            var qDeg = JOINTS.map(function(j) { return (s[j]||0) * 180 / Math.PI; });
+            var tcp = trFk(qDeg);
+            actuals.push([tcp.y, tcp.z]);
           }).catch(function() {});
         }
         i++;
