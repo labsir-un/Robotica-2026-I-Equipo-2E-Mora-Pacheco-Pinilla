@@ -542,12 +542,12 @@ HTML = r'''<!DOCTYPE html>
       <div class="card">
         <div class="card-title">IK &mdash; Cinem&aacute;tica Inversa</div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:10px;">
-          <label style="font-size:.75rem;">x (m):</label>
-          <input type="number" id="ikX" value="0.13" step="0.01" style="width:80px;padding:4px;border:1px solid var(--border);border-radius:4px;font-size:.75rem;">
-          <label style="font-size:.75rem;margin-left:8px;">y (m):</label>
-          <input type="number" id="ikY" value="0.0" step="0.01" style="width:80px;padding:4px;border:1px solid var(--border);border-radius:4px;font-size:.75rem;">
-          <label style="font-size:.75rem;margin-left:8px;">z (m):</label>
-          <input type="number" id="ikZ" value="0.10" step="0.01" style="width:80px;padding:4px;border:1px solid var(--border);border-radius:4px;font-size:.75rem;">
+          <label style="font-size:.75rem;">x (mm):</label>
+          <input type="number" id="ikX" value="130" step="1" style="width:70px;padding:4px;border:1px solid var(--border);border-radius:4px;font-size:.75rem;">
+          <label style="font-size:.75rem;margin-left:8px;">y (mm):</label>
+          <input type="number" id="ikY" value="0" step="1" style="width:70px;padding:4px;border:1px solid var(--border);border-radius:4px;font-size:.75rem;">
+          <label style="font-size:.75rem;margin-left:8px;">z (mm):</label>
+          <input type="number" id="ikZ" value="100" step="1" style="width:70px;padding:4px;border:1px solid var(--border);border-radius:4px;font-size:.75rem;">
           <label style="font-size:.75rem;margin-left:8px;">Codo:</label>
           <select id="ikElbow" style="padding:4px;border:1px solid var(--border);border-radius:4px;font-size:.75rem;">
             <option value="up">Arriba</option>
@@ -563,7 +563,7 @@ HTML = r'''<!DOCTYPE html>
         <div id="ikResults" style="font-size:.85rem;font-family:'SF Mono','Fira Code',monospace;">
           <div>q<sub>1</sub> = <span id="ikQ1">—</span>&deg; | q<sub>2</sub> = <span id="ikQ2">—</span>&deg; | q<sub>3</sub> = <span id="ikQ3">—</span>&deg; | q<sub>4</sub> = <span id="ikQ4">—</span>&deg;</div>
           <div id="ikError" style="color:var(--accent);font-weight:600;"></div>
-        <div style="font-size:.65rem;color:var(--text-muted);margin-top:4px;">Puntos de referencia: x=0.13 m, z≈0.05–0.35 m, y libre (l&iacute;mite radial ≈ 0.32 m)</div>
+        <div style="font-size:.65rem;color:var(--text-muted);margin-top:4px;">Puntos de referencia: x=130 mm, z≈50–350 mm, y libre (l&iacute;mite radial ≈ 320 mm)</div>
         </div>
       </div>
       <div class="log" style="margin-top:6px;">
@@ -2301,10 +2301,10 @@ function buildAct11() {
 /* Act 12 — IK */
 function buildAct12() {
   document.getElementById('ikCalcBtn').onclick = function() {
-    var x = parseFloat(document.getElementById('ikX').value) || 0;
-    var y = parseFloat(document.getElementById('ikY').value) || 0;
-    var z = parseFloat(document.getElementById('ikZ').value) || 0;
-    var q = trIk(x, y, z);
+    var x_mm = parseFloat(document.getElementById('ikX').value) || 0;
+    var y_mm = parseFloat(document.getElementById('ikY').value) || 0;
+    var z_mm = parseFloat(document.getElementById('ikZ').value) || 0;
+    var q = trIk(x_mm/1000, y_mm/1000, z_mm/1000);
     var errEl = document.getElementById('ikError');
     if (!q) {
       errEl.textContent = 'Sin soluci&oacute;n v&aacute;lida (fuera del espacio de trabajo o l&iacute;mites)';
@@ -2317,13 +2317,13 @@ function buildAct12() {
     document.getElementById('ikQ4').textContent = q[3].toFixed(1);
     var el = document.getElementById('ikLog');
     var ts = new Date().toTimeString().slice(0,8);
-    el.innerHTML = '<div><span class="time">' + ts + '</span> IK: (' + x.toFixed(3) + ', ' + y.toFixed(3) + ', ' + z.toFixed(3) + ') &rarr; q=[' + q.map(function(v){return v.toFixed(1);}).join(',') + ']&deg;</div>' + el.innerHTML;
+    el.innerHTML = '<div><span class="time">' + ts + '</span> IK: (' + x_mm + ', ' + y_mm + ', ' + z_mm + ') mm &rarr; q=[' + q.map(function(v){return v.toFixed(1);}).join(',') + ']&deg;</div>' + el.innerHTML;
   };
   document.getElementById('ikSendBtn').onclick = function() {
-    var x = parseFloat(document.getElementById('ikX').value) || 0;
-    var y = parseFloat(document.getElementById('ikY').value) || 0;
-    var z = parseFloat(document.getElementById('ikZ').value) || 0;
-    var q = trIk(x, y, z);
+    var x_mm = parseFloat(document.getElementById('ikX').value) || 0;
+    var y_mm = parseFloat(document.getElementById('ikY').value) || 0;
+    var z_mm = parseFloat(document.getElementById('ikZ').value) || 0;
+    var q = trIk(x_mm/1000, y_mm/1000, z_mm/1000);
     if (!q) return;
     var pos = q.map(function(v) { return rad(v); });
     fetch('/api/command', {
