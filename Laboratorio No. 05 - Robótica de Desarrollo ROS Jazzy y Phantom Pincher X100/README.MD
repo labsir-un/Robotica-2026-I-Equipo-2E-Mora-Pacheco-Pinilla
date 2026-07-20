@@ -109,7 +109,7 @@ Esta sección corresponde a las Actividades 1, 2 y 3 de la guía: preparación d
    ```
    El nodo `pincher_controller` se inicializa con torque habilitado en todos los servos y posición de home en el centro del perfil (raw = 512, equivalente a 0 rad en cada articulación). En hardware real, el comando `ros2 service call /pincher/torque_enable std_srvs/srv/SetBool "{data: true}"` permite verificar que los servos mantienen posición sin deslizamiento.
 
-3. **Comprobación de correspondencia RViz vs. modelo:** con `start_rviz:=true` se abrió RViz mostrando el modelo URDF del Phantom X Pincher X100. Se comparó visualmente la postura del modelo virtual (todas las articulaciones en 0°, brazo extendido horizontalmente) contra la posición del robot simulado en Gazebo. La correspondencia fue exacta: el TCP se ubica en `(x=321 mm, y=0 mm, z=89 mm)` respecto a la base. En hardware real, este paso debe repetirse verificando que la orientación de cada eslabón en RViz coincida con la del robot físico.
+3. **Comprobación de correspondencia RViz vs. modelo:** con `start_rviz:=true` se abrió RViz mostrando el modelo URDF del Phantom X Pincher X100. Se comparó visualmente la postura del modelo virtual (todas las articulaciones en 0°, brazo en posición de home) contra la posición del robot simulado. La correspondencia fue exacta: el TCP se ubica en `(x≈0 mm, y=0 mm, z≈337 mm)` respecto al origen del brazo (`arm_base_link`). En hardware real, este paso debe repetirse verificando que la orientación de cada eslabón en RViz coincida con la del robot físico.
 
 Herramientas del kit que apoyan esta actividad:
 
@@ -128,7 +128,7 @@ Los identificadores DYNAMIXEL se numeran de manera consecutiva desde la base has
 | Muñeca (`wrist`)    | 4 | 0° — efector final alineado con el antebrazo            | La pinza se inclina hacia abajo (disminuye z del TCP)            | Orientación del efector final |
 | Pinza (`gripper`)   | 5 | 0° — pinza cerrada (raw = 512, centro del perfil)       | Las falanges se abren (aumenta separación entre dedos)           | Apertura y cierre de las falanges |
 
-> **Nota:** los valores de home (0° en todas las articulaciones) fueron verificados en simulación mediante la función `fk_dh()` (Actividad 11), que ubica el TCP en `(x=321 mm, y=0 mm, z=89 mm)`. El sentido positivo de cada articulación se determinó comandando pequeños desplazamientos (+10°) desde el home y observando el cambio en la posición del TCP mediante la misma función FK. La convención de signos está alineada con el parámetro `joint_signs: [1, -1, -1, -1, 1]` del controlador: la base y la pinza tienen signo directo, mientras que hombro, codo y muñeca tienen signo invertido respecto al raw del servo.
+> **Nota:** los valores de home (0° en todas las articulaciones) fueron verificados en simulación mediante la función `fk_dh()` (Actividad 11), que ubica el TCP en `(x≈0 mm, y=0 mm, z≈337 mm)` desde el origen del brazo (`arm_base_link`). El sentido positivo de cada articulación se determinó comandando pequeños desplazamientos (+10°) desde el home y observando el cambio en la posición del TCP mediante la misma función FK. La convención de signos está alineada con el parámetro `joint_signs: [1, -1, -1, -1, 1]` del controlador: la base y la pinza tienen signo directo, mientras que hombro, codo y muñeca tienen signo invertido respecto al raw del servo.
 
 ### 2.3. Actividad 3 — Medición del robot
 
@@ -299,7 +299,7 @@ El sistema completo se apoya en un único nodo externo, `pincher_controller` (en
 | `fk_dh` | 11 | `fk_dh.py` | Implementado |
 | `ik` | 12 | `ik.py` | Implementado |
 | `safe_limits` | 6 | *(no implementado como script; valores en constantes de `individual_movement.py`)* | Cubierto vía constantes |
-| `simultaneous_movement` / `sequential_movement` | 7 / 8 como scripts independientes | *(módulos pendientes; funcionalidad cubierta por la interfaz web)* | Cubierto vía web |
+| `simultaneous_movement` / `sequential_movement` | 7 / 8 como scripts independientes | *(funcionalidad cubierta por la interfaz web)* | Cubierto vía web |
 
 > **Nota:** todos los entry points están declarados en `setup.py` y se invocan con `ros2 run lab05_code <nombre>`.
 
@@ -757,17 +757,16 @@ flowchart TD
 
 ### 7.2. Actividad 11 — Cinemática directa
 
-Se implementó `fk_dh.py` que calcula la posición `(x, y, z)` y orientación `(roll, pitch, yaw)` del efector final a partir de las articulaciones `q1, q2, q3, q4` usando los parámetros DH:
+Se implementó `fk_dh.py` que calcula la posición `(x, y, z)` y orientación `(roll, pitch, yaw)` del efector final a partir de las articulaciones `q1, q2, q3, q4` usando la cadena cinemática del modelo Bioloid (multiplicación de matrices de transformación a partir de la geometría exacta del URDF, en lugar de parámetros DH simplificados). Las dimensiones efectivas del modelo son:
 
-| i | α(i−1) | a(i−1) | d(i) | θ(i) |
-|:-:|:------:|:------:|:----:|:----:|
-| 1 | 0° | 0 | L₀ = 0.089 | q1 |
-| 2 | −90° | 0 | 0 | q2 |
-| 3 | 0° | L₁ = 0.101 | 0 | q3 |
-| 4 | 0° | L₂ = 0.101 | 0 | q4 |
-| 5 | 0° | L₃ = 0.119 | 0 | 0 |
+| Parámetro | Valor | Descripción |
+|-----------|:-----:|-------------|
+| L₀ | 54.0 mm | Altura base → hombro |
+| L₁ | 99.5 mm | Hombro → codo |
+| L₂ | 99.5 mm | Codo → muñeca |
+| L₃ | 83.5 mm | Muñeca → TCP |
 
-El script evalúa las 5 configuraciones de la Actividad 7 y las presenta en una tabla comparativa. También incluye un modo interactivo donde el usuario ingresa `q1 q2 q3 q4` en grados y recibe la posición cartesiana resultante. Ejemplo para Home (0,0,0,0): `x=321 mm, y=0 mm, z=89 mm, roll=−90°, pitch=0°, yaw=0°`.
+El script evalúa las 5 configuraciones de la Actividad 7 y las presenta en una tabla comparativa. También incluye un modo interactivo donde el usuario ingresa `q1 q2 q3 q4` en grados y recibe la posición cartesiana resultante. Ejemplo para Home (0,0,0,0): `x≈0 mm, y=0 mm, z≈337 mm, roll≈0°, pitch≈0°, yaw≈−180°` (coordenadas desde `arm_base_link` en el modelo Bioloid).
 
 **Entry point:** `ros2 run lab05_code fk_dh`
 
