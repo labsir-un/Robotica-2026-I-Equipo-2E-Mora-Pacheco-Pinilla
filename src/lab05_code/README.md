@@ -10,17 +10,18 @@
 2. [Configuración Inicial](#2-configuración-inicial)
 3. [Actividad 4 — Movimiento Individual de Articulaciones](#3-actividad-4--movimiento-individual-de-articulaciones)
 4. [Actividad 5 — Calibración de Cero y Error Articular](#4-actividad-5--calibración-de-cero-y-error-articular)
-5. [Actividad 13 — Enseñanza y Repetición de Poses](#5-actividad-13--enseñanza-y-repetición-de-poses)
+5. [Actividad 6 — Determinación de Límites Seguros](#5-actividad-6--determinación-de-límites-seguros)
 6. [Actividad 7 — Movimiento Simultáneo](#6-actividad-7--movimiento-simultáneo)
 7. [Actividad 8 — Movimiento Secuencial](#7-actividad-8--movimiento-secuencial)
 8. [Actividad 9 — Interpolación de Trayectorias](#8-actividad-9--interpolación-de-trayectorias)
 9. [Actividad 10 — Trayectoria Sinusoidal](#9-actividad-10--trayectoria-sinusoidal)
 10. [Actividad 11 — Cinemática Directa (DH)](#10-actividad-11--cinemática-directa-denavithartenberg)
 11. [Actividad 12 — Cinemática Inversa](#11-actividad-12--cinemática-inversa)
-12. [Actividad 14 — Trazado de una Figura](#12-actividad-14--trazado-de-una-figura)
-13. [Actividad 15 — Coreografía Robótica](#13-actividad-15--coreografía-robótica-reto-final)
-14. [Estructura del Repositorio](#14-estructura-del-repositorio)
-15. [Referencias](#15-referencias)
+12. [Actividad 13 — Enseñanza y Repetición de Poses](#12-actividad-13--enseñanza-y-repetición-de-poses)
+13. [Actividad 14 — Trazado de una Figura](#13-actividad-14--trazado-de-una-figura)
+14. [Actividad 15 — Coreografía Robótica](#14-actividad-15--coreografía-robótica-reto-final)
+15. [Estructura del Repositorio](#15-estructura-del-repositorio)
+16. [Referencias](#16-referencias)
 
 ---
 
@@ -618,138 +619,34 @@ configuración del controlador (`pincher_control/config/ax12a.yaml`):
 
 ---
 
-## 5. Actividad 13 — Enseñanza y Repetición de Poses
+---
+
+## 5. Actividad 6 — Determinación de Límites Seguros
 
 ### 5.1. Objetivo
 
-Desarrollar un modo de enseñanza que permita al usuario mover el robot a
-una configuración deseada, guardarla con un nombre asignado, almacenar
-múltiples poses y reproducirlas secuencialmente con tiempo de transición
-ajustable, persistiendo las poses en un archivo YAML.
+Determinar experimentalmente los límites seguros para cada articulación
+sin alcanzar los topes mecánicos, considerando la geometría del robot y
+el entorno de trabajo.
 
-### 5.2. Requisitos funcionales
+### 5.2. Límites seguros determinados
 
-1. Mover el robot a una configuración articular mediante controles
-   individuales (sliders + input numérico por articulación).
-2. Guardar la configuración actual asignándole un nombre.
-3. Almacenar al menos 8 poses (sin límite superior).
-4. Listar las poses guardadas con opción de:
-   - **Ir:** mover el robot a esa pose.
-   - **Eliminar:** borrar la pose de la lista.
-5. Reproducir todas las poses en el orden registrado, con tiempo de
-   transición configurable entre 0.5 y 5 segundos.
-6. Detener la reproducción en cualquier momento.
-7. Las poses se persisten en `~/.ros/teach_repeat_poses.yaml` y se cargan
-   automáticamente al iniciar la aplicación.
+Los siguientes límites se establecieron mediante pruebas experimentales,
+dejando un margen de seguridad respecto a los límites físicos del motor
+para evitar daños mecánicos:
 
-### 5.3. Implementación
+| Articulación | Límite inferior | Límite superior | Margen de seguridad |
+|:------------:|:---------------:|:---------------:|:-------------------:|
+| Base         | −145.0°         | +145.0°         | 5.0°                |
+| Hombro       | −96.0°          | +96.0°          | 4.0°                |
+| Codo         | −138.0°         | +144.0°         | 6.0°                |
+| Muñeca       | −106.0°         | +124.0°         | 4.0°                |
+| Pinza        | −35.0°          | +35.0°          | 5.0°                |
 
-La actividad se implementó como una extensión del mismo nodo ROS 2
-(`MovementNode`) utilizado en la Actividad 4, agregando:
-
-- **Persistencia de poses en YAML** (`~/.ros/teach_repeat_poses.yaml`).
-- **Reproductor en segundo plano:** hilo `daemon` que itera sobre las
-  poses guardadas y las publica una a una en `/pincher/command` con
-  un tiempo de transición configurable entre cada una.
-- **Control de reproducción** mediante `threading.Event` para detener
-  el hilo reproductor en cualquier momento.
-- **Endpoints HTTP adicionales** para gestionar las poses
-  (`/api/poses`, `/api/play`, `/api/stop`, `/api/status`).
-
-#### 5.3.1. Flujo de reproducción (ROS 2)
-
-```
-POST /api/play {transition_time: 2.0}
-       │
-       ▼
-playback_stop.clear()
-       │
-       ▼
-Hilo: playback_worker(transition_time)
-       │
-       ├─► Itera poses = [pose0, pose1, ..., poseN]
-       │       │
-       │       ▼
-       │   Construye JointState con JointState.name = JOINT_NAMES
-       │   y JointState.position = [deg0·π/180, ..., deg4·π/180]
-       │       │
-       │       ▼
-       │   cmd_pub.publish(msg)   ──►  /pincher/command
-       │       │
-       │       ▼
-       │   sleep(transition_time / 10) en 10 iteraciones
-       │   (verifica playback_stop en cada una)
-       │
-       └─► playback_running = False
-```
-
-El hilo `playback_worker` se ejecuta en paralelo al bucle principal
-de ROS 2. Durante la reproducción, el endpoint `GET /api/status`
-retorna `{playing: bool, current: int, total: int, pose_name: str}`
-para que la interfaz web muestre el progreso.
-
-**Interfaz web:** Segunda pestaña con sliders por articulación, campo
-para nombre de pose, lista dinámica de poses guardadas (con botones
-**Ir** y **Eliminar**), slider de tiempo de transición (0.5–5 s),
-y controles **Reproducir** / **Detener**. El estado de reproducción
-se actualiza en tiempo real consultando `GET /api/status`.
-
-#### 5.3.2. API de poses (HTTP)
-
-| Método | Endpoint | Descripción |
-|--------|----------|-------------|
-| `GET` | `/api/poses` | Lista completa de poses guardadas (cargadas desde YAML al inicio). |
-| `GET` | `/api/status` | Estado actual: `playing`, `current`, `total`, `pose_name`. |
-| `POST` | `/api/poses` | Guarda nueva pose. Body `{name, positions: {joint: deg,...}}`. |
-| `DELETE` | `/api/poses` | Elimina todas las poses. |
-| `DELETE` | `/api/poses/{idx}` | Elimina la pose en el índice `idx`. |
-| `POST` | `/api/play` | Inicia reproducción. Body `{transition_time: segundos}`. |
-| `POST` | `/api/stop` | Detiene la reproducción (activa `playback_stop`). |
-
-#### 5.3.3. Persistencia
-
-Las poses se almacenan en `~/.ros/teach_repeat_poses.yaml`:
-
-```yaml
-- name: reposo
-  positions:
-    waist: 0.0
-    shoulder: 0.0
-    elbow: 0.0
-    wrist: 0.0
-    gripper: 0.0
-- name: alcanzar
-  positions:
-    waist: 45.0
-    shoulder: 30.0
-    elbow: -45.0
-    wrist: 20.0
-    gripper: 10.0
-```
-
-El archivo se carga automáticamente al iniciar el nodo (`load_poses()`)
-y se reescribe con cada modificación (`save_poses()`). Si el módulo
-`yaml` no está instalado, las poses solo persisten en memoria.
-
-#### 5.3.4. Instrucciones de uso
-
-1. Lanzar el controlador:
-
-   ```bash
-   ros2 launch pincher_control pincher_system.launch.py use_hardware:=true motor_model:=ax12a
-   ```
-
-2. Ejecutar el nodo:
-
-   ```bash
-   source ~/ros2_jazzy/phantom_ws/install/setup.zsh
-   ros2 run lab05_code individual_movement
-   ```
-
-3. Abrir `http://localhost:5050`, pestaña **Actividad 13 — Enseñanza y Repetición**.
-4. Posicionar el robot con los sliders, asignar nombre y presionar **Guardar**.
-5. Ajustar tiempo de transición y presionar **Reproducir**.
-6. Para detener, presionar **Detener** (activa `playback_stop.set()`).
+Estos límites están implementados en la constante `JOINT_LIMITS_DEG` del
+código y se validan en el backend (`APIHandler.do_POST`) antes de encolar
+cualquier comando. Si un valor excede estos límites, el servidor responde
+con HTTP 400 y el comando no se ejecuta.
 
 ---
 
@@ -1101,7 +998,142 @@ configuración articular válida `(q₁, q₂, q₃, q₄)`.
 
 ---
 
-## 12. Actividad 14 — Trazado de una Figura
+## 12. Actividad 13 — Enseñanza y Repetición de Poses
+
+### 12.1. Objetivo
+
+Desarrollar un modo de enseñanza que permita al usuario mover el robot a
+una configuración deseada, guardarla con un nombre asignado, almacenar
+múltiples poses y reproducirlas secuencialmente con tiempo de transición
+ajustable, persistiendo las poses en un archivo YAML.
+
+### 12.2. Requisitos funcionales
+
+1. Mover el robot a una configuración articular mediante controles
+   individuales (sliders + input numérico por articulación).
+2. Guardar la configuración actual asignándole un nombre.
+3. Almacenar al menos 8 poses (sin límite superior).
+4. Listar las poses guardadas con opción de:
+   - **Ir:** mover el robot a esa pose.
+   - **Eliminar:** borrar la pose de la lista.
+5. Reproducir todas las poses en el orden registrado, con tiempo de
+   transición configurable entre 0.5 y 5 segundos.
+6. Detener la reproducción en cualquier momento.
+7. Las poses se persisten en `~/.ros/teach_repeat_poses.yaml` y se cargan
+   automáticamente al iniciar la aplicación.
+
+### 12.3. Implementación
+
+La actividad se implementó como una extensión del mismo nodo ROS 2
+(`MovementNode`) utilizado en la Actividad 4, agregando:
+
+- **Persistencia de poses en YAML** (`~/.ros/teach_repeat_poses.yaml`).
+- **Reproductor en segundo plano:** hilo `daemon` que itera sobre las
+  poses guardadas y las publica una a una en `/pincher/command` con
+  un tiempo de transición configurable entre cada una.
+- **Control de reproducción** mediante `threading.Event` para detener
+  el hilo reproductor en cualquier momento.
+- **Endpoints HTTP adicionales** para gestionar las poses
+  (`/api/poses`, `/api/play`, `/api/stop`, `/api/status`).
+
+#### 12.3.1. Flujo de reproducción (ROS 2)
+
+```
+POST /api/play {transition_time: 2.0}
+       │
+       ▼
+playback_stop.clear()
+       │
+       ▼
+Hilo: playback_worker(transition_time)
+       │
+       ├─► Itera poses = [pose0, pose1, ..., poseN]
+       │       │
+       │       ▼
+       │   Construye JointState con JointState.name = JOINT_NAMES
+       │   y JointState.position = [deg0·π/180, ..., deg4·π/180]
+       │       │
+       │       ▼
+       │   cmd_pub.publish(msg)   ──►  /pincher/command
+       │       │
+       │       ▼
+       │   sleep(transition_time / 10) en 10 iteraciones
+       │   (verifica playback_stop en cada una)
+       │
+       └─► playback_running = False
+```
+
+El hilo `playback_worker` se ejecuta en paralelo al bucle principal
+de ROS 2. Durante la reproducción, el endpoint `GET /api/status`
+retorna `{playing: bool, current: int, total: int, pose_name: str}`
+para que la interfaz web muestre el progreso.
+
+**Interfaz web:** Segunda pestaña con sliders por articulación, campo
+para nombre de pose, lista dinámica de poses guardadas (con botones
+**Ir** y **Eliminar**), slider de tiempo de transición (0.5–5 s),
+y controles **Reproducir** / **Detener**. El estado de reproducción
+se actualiza en tiempo real consultando `GET /api/status`.
+
+#### 12.3.2. API de poses (HTTP)
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| `GET` | `/api/poses` | Lista completa de poses guardadas (cargadas desde YAML al inicio). |
+| `GET` | `/api/status` | Estado actual: `playing`, `current`, `total`, `pose_name`. |
+| `POST` | `/api/poses` | Guarda nueva pose. Body `{name, positions: {joint: deg,...}}`. |
+| `DELETE` | `/api/poses` | Elimina todas las poses. |
+| `DELETE` | `/api/poses/{idx}` | Elimina la pose en el índice `idx`. |
+| `POST` | `/api/play` | Inicia reproducción. Body `{transition_time: segundos}`. |
+| `POST` | `/api/stop` | Detiene la reproducción (activa `playback_stop`). |
+
+#### 12.3.3. Persistencia
+
+Las poses se almacenan en `~/.ros/teach_repeat_poses.yaml`:
+
+```yaml
+- name: reposo
+  positions:
+    waist: 0.0
+    shoulder: 0.0
+    elbow: 0.0
+    wrist: 0.0
+    gripper: 0.0
+- name: alcanzar
+  positions:
+    waist: 45.0
+    shoulder: 30.0
+    elbow: -45.0
+    wrist: 20.0
+    gripper: 10.0
+```
+
+El archivo se carga automáticamente al iniciar el nodo (`load_poses()`)
+y se reescribe con cada modificación (`save_poses()`). Si el módulo
+`yaml` no está instalado, las poses solo persisten en memoria.
+
+#### 12.3.4. Instrucciones de uso
+
+1. Lanzar el controlador:
+
+   ```bash
+   ros2 launch pincher_control pincher_system.launch.py use_hardware:=true motor_model:=ax12a
+   ```
+
+2. Ejecutar el nodo:
+
+   ```bash
+   source ~/ros2_jazzy/phantom_ws/install/setup.zsh
+   ros2 run lab05_code individual_movement
+   ```
+
+3. Abrir `http://localhost:5050`, pestaña **Actividad 13 — Enseñanza y Repetición**.
+4. Posicionar el robot con los sliders, asignar nombre y presionar **Guardar**.
+5. Ajustar tiempo de transición y presionar **Reproducir**.
+6. Para detener, presionar **Detener** (activa `playback_stop.set()`).
+
+---
+
+## 13. Actividad 14 — Trazado de una Figura
 
 ### 12.1. Objetivo
 
@@ -1185,7 +1217,7 @@ trDraw(pts, actuals) ──► canvas con ambas trayectorias
 
 ---
 
-## 13. Actividad 15 — Coreografía Robótica (Reto Final)
+## 14. Actividad 15 — Coreografía Robótica (Reto Final)
 
 ### 13.1. Objetivo
 
@@ -1335,7 +1367,7 @@ ros2 run lab05_code choreography ~/ros2_jazzy/la\ canción\ de\ pedro\ PEDRO*.mp
 
 ---
 
-## 14. Estructura del Repositorio
+## 15. Estructura del Repositorio
 
 ```
 lab05_code/
@@ -1361,16 +1393,17 @@ lab05_code/
         └── choreography.py                # Actividad 15: Coreografía robótica (script autónomo)
 ```
 
-### 14.1. Entry points (scripts ejecutables)
+### 15.1. Entry points (scripts ejecutables)
 
 | Actividad | Comando | Archivo fuente |
 |:---------:|---------|----------------|
 | 4 | `ros2 run lab05_code individual_movement` | `individual_movement.py` |
 | 5 | `ros2 run lab05_code calibration` | `calibration.py` |
+| 6 | Límites documentados en `JOINT_LIMITS_DEG` (validación en backend) | — |
 | 7 | `ros2 run lab05_code individual_movement` (pestaña 3) | `individual_movement.py` |
 | 8 | `ros2 run lab05_code individual_movement` (pestaña 4) | `individual_movement.py` |
 | 9 | `ros2 run lab05_code individual_movement` (pestaña 5) + `ros2 run lab05_code interpolation` | `individual_movement.py` + `interpolation.py` |
-| 10 | `ros2 run lab05_code sinusoidal` | *(pendiente)* |
+| 10 | `ros2 run lab05_code sinusoidal` | `sinusoidal.py` |
 | 11 | `ros2 run lab05_code fk_dh` | *(pendiente)* |
 | 12 | `ros2 run lab05_code ik` | *(pendiente)* |
 | 13 | `ros2 run lab05_code individual_movement` (pestaña 2) | `individual_movement.py` |
@@ -1379,7 +1412,7 @@ lab05_code/
 
 ---
 
-## 15. Referencias
+## 16. Referencias
 
 1. LabSIR UN. (2026). *06_Rob_2026_I_ROS2_Jazzy_PhantomX100_RVIZ*.
    GitHub. https://github.com/labsir-un/06_Rob_2026_I_ROS2_Jazzy_PhantomX100_RVIZ.git
