@@ -36,18 +36,16 @@ def _grid_ik(x, y, z, step):
 
 
 def ik(x, y, z, elbow_up=False):
-    # Fast coarse search, then fine search around best
-    q = _grid_ik(x, y, z, 10)
-    if q is None:
-        return None
-    # Refine around best
-    best, best_err = list(q), float('inf')
-    for d2 in range(-9, 10, 2):
-        for d3 in range(-9, 10, 2):
-            for d4 in range(-9, 10, 2):
-                q = [q[0], q[1]+d2, q[2]+d3, q[3]+d4]
-                if any(q[i] < LIM[i][0] or q[i] > LIM[i][1] for i in range(4)):
-                    continue
+    return _grid_ik(x, y, z, 20)
+
+
+def _grid_ik(x, y, z, step):
+    q1 = math.degrees(math.atan2(y, x))
+    best, best_err = None, float('inf')
+    for q2d in range(LIM[1][0], LIM[1][1] + 1, step):
+        for q3d in range(LIM[2][0], LIM[2][1] + 1, step):
+            for q4d in range(LIM[3][0], LIM[3][1] + 1, step):
+                q = [q1, q2d, q3d, q4d]
                 xf, yf, zf, _, _, _ = fk_fn(q)
                 err = (xf-x)**2 + (yf-y)**2 + (zf-z)**2
                 if err < best_err:
