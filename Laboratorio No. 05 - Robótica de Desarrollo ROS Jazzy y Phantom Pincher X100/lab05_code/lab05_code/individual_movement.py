@@ -2709,12 +2709,12 @@ class MovementNode(Node):
             self.get_logger().info(
                 f"Comando: {dict(zip(cmd['name'], [f'{v/DEG:.1f}°' for v in cmd['position']]))}")
         elif cmd['type'] == 'home':
-            if self._service_available:
-                req = Trigger.Request()
-                self.home_cli.call_async(req)
-                self.get_logger().info('Enviando home...')
-            else:
-                self.get_logger().warn('Home no disponible (servicio no conectado)')
+            msg = JointState()
+            msg.header.stamp = self.get_clock().now().to_msg()
+            msg.name = list(JOINT_NAMES)
+            msg.position = [0.0] * len(JOINT_NAMES)
+            self.cmd_pub.publish(msg)
+            self.get_logger().info('Home enviado (todas a 0°)')
 
 def main():
     rclpy.init()
