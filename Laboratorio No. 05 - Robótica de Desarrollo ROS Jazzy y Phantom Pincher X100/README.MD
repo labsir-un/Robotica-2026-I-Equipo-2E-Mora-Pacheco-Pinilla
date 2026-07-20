@@ -1018,7 +1018,7 @@ El desarrollo de este laboratorio me permitió consolidar competencias fundament
 
 ### Andres Gustavo Pinilla Martinez
 
-*Pendiente.*
+Este laboratorio me permitió pasar de la teoría de cinemática directa e inversa a su implementación real sobre un manipulador físico, lo cual expuso detalles que no siempre son evidentes en el papel: el offset de calibración de cada servomotor, las limitaciones reales de alcance del brazo al combinar orientación y posición, y la importancia de verificar cada solución articular contra los límites de seguridad antes de ejecutarla. Trabajar con ROS 2 Jazzy reforzó mi comprensión de cómo estructurar un sistema de control en nodos independientes que se comunican mediante tópicos y servicios, en lugar de escribir un solo script monolítico, lo que facilitó probar cada actividad por separado y reutilizar el mismo módulo de cinemática en varias tareas. También quedó claro el valor de simular y validar una trayectoria antes de correrla en el robot real, especialmente en las actividades de trazado y calibración, donde un error de signo o de límite puede traducirse directamente en un movimiento inseguro. En general, esta práctica fortaleció tanto mis habilidades técnicas en robótica como mi disciplina para documentar y verificar cada paso del proceso.
 
 ---
 
