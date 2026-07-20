@@ -114,7 +114,10 @@ class PincherController(Node):
         timer_period = 1.0 / max(self.read_rate_hz, 1.0)
         self.state_timer = self.create_timer(timer_period, self.state_timer_callback)
 
-        # Publish initial joint states immediately so RViz shows correct pose
+        # Publish initial joint states with delay so robot_state_publisher is ready
+        self._initial_publish_timer = self.create_timer(1.0, self._publish_initial_state)
+
+    def _publish_initial_state(self) -> None:
         msg = JointState()
         msg.header.stamp = self.get_clock().now().to_msg()
         gripper_pos = self.current_joint_positions[4]
@@ -122,6 +125,7 @@ class PincherController(Node):
         msg.name = list(self.joint_names) + ['gripper_finger1', 'gripper_finger2']
         msg.position = list(self.current_joint_positions) + [finger1_pos, finger1_pos]
         self.joint_state_publisher.publish(msg)
+        self._initial_publish_timer.cancel()
 
         if self.use_hardware:
             self.hardware_ready = self._connect_hardware()
