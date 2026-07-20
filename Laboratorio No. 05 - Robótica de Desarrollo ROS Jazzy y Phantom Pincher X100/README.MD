@@ -152,7 +152,14 @@ Estos parámetros representan las dimensiones geométricas del manipulador y con
 
 *Figura 2: Dimensiones del manipulador Phantom X Pincher X100 en posición de home (0° en todas las articulaciones), mostrando los sistemas coordenados de cada eslabón y los parámetros geométricos L₁–L₄.*
 
-> **Nota:** los valores utilizados en el código (`lab05_code/lab05_code/fk_dh.py`) provienen del archivo URDF (`pincher_description/urdf/robot.xacro`) y difieren ligeramente de los medidos sobre las mallas STL: `L₁ = 0.089 m` (base al hombro, incluye offset del joint waist), `L₂ = 0.101 m`, `L₃ = 0.101 m`, `L₄ = 0.119 m`. Ambas tablas se incluyen como referencia; los valores STL representan la medición directa solicitada en la guía, mientras que los valores URDF son los que emplea el simulador y el controlador.
+**Modelo en RViz con los STL correctos del Phantom X Pincher:**
+
+El archivo `robot.xacro` fue modificado para integrar la geometría exacta del kit Bioloid (frames F2, F3, F4, F10 y servomotores AX-12A), reemplazando los STL genéricos del modelo PX100 que venían por defecto. Se incorporaron además los modelos STL del entorno de trabajo (base, latas, canastilla, cámara) desde el repositorio del compañero [Equipo 2D](https://github.com/labsir-un/Robotica-2026-I-Equipo-2D-Cardenas-Pirateque-Suarez), conservando los nombres de articulación originales (`waist`, `shoulder`, `elbow`, `wrist`, `gripper`) para mantener compatibilidad con `pincher_control` y `lab05_code`.
+
+![RViz modelo Bioloid](rviz_modelo_bioloid.png)
+
+*Figura 2b: Visualización del modelo completo en RViz2 con los STL/DAE correctos del Phantom X Pincher y el entorno de trabajo.*
+
 
 ---
 
