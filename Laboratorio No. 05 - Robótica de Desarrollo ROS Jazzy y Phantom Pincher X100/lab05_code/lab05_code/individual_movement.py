@@ -2252,6 +2252,7 @@ function buildTracing() {
     }
 
     function pollActual() {
+      fetch('/api/track_tcp', {method:'POST'}).catch(function(){});
       fetch('/api/state').then(function(r) { return r.json(); }).then(function(s) {
         var qDeg = JOINTS.map(function(j) { return (s[j]||0) * 180 / Math.PI; });
         var tcp = trFk(qDeg);
@@ -2282,13 +2283,11 @@ function buildTracing() {
                 trDraw(pts, actuals);
                 var ts2 = new Date().toTimeString().slice(0,8);
                 logEl.innerHTML = '<div><span class="time">' + ts2 + '</span> Trazado completado (' + total + ' puntos)</div>' + logEl.innerHTML;
-                // Publish trajectory to RViz (actual world coords from FK)
-                var worldPts = actuals.map(function(a) { return [a[2], a[0], a[1]]; });
-                console.log('Trajectory pts:', worldPts.length);
+                // Publish trajectory from TF points stored on server
                 fetch('/api/trajectory', {
                   method: 'POST',
                   headers: {'Content-Type':'application/json'},
-                  body: JSON.stringify({ points: worldPts })
+                  body: JSON.stringify({ points: [] })
                 });
               }, 200);
             }, 100);
@@ -2564,12 +2563,29 @@ class APIHandler(BaseHTTPRequestHandler):
             self._set_headers()
             self.wfile.write(b'{"status":"ok"}')
 
+        elif self.path == '/api/track_tcp':
+            try:
+                now = rclpy.time.Time()
+                t = self.node_ref.tf_buffer.lookup_transform('base_link', 'end_effector', now,
+                    timeout=rclpy.duration.Duration(seconds=0.3))
+                p = [t.transform.translation.x, t.transform.translation.y, t.transform.translation.z]
+                self.node_ref.traj_points.append(p)
+            except Exception:
+                pass
+            self._set_headers()
+            self.wfile.write(b'{"status":"ok"}')
+
         elif self.path == '/api/trajectory':
             length = int(self.headers.get('Content-Length', 0))
             body = self.wfile if length == 0 else self.rfile.read(length)
             data = json.loads(body)
             pts = data.get('points', [])
-            command_queue.put({'type': 'trajectory', 'points': pts})
+            if pts:
+                command_queue.put({'type': 'trajectory', 'points': pts})
+            else:
+                # Publish from stored TF points
+                command_queue.put({'type': 'trajectory', 'points': list(self.node_ref.traj_points)})
+                self.node_ref.traj_points = []
             self._set_headers()
             self.wfile.write(b'{"status":"ok"}')
 
@@ -2823,14 +2839,6 @@ class MovementNode(Node):
             self.traj_pub.publish(marker)
             return
 
-        # Use TF to get actual TCP relative to base_link
-        try:
-            now = rclpy.time.Time()
-            t = self.tf_buffer.lookup_transform('base_link', 'end_effector', now, timeout=rclpy.duration.Duration(seconds=0.5))
-            ex, ey, ez = t.transform.translation.x, t.transform.translation.y, t.transform.translation.z
-        except Exception:
-            ex, ey, ez = 0.0, 0.0, 0.251
-
         marker.type = Marker.LINE_STRIP
         marker.action = Marker.ADD
         marker.pose.orientation.w = 1.0
@@ -2839,16 +2847,14 @@ class MovementNode(Node):
         marker.color.g = 0.1
         marker.color.b = 0.1
         marker.color.a = 1.0
-        # Compute offset from FK coords (arm frame) to TF coords (base_link)
-        dx, dy, dz = ex - 0.321, ey - 0.0, ez - 0.089
         for p in points:
             pt = Point()
-            pt.x = float(p[0]) if isinstance(p, list) else float(p.get('x', 0)) + dx
-            pt.y = float(p[1]) if isinstance(p, list) else float(p.get('y', 0)) + dy
-            pt.z = float(p[2]) if isinstance(p, list) else float(p.get('z', 0)) + dz
+            pt.x = float(p[0]) if isinstance(p, list) else float(p.get('x', 0))
+            pt.y = float(p[1]) if isinstance(p, list) else float(p.get('y', 0))
+            pt.z = float(p[2]) if isinstance(p, list) else float(p.get('z', 0))
             marker.points.append(pt)
         self.traj_pub.publish(marker)
-        self.get_logger().info(f'Trajectory: {len(marker.points)} pts, offset=({dx:.3f},{dy:.3f},{dz:.3f}), TCP TF=({ex:.3f},{ey:.3f},{ez:.3f})')
+        self.get_logger().info(f'Trajectory: {len(marker.points)} pts')
 
 def main():
     rclpy.init()
