@@ -11,14 +11,14 @@ import xacro
 
 
 EXPECTED_MESHES = [
-    'px100_1_base.stl',
-    'px100_2_shoulder.stl',
-    'px100_3_upper_arm.stl',
-    'px100_4_forearm.stl',
-    'px100_5_gripper.stl',
-    'px100_6_gripper_prop.stl',
-    'px100_7_gripper_bar.stl',
-    'px100_8_gripper_finger.stl',
+    'visual/ax12.dae',
+    'visual/f2.dae',
+    'visual/f3.dae',
+    'visual/f4.dae',
+    'visual/finger.dae',
+    'visual/gripper_base.dae',
+    'visual/phantomx_pincher_mount.dae',
+    'STL/caseBaseRobot.stl',
 ]
 
 
