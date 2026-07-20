@@ -99,32 +99,4 @@
       mimic_finger_joints="$(arg mimic_finger_joints)"
       gazebo_preserve_fixed_joint="$(arg gazebo_preserve_fixed_joint)"/>
 
-  <!-- Example environment / mounting macros (kept commented out) -->
-  <!--
-  <xacro:task_board
-      prefix="$(arg prefix)"
-      child="task_board_mount_link"
-      collision="$(arg collision)"
-      gazebo_preserve_fixed_joint="$(arg gazebo_preserve_fixed_joint)"/>
-
-  <xacro:task_board_mount
-      prefix="$(arg prefix)"
-      child="base_mount_link"
-      collision="$(arg collision)"
-      gazebo_preserve_fixed_joint="$(arg gazebo_preserve_fixed_joint)"/>
-
-  <xacro:base_mount
-      prefix="$(arg prefix)"
-      child="arm_base_link"
-      collision="$(arg collision)"
-      gazebo_preserve_fixed_joint="$(arg gazebo_preserve_fixed_joint)"/>
-  -->
-
-  <!-- Gazebo - ROS 2 control (Ignition) 
-  <xacro:if value="$(arg ros2_control)">
-    <xacro:if value="${'ign' in '$(arg ros2_control_plugin)' or 'gz' in '$(arg ros2_control_plugin)'}">
-      <xacro:ign_ros2_control controller_parameters="$(arg ros2_controller_parameters)"/>
-    </xacro:if>
-  </xacro:if>
-  -->
 </robot>
