@@ -13,6 +13,7 @@ from urllib.parse import urlparse
 
 import rclpy
 from rclpy.node import Node
+from rclpy.qos import QoSProfile, DurabilityPolicy, ReliabilityPolicy, HistoryPolicy
 from sensor_msgs.msg import JointState
 from std_srvs.srv import Trigger
 from visualization_msgs.msg import Marker
@@ -2747,7 +2748,13 @@ class MovementNode(Node):
     def __init__(self):
         super().__init__('individual_movement')
         self.cmd_pub = self.create_publisher(JointState, '/pincher/command', 10)
-        self.traj_pub = self.create_publisher(Marker, '/tcp_trajectory', 10)
+        self.traj_pub = self.create_publisher(Marker, '/tcp_trajectory',
+            qos_profile=QoSProfile(
+                depth=10,
+                durability=DurabilityPolicy.TRANSIENT_LOCAL,
+                reliability=ReliabilityPolicy.RELIABLE,
+                history=HistoryPolicy.KEEP_LAST,
+            ))
         self.traj_points = []
         self.state_sub = self.create_subscription(
             JointState, '/joint_states', self.state_cb, 10)
