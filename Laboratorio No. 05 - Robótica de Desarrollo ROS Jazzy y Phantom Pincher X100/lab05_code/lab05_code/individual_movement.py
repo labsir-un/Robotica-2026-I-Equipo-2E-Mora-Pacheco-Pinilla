@@ -15,6 +15,8 @@ import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import JointState
 from std_srvs.srv import Trigger
+from visualization_msgs.msg import Marker
+from geometry_msgs.msg import Point
 
 try:
     import yaml
@@ -2274,6 +2276,13 @@ function buildTracing() {
                 trDraw(pts, actuals);
                 var ts2 = new Date().toTimeString().slice(0,8);
                 logEl.innerHTML = '<div><span class="time">' + ts2 + '</span> Trazado completado (' + total + ' puntos)</div>' + logEl.innerHTML;
+                // Publish trajectory to RViz
+                var worldPts = actuals.map(function(a) { return [0.13, a[0], a[1]]; });
+                fetch('/api/trajectory', {
+                  method: 'POST',
+                  headers: {'Content-Type':'application/json'},
+                  body: JSON.stringify({ points: worldPts })
+                });
               }, 200);
             }, 100);
           }, 3000);
@@ -2548,6 +2557,19 @@ class APIHandler(BaseHTTPRequestHandler):
             self._set_headers()
             self.wfile.write(b'{"status":"ok"}')
 
+        elif self.path == '/api/trajectory':
+            length = int(self.headers.get('Content-Length', 0))
+            body = self.wfile if length == 0 else self.rfile.read(length)
+            data = json.loads(body)
+            pts = data.get('points', [])
+            if pts:
+                command_queue.put({'type': 'trajectory', 'points': pts})
+                self._set_headers()
+                self.wfile.write(b'{"status":"ok"}')
+            else:
+                self._set_headers(400)
+                self.wfile.write(b'{"status":"error","msg":"no points"}')
+
         elif self.path == '/api/poses':
             length = int(self.headers.get('Content-Length', 0))
             body = self.wfile if length == 0 else self.rfile.read(length)
@@ -2726,6 +2748,8 @@ class MovementNode(Node):
     def __init__(self):
         super().__init__('individual_movement')
         self.cmd_pub = self.create_publisher(JointState, '/pincher/command', 10)
+        self.traj_pub = self.create_publisher(Marker, '/tcp_trajectory', 10)
+        self.traj_points = []
         self.state_sub = self.create_subscription(
             JointState, '/joint_states', self.state_cb, 10)
         self.home_cli = self.create_client(Trigger, '/pincher/home')
@@ -2774,6 +2798,31 @@ class MovementNode(Node):
             msg.position = [0.0] * len(JOINT_NAMES)
             self.cmd_pub.publish(msg)
             self.get_logger().info('Home enviado (todas a 0°)')
+        elif cmd['type'] == 'trajectory':
+            self.publish_trajectory_marker(cmd['points'])
+
+    def publish_trajectory_marker(self, points):
+        marker = Marker()
+        marker.header.frame_id = 'base_link'
+        marker.header.stamp = self.get_clock().now().to_msg()
+        marker.ns = 'tcp_traj'
+        marker.id = 0
+        marker.type = Marker.LINE_STRIP
+        marker.action = Marker.ADD
+        marker.pose.orientation.w = 1.0
+        marker.scale.x = 0.002
+        marker.color.r = 1.0
+        marker.color.g = 0.0
+        marker.color.b = 0.0
+        marker.color.a = 1.0
+        for p in points:
+            pt = Point()
+            pt.x = float(p[0]) if isinstance(p, list) else float(p.get('x', 0))
+            pt.y = float(p[1]) if isinstance(p, list) else float(p.get('y', 0))
+            pt.z = float(p[2]) if isinstance(p, list) else float(p.get('z', 0))
+            marker.points.append(pt)
+        self.traj_pub.publish(marker)
+        self.get_logger().info(f'Trajectory published: {len(marker.points)} points')
 
 def main():
     rclpy.init()
