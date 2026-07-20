@@ -117,8 +117,10 @@ class PincherController(Node):
         # Publish initial joint states immediately so RViz shows correct pose
         msg = JointState()
         msg.header.stamp = self.get_clock().now().to_msg()
-        msg.name = list(self.joint_names)
-        msg.position = list(self.current_joint_positions)
+        gripper_pos = self.current_joint_positions[4]
+        finger1_pos = gripper_pos * 0.00503 + 0.0079
+        msg.name = list(self.joint_names) + ['gripper_finger1', 'gripper_finger2']
+        msg.position = list(self.current_joint_positions) + [finger1_pos, finger1_pos]
         self.joint_state_publisher.publish(msg)
 
         if self.use_hardware:
@@ -491,8 +493,10 @@ class PincherController(Node):
 
         msg = JointState()
         msg.header.stamp = self.get_clock().now().to_msg()
-        msg.name = list(self.joint_names)
-        msg.position = list(self.current_joint_positions)
+        msg.name = list(self.joint_names) + ['gripper_finger1', 'gripper_finger2']
+        gripper_pos = self.current_joint_positions[4]
+        finger1_pos = gripper_pos * 0.00503 + 0.0079
+        msg.position = list(self.current_joint_positions) + [finger1_pos, finger1_pos]
         self.joint_state_publisher.publish(msg)
 
     def close(self) -> None:
