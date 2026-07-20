@@ -114,6 +114,13 @@ class PincherController(Node):
         timer_period = 1.0 / max(self.read_rate_hz, 1.0)
         self.state_timer = self.create_timer(timer_period, self.state_timer_callback)
 
+        # Publish initial joint states immediately so RViz shows correct pose
+        msg = JointState()
+        msg.header.stamp = self.get_clock().now().to_msg()
+        msg.name = list(self.joint_names)
+        msg.position = list(self.current_joint_positions)
+        self.joint_state_publisher.publish(msg)
+
         if self.use_hardware:
             self.hardware_ready = self._connect_hardware()
             if self.hardware_ready and self.home_on_startup:
