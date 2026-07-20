@@ -2280,6 +2280,7 @@ function buildTracing() {
                 logEl.innerHTML = '<div><span class="time">' + ts2 + '</span> Trazado completado (' + total + ' puntos)</div>' + logEl.innerHTML;
                 // Publish trajectory to RViz (actual world coords from FK)
                 var worldPts = actuals.map(function(a) { return [a[2], a[0], a[1]]; });
+                console.log('Trajectory pts:', worldPts.length);
                 fetch('/api/trajectory', {
                   method: 'POST',
                   headers: {'Content-Type':'application/json'},
@@ -2805,22 +2806,25 @@ class MovementNode(Node):
         marker.header.stamp = self.get_clock().now().to_msg()
         marker.ns = 'tcp_traj'
         marker.id = 0
-        marker.type = Marker.LINE_STRIP
-        marker.action = Marker.ADD
-        marker.pose.orientation.w = 1.0
-        marker.scale.x = 0.002
-        marker.color.r = 1.0
-        marker.color.g = 0.0
-        marker.color.b = 0.0
-        marker.color.a = 1.0
-        for p in points:
-            pt = Point()
-            pt.x = float(p[0]) if isinstance(p, list) else float(p.get('x', 0))
-            pt.y = float(p[1]) if isinstance(p, list) else float(p.get('y', 0))
-            pt.z = float(p[2]) if isinstance(p, list) else float(p.get('z', 0))
-            marker.points.append(pt)
+        if not points:
+            marker.action = Marker.DELETE
+        else:
+            marker.type = Marker.LINE_STRIP
+            marker.action = Marker.ADD
+            marker.pose.orientation.w = 1.0
+            marker.scale.x = 0.005
+            marker.color.r = 1.0
+            marker.color.g = 0.2
+            marker.color.b = 0.2
+            marker.color.a = 1.0
+            for p in points:
+                pt = Point()
+                pt.x = float(p[0]) if isinstance(p, list) else float(p.get('x', 0))
+                pt.y = float(p[1]) if isinstance(p, list) else float(p.get('y', 0))
+                pt.z = float(p[2]) if isinstance(p, list) else float(p.get('z', 0))
+                marker.points.append(pt)
         self.traj_pub.publish(marker)
-        self.get_logger().info(f'Trajectory published: {len(marker.points)} points')
+        self.get_logger().info(f'Trajectory marker: {len(marker.points)} pts')
 
 def main():
     rclpy.init()
