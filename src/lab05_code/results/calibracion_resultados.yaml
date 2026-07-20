@@ -1,0 +1,117 @@
+articulaciones:
+  elbow:
+    avg_error_deg: -0.29
+    desired:
+    - -60
+    - -30
+    - 0
+    - 30
+    - 60
+    errors:
+    - -0.47
+    - 0.79
+    - 0.0
+    - -0.79
+    - -1.0
+    label: Codo
+    max_error_deg: 1.0
+    measured:
+    - -59.53
+    - -30.79
+    - -0.0
+    - 30.79
+    - 61.0
+    zero_offset_deg: -0.29
+  gripper:
+    avg_error_deg: 0.29
+    desired:
+    - -30
+    - -15
+    - 0
+    - 15
+    - 30
+    errors:
+    - 0.21
+    - 0.25
+    - 0.29
+    - 0.34
+    - 0.38
+    label: Pinza
+    max_error_deg: 0.38
+    measured:
+    - -30.21
+    - -15.25
+    - -0.29
+    - 14.66
+    - 29.62
+    zero_offset_deg: 0.29
+  shoulder:
+    avg_error_deg: -0.85
+    desired:
+    - 0
+    - 15
+    - 30
+    - 45
+    - 60
+    errors:
+    - -0.29
+    - -0.54
+    - -1.09
+    - -1.04
+    - -1.29
+    label: Hombro
+    max_error_deg: 1.29
+    measured:
+    - 0.29
+    - 15.54
+    - 31.09
+    - 46.04
+    - 61.29
+    zero_offset_deg: -0.85
+  waist:
+    avg_error_deg: 0.76
+    desired:
+    - -60
+    - -30
+    - 0
+    - 30
+    - 60
+    errors:
+    - 0.7
+    - 1.38
+    - 0.0
+    - 0.09
+    - 1.64
+    label: Base
+    max_error_deg: 1.64
+    measured:
+    - -60.7
+    - -31.38
+    - 0.0
+    - 29.91
+    - 58.36
+    zero_offset_deg: 0.76
+  wrist:
+    avg_error_deg: -0.29
+    desired:
+    - -60
+    - -30
+    - 0
+    - 30
+    - 60
+    errors:
+    - -0.18
+    - -0.09
+    - -0.29
+    - -0.5
+    - -0.41
+    label: Muñeca
+    max_error_deg: 0.5
+    measured:
+    - -59.82
+    - -29.91
+    - 0.29
+    - 30.5
+    - 60.41
+    zero_offset_deg: -0.29
+fecha: '2026-07-08 23:04:00'
