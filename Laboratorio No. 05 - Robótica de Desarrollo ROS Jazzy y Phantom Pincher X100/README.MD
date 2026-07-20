@@ -508,7 +508,7 @@ home_positions: [515, 509, 511, 511, 513]
 
 ### 5.4. Actividad 6 — Determinación de límites seguros
 
-Los límites seguros se determinaron mediante pruebas experimentales en las que se incrementó gradualmente el valor comandado de cada articulación hasta alcanzar el límite mecánico, registrando el valor extremo y restando un margen de seguridad para evitar daños. Los valores obtenidos se incorporaron en la tabla `JOINT_LIMITS_DEG` dentro de `individual_movement.py`:
+Los límites seguros se determinaron mediante pruebas experimentales en las que se incrementó gradualmente el valor comandado de cada articulación hasta alcanzar el límite mecánico, registrando el valor extremo y restando un margen de seguridad para evitar daños. Los valores obtenidos se incorporaron en la tabla `JOINT_LIMITS_DEG` dentro del archivo `lab05_code/lab05_code/individual_movement.py`:
 
 | Articulación | Límite inferior | Límite superior | Margen de seguridad |
 |:------------:|:---------------:|:---------------:|:-------------------:|
@@ -944,29 +944,21 @@ Laboratorio No. 05/
 │   ├── calibracion_resultados.yaml
 │   ├── offsets_recomendados.yaml
 │   └── README_calibracion.md          # Reporte autogenerado por calibration.py
-├── lab05_code/                        # Paquete ROS 2 con el código propio del laboratorio
-│   ├── package.xml
-│   ├── setup.py                       # Entry points (incluye los pendientes; ver nota en sección 4)
-│   ├── setup.cfg
-│   ├── results/                       # Copia de los resultados de calibración usada por el paquete
-│   └── lab05_code/
-│       ├── __init__.py
-│       ├── individual_movement.py     # Act. 4, 7, 8, 9, 13, 15: nodo + interfaz web unificada
-│       ├── calibration.py             # Act. 5: calibración de cero y error articular
-│       ├── interpolation.py           # Act. 9: interpolación de trayectorias (script)
-│       └── choreography.py            # Act. 15: coreografía robótica (script autónomo)
-├── pincher_control/                   # Paquete base: controlador, GUI y utilidades DYNAMIXEL
-│   ├── config/                        # ax12a.yaml, xl430.yaml (ver nota de la sección 3.5)
-│   ├── launch/pincher_system.launch.py
-│   └── pincher_control/
-│       ├── control_servo.py           # Nodo pincher_controller
-│       ├── dynamixel_profiles.py      # Perfiles AX-12A / XL430 (registros y conversión rad<->raw)
-│       ├── pincher_gui.py             # GUI Tkinter (sliders, HOME, torque, parada de software)
-│       └── scan_dynamixel.py          # Escáner de IDs del bus DYNAMIXEL
-└── pincher_description/               # Paquete base: modelo del robot
-    ├── urdf/robot.xacro               # Modelo con las modificaciones de la sección 3.7
-    ├── meshes/                        # 8 mallas STL (px100_1_base ... px100_8_gripper_finger)
-    ├── rviz/pincher.rviz
+└── lab05_code/                        # Paquete ROS 2 con el código propio del laboratorio
+    ├── package.xml
+    ├── setup.py                       # Entry points (13 scripts registrados)
+    ├── setup.cfg
+    └── lab05_code/
+        ├── __init__.py
+        ├── individual_movement.py     # Act. 4, 7, 8, 9, 13, 14, 15: nodo + interfaz web unificada
+        ├── calibration.py             # Act. 5: calibración de cero y error articular
+        ├── interpolation.py           # Act. 9: interpolación de trayectorias (script)
+        ├── sinusoidal.py              # Act. 10: trayectoria sinusoidal (script)
+        ├── fk_dh.py                   # Act. 11: cinemática directa DH (script)
+        ├── ik.py                      # Act. 12: cinemática inversa (script)
+        ├── tracing.py                 # Act. 14: trazado de figuras CLI (script)
+        └── choreography.py            # Act. 15: coreografía robótica (script autónomo)
+```
     └── launch/                        # display.launch.py, display_gui.launch.py
 ```
 
