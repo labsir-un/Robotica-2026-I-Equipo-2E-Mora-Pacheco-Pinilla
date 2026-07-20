@@ -65,6 +65,9 @@ HTML = r'''<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>Lab 05 &mdash; Control Phantom X</title>
 <style>
   :root {
@@ -2300,6 +2303,9 @@ function buildAct11() {
 }
 /* Act 12 — IK */
 function buildAct12() {
+  document.getElementById('ikX').value = 130;
+  document.getElementById('ikY').value = 0;
+  document.getElementById('ikZ').value = 100;
   document.getElementById('ikCalcBtn').onclick = function() {
     var x_mm = parseFloat(document.getElementById('ikX').value) || 0;
     var y_mm = parseFloat(document.getElementById('ikY').value) || 0;
@@ -2443,7 +2449,13 @@ class APIHandler(BaseHTTPRequestHandler):
             self.wfile.write(json.dumps(pt if p else
                 {'playing': False, 'current': 0, 'total': 0, 'pose_name': '—'}).encode())
         elif parsed_path == '/' or parsed_path == '/index.html':
-            self._set_headers(200, 'text/html; charset=utf-8')
+            self.send_response(200)
+            self.send_header('Content-Type', 'text/html; charset=utf-8')
+            self.send_header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+            self.send_header('Pragma', 'no-cache')
+            self.send_header('Expires', '0')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
             self.wfile.write(HTML.encode('utf-8'))
         else:
             self._set_headers(404)
