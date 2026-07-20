@@ -66,24 +66,24 @@
   <!--       -->
   <!-- Macro -->
   <!--       -->
-   <xacro:macro name="phantomx_pincher_joint" params="
-     parent
-     child
-     joint_name
-     joint_type
-     joint_origin_xyz
-     joint_origin_rpy
-     joint_axis_xyz:=unset
-     joint_lower_limit:=unset
-     joint_upper_limit:=unset
-     joint_velocity_limit:=unset
-     joint_torque_limit:=unset
-     joint_damping:=0.0
-     joint_friction:=0.0
-     mimic_joint:=none
-     mimic_multiplier:=1.0
-     mimic_offset:=0.0
-     safety_limits:=false
+  <xacro:macro name="phantomx_pincher_joint" params="
+    parent
+    child
+    joint_name
+    joint_type
+    joint_origin_xyz
+    joint_origin_rpy
+    joint_axis_xyz:=unset
+    joint_lower_limit:=unset
+    joint_upper_limit:=unset
+    joint_velocity_limit:=unset
+    joint_torque_limit:=unset
+    joint_damping:=0.0
+    joint_friction:=0.0
+    mimic_joint:=none
+    mimic_multiplier:=1.0
+    mimic_offset:=0.0
+    safety_limits:=false
     safety_position_margin:=0.0
     safety_k_position:=0.0
     safety_k_velocity:=0.0

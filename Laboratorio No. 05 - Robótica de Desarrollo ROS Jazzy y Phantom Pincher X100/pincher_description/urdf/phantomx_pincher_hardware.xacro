@@ -198,19 +198,19 @@
   <xacro:property name="pincher_finger_link_mu" value="1.0"/>
   <xacro:property name="pincher_finger_link_mesh" value="finger"/>
   <xacro:property name="pincher_finger_link_collision_type" value="mesh"/>
-   <xacro:macro name="pincher_finger" params="
-     prefix
-     name
-     parent
-     joint_origin_xyz
-     joint_origin_rpy
-     collision:=true
-     mimic_joint:=none
-     mimic_multiplier:=1.0
-     mimic_offset:=0.0
-     gazebo_preserve_fixed_joint:=false
-   ">
-     <xacro:phantomx_pincher_joint parent="${prefix}${parent}" child="${prefix}${name}_link" joint_name="${prefix}${name}" joint_type="${pincher_finger_joint_type}" joint_origin_xyz="${joint_origin_xyz}" joint_origin_rpy="${joint_origin_rpy}" joint_axis_xyz="${pincher_finger_joint_axis_xyz}" joint_lower_limit="${pincher_finger_joint_lower_limit}" joint_upper_limit="${pincher_finger_joint_upper_limit}" joint_velocity_limit="${pincher_finger_joint_velocity_limit}" joint_torque_limit="${pincher_finger_joint_torque_limit}" joint_damping="${pincher_finger_joint_damping}" joint_friction="${pincher_finger_joint_friction}" gazebo_preserve_fixed_joint="${gazebo_preserve_fixed_joint}" mimic_joint="${mimic_joint}" mimic_multiplier="${mimic_multiplier}" mimic_offset="${mimic_offset}"/>
+  <xacro:macro name="pincher_finger" params="
+    prefix
+    name
+    parent
+    joint_origin_xyz
+    joint_origin_rpy
+    collision:=true
+    mimic_joint:=none
+    mimic_multiplier:=1.0
+    mimic_offset:=0.0
+    gazebo_preserve_fixed_joint:=false
+  ">
+    <xacro:phantomx_pincher_joint parent="${prefix}${parent}" child="${prefix}${name}_link" joint_name="${prefix}${name}" joint_type="${pincher_finger_joint_type}" joint_origin_xyz="${joint_origin_xyz}" joint_origin_rpy="${joint_origin_rpy}" joint_axis_xyz="${pincher_finger_joint_axis_xyz}" joint_lower_limit="${pincher_finger_joint_lower_limit}" joint_upper_limit="${pincher_finger_joint_upper_limit}" joint_velocity_limit="${pincher_finger_joint_velocity_limit}" joint_torque_limit="${pincher_finger_joint_torque_limit}" joint_damping="${pincher_finger_joint_damping}" joint_friction="${pincher_finger_joint_friction}" gazebo_preserve_fixed_joint="${gazebo_preserve_fixed_joint}" mimic_joint="${mimic_joint}" mimic_multiplier="${mimic_multiplier}" mimic_offset="${mimic_offset}"/>
     <xacro:phantomx_pincher_link link_name="${prefix}${name}_link" mesh="${pincher_finger_link_mesh}" collision="${collision}" collision_type="${pincher_finger_link_collision_type}" mu="${pincher_finger_link_mu}"/>
   </xacro:macro>
 
