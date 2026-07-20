@@ -1100,7 +1100,21 @@ El video recorre todas las actividades del laboratorio: algunas se muestran en s
 
 ### 12.2. Capturas y gráficas
 
-Las gráficas de calibración (Actividad 5) están incluidas en la sección 5.3, las de interpolación (Actividad 9) en la sección 6.4, y las de trayectoria sinusoidal (Actividad 10) en la sección 6.5. Las capturas de terminal (`ros2 topic list`, `ros2 node list`, `rqt_graph`, etc.) tomadas durante las pruebas se añadirán aquí como evidencia adicional.
+Las gráficas de calibración (Actividad 5) están incluidas en la sección 5.3, las de interpolación (Actividad 9) en la sección 6.4, y las de trayectoria sinusoidal (Actividad 10) en la sección 6.5.
+
+**Capturas de terminal:**
+
+![ros2 topic list](terminal_topic_list.png)
+
+*Figura 12.1: Salida de `ros2 topic list` durante la ejecución del sistema completo.*
+
+![ros2 node list](terminal_node_list.png)
+
+*Figura 12.2: Salida de `ros2 node list` con todos los nodos activos.*
+
+![rqt_graph](terminal_rqt_graph.png)
+
+*Figura 12.3: Grafo de nodos y tópicos generado con `rqt_graph`.*
 
 
 
