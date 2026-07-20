@@ -248,14 +248,16 @@ HTML = r'''<!DOCTYPE html>
     </div>
   </div>
   <div class="tabs">
-    <button class="tab active" data-tab="act4">Actividad 4 &mdash; Movimiento Individual</button>
-    <button class="tab" data-tab="act7">Actividad 7 &mdash; Movimiento Simultáneo</button>
-    <button class="tab" data-tab="act8">Actividad 8 &mdash; Secuencial</button>
-    <button class="tab" data-tab="act9">Actividad 9 &mdash; Interpolación</button>
-    <button class="tab" data-tab="act13">Actividad 13 &mdash; Enseñanza</button>
-    <button class="tab" data-tab="dance">Baile &mdash; Coreografía</button>
-    <button class="tab" data-tab="sinusoidal">Actividad 10 &mdash; Trayectoria Sinusoidal</button>
-    <button class="tab" data-tab="tracing">Actividad 14 &mdash; Trazado</button>
+    <button class="tab active" data-tab="act4">Act 4</button>
+    <button class="tab" data-tab="act7">Act 7</button>
+    <button class="tab" data-tab="act8">Act 8</button>
+    <button class="tab" data-tab="act9">Act 9</button>
+    <button class="tab" data-tab="sinusoidal">Act 10</button>
+    <button class="tab" data-tab="act11">Act 11</button>
+    <button class="tab" data-tab="act12">Act 12</button>
+    <button class="tab" data-tab="act13">Act 13</button>
+    <button class="tab" data-tab="tracing">Act 14</button>
+    <button class="tab" data-tab="dance">Act 15</button>
   </div>
 
   <div id="act4" class="tab-content active">
@@ -501,6 +503,71 @@ HTML = r'''<!DOCTYPE html>
       <div class="log" style="margin-top:6px;">
         <div class="card-title">Estado</div>
         <div class="entries" id="sinLog"></div>
+      </div>
+    </div>
+  </div>
+  <div id="act11" class="tab-content">
+    <div class="body">
+      <div class="card">
+        <div class="card-title">FK &mdash; Cinem&aacute;tica Directa</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:10px;">
+          <label style="font-size:.75rem;">q<sub>1</sub> (Base):</label>
+          <input type="number" id="fkQ1" value="0" step="1" style="width:70px;padding:4px;border:1px solid var(--border);border-radius:4px;font-size:.75rem;">&deg;
+          <label style="font-size:.75rem;margin-left:8px;">q<sub>2</sub> (Hombro):</label>
+          <input type="number" id="fkQ2" value="0" step="1" style="width:70px;padding:4px;border:1px solid var(--border);border-radius:4px;font-size:.75rem;">&deg;
+          <label style="font-size:.75rem;margin-left:8px;">q<sub>3</sub> (Codo):</label>
+          <input type="number" id="fkQ3" value="0" step="1" style="width:70px;padding:4px;border:1px solid var(--border);border-radius:4px;font-size:.75rem;">&deg;
+          <label style="font-size:.75rem;margin-left:8px;">q<sub>4</sub> (Mu&ntilde;eca):</label>
+          <input type="number" id="fkQ4" value="0" step="1" style="width:70px;padding:4px;border:1px solid var(--border);border-radius:4px;font-size:.75rem;">&deg;
+          <button class="btn btn-play btn-sm" id="fkCalcBtn">Calcular</button>
+          <button class="btn btn-success btn-sm" id="fkSendBtn">Enviar al robot</button>
+          <button class="btn btn-sm btn-home" id="fkHomeBtn">Home</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Resultados</div>
+        <div id="fkResults" style="font-size:.85rem;font-family:'SF Mono','Fira Code',monospace;">
+          <div>TCP: x = <span id="fkX">—</span> mm, y = <span id="fkY">—</span> mm, z = <span id="fkZ">—</span> mm</div>
+          <div>Orientaci&oacute;n: roll = <span id="fkRoll">—</span>&deg;, pitch = <span id="fkPitch">—</span>&deg;, yaw = <span id="fkYaw">—</span>&deg;</div>
+        </div>
+      </div>
+      <div class="log" style="margin-top:6px;">
+        <div class="card-title">Estado</div>
+        <div class="entries" id="fkLog"></div>
+      </div>
+    </div>
+  </div>
+  <div id="act12" class="tab-content">
+    <div class="body">
+      <div class="card">
+        <div class="card-title">IK &mdash; Cinem&aacute;tica Inversa</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:10px;">
+          <label style="font-size:.75rem;">x (m):</label>
+          <input type="number" id="ikX" value="0.25" step="0.01" style="width:80px;padding:4px;border:1px solid var(--border);border-radius:4px;font-size:.75rem;">
+          <label style="font-size:.75rem;margin-left:8px;">y (m):</label>
+          <input type="number" id="ikY" value="0.0" step="0.01" style="width:80px;padding:4px;border:1px solid var(--border);border-radius:4px;font-size:.75rem;">
+          <label style="font-size:.75rem;margin-left:8px;">z (m):</label>
+          <input type="number" id="ikZ" value="0.15" step="0.01" style="width:80px;padding:4px;border:1px solid var(--border);border-radius:4px;font-size:.75rem;">
+          <label style="font-size:.75rem;margin-left:8px;">Codo:</label>
+          <select id="ikElbow" style="padding:4px;border:1px solid var(--border);border-radius:4px;font-size:.75rem;">
+            <option value="up">Arriba</option>
+            <option value="down">Abajo</option>
+          </select>
+          <button class="btn btn-play btn-sm" id="ikCalcBtn">Calcular</button>
+          <button class="btn btn-success btn-sm" id="ikSendBtn">Enviar al robot</button>
+          <button class="btn btn-sm btn-home" id="ikHomeBtn">Home</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Resultados</div>
+        <div id="ikResults" style="font-size:.85rem;font-family:'SF Mono','Fira Code',monospace;">
+          <div>q<sub>1</sub> = <span id="ikQ1">—</span>&deg; | q<sub>2</sub> = <span id="ikQ2">—</span>&deg; | q<sub>3</sub> = <span id="ikQ3">—</span>&deg; | q<sub>4</sub> = <span id="ikQ4">—</span>&deg;</div>
+          <div id="ikError" style="color:var(--accent);font-weight:600;"></div>
+        </div>
+      </div>
+      <div class="log" style="margin-top:6px;">
+        <div class="card-title">Estado</div>
+        <div class="entries" id="ikLog"></div>
       </div>
     </div>
   </div>
@@ -1896,71 +1963,71 @@ function buildSinusoidal() {
 var trRunning = false;
 var trStopFlag = false;
 
-function buildTracing() {
-  /* IK for Phantom X Pincher (same as Python tracing.py) */
-  var L0 = 0.089, L1 = 0.101, L2 = 0.101, L3 = 0.119;
+/* IK for Phantom X Pincher (same as Python tracing.py) */
+var L0 = 0.089, L1 = 0.101, L2 = 0.101, L3 = 0.119;
 
-  function trIk(x, y, z) {
-    var q1 = Math.atan2(y, x) * 180 / Math.PI;
-    var r = Math.sqrt(x*x + y*y);
-    var ze = L0 + L3 - z;
-    var d2 = r*r + ze*ze;
-    if (d2 > Math.pow(L1+L2, 2)) return null;
-    var d = Math.sqrt(d2);
-    var c3 = (d2 - L1*L1 - L2*L2) / (2*L1*L2);
-    if (c3 < -1 || c3 > 1) return null;
-    var q3 = Math.acos(c3) * 180 / Math.PI;
-    q3 = -q3;
-    var alpha = Math.atan2(L2 * Math.sin(q3*Math.PI/180), L1 + L2 * Math.cos(q3*Math.PI/180));
-    var q2 = Math.atan2(ze, r) * 180 / Math.PI - alpha * 180 / Math.PI;
-    var q4 = -90 - q2 - q3;
-    var q = [q1, q2, q3, q4, 0];
-    var limits = [[-150,150],[-150,150],[-150,150],[-150,150],[-90,90]];
-    for (var k = 0; k < 5; k++) {
-      if (q[k] < limits[k][0] || q[k] > limits[k][1]) return null;
-    }
-    return q;
+function trIk(x, y, z) {
+  var q1 = Math.atan2(y, x) * 180 / Math.PI;
+  var r = Math.sqrt(x*x + y*y);
+  var ze = L0 + L3 - z;
+  var d2 = r*r + ze*ze;
+  if (d2 > Math.pow(L1+L2, 2)) return null;
+  var d = Math.sqrt(d2);
+  var c3 = (d2 - L1*L1 - L2*L2) / (2*L1*L2);
+  if (c3 < -1 || c3 > 1) return null;
+  var q3 = Math.acos(c3) * 180 / Math.PI;
+  q3 = -q3;
+  var alpha = Math.atan2(L2 * Math.sin(q3*Math.PI/180), L1 + L2 * Math.cos(q3*Math.PI/180));
+  var q2 = Math.atan2(ze, r) * 180 / Math.PI - alpha * 180 / Math.PI;
+  var q4 = -90 - q2 - q3;
+  var q = [q1, q2, q3, q4, 0];
+  var limits = [[-150,150],[-150,150],[-150,150],[-150,150],[-90,90]];
+  for (var k = 0; k < 5; k++) {
+    if (q[k] < limits[k][0] || q[k] > limits[k][1]) return null;
   }
+  return q;
+}
 
-  /* FK for Phantom X Pincher (returns world x,y,z from joint angles in degrees) */
-  function trFk(qDeg) {
-    var q = qDeg.map(function(v) { return v * Math.PI / 180; });
-    var T = [[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]];
-    var params = [
-      {a:0, alpha:0, d:L0, theta:q[0]},
-      {a:0, alpha:-Math.PI/2, d:0, theta:q[1]},
-      {a:L1, alpha:0, d:0, theta:q[2]},
-      {a:L2, alpha:0, d:0, theta:q[3]},
-      {a:L3, alpha:0, d:0, theta:0},
+/* FK for Phantom X Pincher (returns world x,y,z from joint angles in degrees) */
+function trFk(qDeg) {
+  var q = qDeg.map(function(v) { return v * Math.PI / 180; });
+  var T = [[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]];
+  var params = [
+    {a:0, alpha:0, d:L0, theta:q[0]},
+    {a:0, alpha:-Math.PI/2, d:0, theta:q[1]},
+    {a:L1, alpha:0, d:0, theta:q[2]},
+    {a:L2, alpha:0, d:0, theta:q[3]},
+    {a:L3, alpha:0, d:0, theta:0},
+  ];
+  function dh(a, alpha, d, theta) {
+    var ct = Math.cos(theta), st = Math.sin(theta);
+    var ca = Math.cos(alpha), sa = Math.sin(alpha);
+    return [
+      [ct, -st, 0, a],
+      [st*ca, ct*ca, -sa, -d*sa],
+      [st*sa, ct*sa, ca, d*ca],
+      [0, 0, 0, 1]
     ];
-    function dh(a, alpha, d, theta) {
-      var ct = Math.cos(theta), st = Math.sin(theta);
-      var ca = Math.cos(alpha), sa = Math.sin(alpha);
-      return [
-        [ct, -st, 0, a],
-        [st*ca, ct*ca, -sa, -d*sa],
-        [st*sa, ct*sa, ca, d*ca],
-        [0, 0, 0, 1]
-      ];
-    }
-    function mul(A, B) {
-      var R = [];
-      for (var i = 0; i < 4; i++) {
-        R[i] = [];
-        for (var j = 0; j < 4; j++) {
-          var s = 0;
-          for (var k = 0; k < 4; k++) s += A[i][k] * B[k][j];
-          R[i][j] = s;
-        }
-      }
-      return R;
-    }
-    for (var p = 0; p < params.length; p++) {
-      T = mul(T, dh(params[p].a, params[p].alpha, params[p].d, params[p].theta));
-    }
-    return { x: T[0][3], y: T[1][3], z: T[2][3] };
   }
+  function mul(A, B) {
+    var R = [];
+    for (var i = 0; i < 4; i++) {
+      R[i] = [];
+      for (var j = 0; j < 4; j++) {
+        var s = 0;
+        for (var k = 0; k < 4; k++) s += A[i][k] * B[k][j];
+        R[i][j] = s;
+      }
+    }
+    return R;
+  }
+  for (var p = 0; p < params.length; p++) {
+    T = mul(T, dh(params[p].a, params[p].alpha, params[p].d, params[p].theta));
+  }
+  return { x: T[0][3], y: T[1][3], z: T[2][3] };
+}
 
+function buildTracing() {
   function trGenFig(shape, size, nEdge) {
     var pts = [];
     var verts;
@@ -2181,6 +2248,98 @@ function buildTracing() {
   };
 }
 
+/* Act 11 — FK */
+function buildAct11() {
+  document.getElementById('fkCalcBtn').onclick = function() {
+    var q1 = parseFloat(document.getElementById('fkQ1').value) || 0;
+    var q2 = parseFloat(document.getElementById('fkQ2').value) || 0;
+    var q3 = parseFloat(document.getElementById('fkQ3').value) || 0;
+    var q4 = parseFloat(document.getElementById('fkQ4').value) || 0;
+    var qDeg = [q1, q2, q3, q4];
+    var tcp = trFk(qDeg);
+    if (!tcp) { document.getElementById('fkX').textContent = '—'; return; }
+    document.getElementById('fkX').textContent = (tcp.x * 1000).toFixed(1);
+    document.getElementById('fkY').textContent = (tcp.y * 1000).toFixed(1);
+    document.getElementById('fkZ').textContent = (tcp.z * 1000).toFixed(1);
+    var roll = Math.atan2(tcp.ry || 0, tcp.rz || 0);
+    document.getElementById('fkRoll').textContent = '—';
+    document.getElementById('fkPitch').textContent = '—';
+    document.getElementById('fkYaw').textContent = '—';
+    var el = document.getElementById('fkLog');
+    var ts = new Date().toTimeString().slice(0,8);
+    el.innerHTML = '<div><span class="time">' + ts + '</span> FK: q=[' + q1.toFixed(1) + ',' + q2.toFixed(1) + ',' + q3.toFixed(1) + ',' + q4.toFixed(1) + '] &rarr; TCP (' + (tcp.x*1000).toFixed(1) + ', ' + (tcp.y*1000).toFixed(1) + ', ' + (tcp.z*1000).toFixed(1) + ') mm</div>' + el.innerHTML;
+  };
+  document.getElementById('fkSendBtn').onclick = function() {
+    var q1 = parseFloat(document.getElementById('fkQ1').value) || 0;
+    var q2 = parseFloat(document.getElementById('fkQ2').value) || 0;
+    var q3 = parseFloat(document.getElementById('fkQ3').value) || 0;
+    var q4 = parseFloat(document.getElementById('fkQ4').value) || 0;
+    var pos = [rad(q1), rad(q2), rad(q3), rad(q4), 0];
+    fetch('/api/command', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ name: JOINTS, position: pos })
+    }).then(function(r) { return r.json(); }).then(function(d) {
+      var el = document.getElementById('fkLog');
+      var ts = new Date().toTimeString().slice(0,8);
+      el.innerHTML = '<div><span class="time">' + ts + '</span> FK enviado al robot</div>' + el.innerHTML;
+    });
+  };
+  document.getElementById('fkHomeBtn').onclick = function() {
+    fetch('/api/command', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ name: JOINTS, position: [0,0,0,0,0] })
+    });
+  };
+}
+/* Act 12 — IK */
+function buildAct12() {
+  document.getElementById('ikCalcBtn').onclick = function() {
+    var x = parseFloat(document.getElementById('ikX').value) || 0;
+    var y = parseFloat(document.getElementById('ikY').value) || 0;
+    var z = parseFloat(document.getElementById('ikZ').value) || 0;
+    var q = trIk(x, y, z);
+    var errEl = document.getElementById('ikError');
+    if (!q) {
+      errEl.textContent = 'Sin soluci&oacute;n v&aacute;lida (fuera del espacio de trabajo o l&iacute;mites)';
+      return;
+    }
+    errEl.textContent = 'Soluci&oacute;n v&aacute;lida';
+    document.getElementById('ikQ1').textContent = q[0].toFixed(1);
+    document.getElementById('ikQ2').textContent = q[1].toFixed(1);
+    document.getElementById('ikQ3').textContent = q[2].toFixed(1);
+    document.getElementById('ikQ4').textContent = q[3].toFixed(1);
+    var el = document.getElementById('ikLog');
+    var ts = new Date().toTimeString().slice(0,8);
+    el.innerHTML = '<div><span class="time">' + ts + '</span> IK: (' + x.toFixed(3) + ', ' + y.toFixed(3) + ', ' + z.toFixed(3) + ') &rarr; q=[' + q.map(function(v){return v.toFixed(1);}).join(',') + ']&deg;</div>' + el.innerHTML;
+  };
+  document.getElementById('ikSendBtn').onclick = function() {
+    var x = parseFloat(document.getElementById('ikX').value) || 0;
+    var y = parseFloat(document.getElementById('ikY').value) || 0;
+    var z = parseFloat(document.getElementById('ikZ').value) || 0;
+    var q = trIk(x, y, z);
+    if (!q) return;
+    var pos = q.map(function(v) { return rad(v); });
+    fetch('/api/command', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ name: JOINTS, position: pos })
+    }).then(function(r) { return r.json(); }).then(function(d) {
+      var el = document.getElementById('ikLog');
+      var ts = new Date().toTimeString().slice(0,8);
+      el.innerHTML = '<div><span class="time">' + ts + '</span> IK enviado al robot</div>' + el.innerHTML;
+    });
+  };
+  document.getElementById('ikHomeBtn').onclick = function() {
+    fetch('/api/command', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ name: JOINTS, position: [0,0,0,0,0] })
+    });
+  };
+}
+/* Init */
 try { buildAct4(); } catch(e) { logJSError(e.message, 'buildAct4'); }
 try { buildAct7(); } catch(e) { logJSError(e.message, 'buildAct7'); }
 try { buildAct8(); } catch(e) { logJSError(e.message, 'buildAct8'); }
@@ -2189,6 +2348,8 @@ try { buildAct13(); } catch(e) { logJSError(e.message, 'buildAct13'); }
 try { buildDance(); } catch(e) { logJSError(e.message, 'buildDance'); }
 try { buildSinusoidal(); } catch(e) { logJSError(e.message, 'buildSinusoidal'); }
 try { buildTracing(); } catch(e) { logJSError(e.message, 'buildTracing'); }
+try { buildAct11(); } catch(e) { logJSError(e.message, 'buildAct11'); }
+try { buildAct12(); } catch(e) { logJSError(e.message, 'buildAct12'); }
 try { poll(); } catch(e) { logJSError(e.message, 'poll'); }
 </script>
 </body>
