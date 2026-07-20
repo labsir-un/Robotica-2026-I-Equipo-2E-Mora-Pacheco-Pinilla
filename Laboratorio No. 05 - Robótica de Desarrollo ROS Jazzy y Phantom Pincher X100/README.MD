@@ -656,7 +656,11 @@ ros2 run lab05_code interpolation
 
 Adicionalmente, la pestaña *Actividad 9* de la interfaz web permite seleccionar configuraciones A/B, duración, método (lineal, cúbico o ambos) y visualizar las curvas de posición/velocidad/aceleración en Canvas antes de ejecutar en el robot con confirmación previa.
 
-*Gráfica generada:* `interpolacion_config_a_a_b.png` — a incluir en el repositorio una vez ejecutada la prueba física completa.
+**Gráfica generada (interpolación lineal vs. cúbica):**
+
+![Interpolación de trayectorias](interpolacion_config_a_a_b.png)
+
+*Figura 6.1: Comparación de interpolación lineal (izquierda) y cúbica (derecha) desde la Configuración A (home) a la Configuración B (85°, −20°, 55°, 25°, 0°). Se muestran posición, velocidad y aceleración para cada articulación. La interpolación cúbica presenta arranque y frenado suaves (velocidad cero en extremos), mientras que la lineal muestra cambios bruscos de velocidad en t=0 y t=T.*
 
 ### 6.5. Actividad 10 — Trayectoria sinusoidal
 
@@ -674,6 +678,12 @@ sobre la articulación del hombro (`shoulder`), realizando cuatro pruebas combin
 | 4 | 60 | 0.50 |
 
 El script genera puntos a 50 Hz durante al menos 2 periodos, registra posición deseada y medida, grafica ambas curvas por prueba en un PNG, y calcula el error máximo y el error cuadrático medio (RMSE). El entry point está registrado en `setup.py`.
+
+**Gráfica generada (pruebas 1–4 sobre el hombro):**
+
+![Trayectoria sinusoidal](sinusoidal_resultados.png)
+
+*Figura 6.2: Trayectoria sinusoidal `q(t) = q_0 + A·sin(2πft)` sobre la articulación del hombro para 4 combinaciones de amplitud y frecuencia. Cada panel muestra la posición deseada y medida, junto con el error máximo y RMSE.*
 
 ---
 
@@ -1011,7 +1021,7 @@ El video recorre todas las actividades del laboratorio: algunas se muestran en s
 
 ### 12.2. Capturas y gráficas
 
-Las gráficas de calibración (Actividad 5) están incluidas en la sección 5.3, y las de interpolación (Actividad 9) se añadirán en la sección 6.4 una vez ejecutada la prueba física completa. Las capturas de terminal (`ros2 topic list`, `ros2 node list`, `rqt_graph`, etc.) tomadas durante las pruebas se añadirán aquí como evidencia adicional.
+Las gráficas de calibración (Actividad 5) están incluidas en la sección 5.3, las de interpolación (Actividad 9) en la sección 6.4, y las de trayectoria sinusoidal (Actividad 10) en la sección 6.5. Las capturas de terminal (`ros2 topic list`, `ros2 node list`, `rqt_graph`, etc.) tomadas durante las pruebas se añadirán aquí como evidencia adicional.
 
 
 
