@@ -255,6 +255,7 @@ HTML = r'''<!DOCTYPE html>
     <button class="tab" data-tab="act13">Actividad 13 &mdash; Enseñanza</button>
     <button class="tab" data-tab="dance">Baile &mdash; Coreografía</button>
     <button class="tab" data-tab="sinusoidal">Actividad 10 &mdash; Trayectoria Sinusoidal</button>
+    <button class="tab" data-tab="tracing">Actividad 14 &mdash; Trazado</button>
   </div>
 
   <div id="act4" class="tab-content active">
@@ -500,6 +501,46 @@ HTML = r'''<!DOCTYPE html>
       <div class="log" style="margin-top:6px;">
         <div class="card-title">Estado</div>
         <div class="entries" id="sinLog"></div>
+      </div>
+    </div>
+  </div>
+  <div id="tracing" class="tab-content">
+    <div class="body">
+      <div class="card">
+        <div class="card-title">Configuraci&oacute;n</div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:8px;">
+          <label style="font-size:.75rem;font-weight:500;">Figura:</label>
+          <select id="trFigSelect" style="padding:4px 8px;border:1px solid var(--border);border-radius:4px;font-size:.75rem;">
+            <option value="triangle">Tri&aacute;ngulo</option>
+            <option value="square">Cuadrado</option>
+          </select>
+          <label style="font-size:.75rem;font-weight:500;">Tama&ntilde;o:</label>
+          <select id="trSizeSelect" style="padding:4px 8px;border:1px solid var(--border);border-radius:4px;font-size:.75rem;">
+            <option value="0.04">4 cm</option>
+            <option value="0.06" selected>6 cm</option>
+          </select>
+          <button class="btn btn-play btn-sm" id="trStartBtn">&#9654; Trazar</button>
+          <button class="btn btn-stop btn-sm" id="trStopBtn" disabled>&#9632; Detener</button>
+          <button class="btn btn-sm btn-home" id="trHomeBtn">Home</button>
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;">
+        <div class="card" style="flex:1;min-width:300px;">
+          <div class="card-title">Trayectoria (vista Y&ndash;Z)</div>
+          <canvas id="trCanvas" style="width:100%;height:250px;border:1px solid var(--border-light);border-radius:4px;"></canvas>
+        </div>
+        <div class="card" style="flex:1;min-width:250px;">
+          <div class="card-title">Estado</div>
+          <div id="trStatus" style="font-size:.75rem;font-family:'SF Mono','Fira Code',monospace;">
+            <div>Figura: <span id="trFigName">—</span></div>
+            <div>Punto: <span id="trPoint">0 / 0</span></div>
+            <div>Progreso: <span id="trProgress">—</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="log" style="margin-top:6px;">
+        <div class="card-title">Estado</div>
+        <div class="entries" id="trLog"></div>
       </div>
     </div>
   </div>
@@ -1851,6 +1892,221 @@ function buildSinusoidal() {
   };
 }
 
+/* Act 14 — Trazado */
+var trRunning = false;
+var trStopFlag = false;
+
+function buildTracing() {
+  /* IK for Phantom X Pincher (same as Python tracing.py) */
+  var L0 = 0.089, L1 = 0.101, L2 = 0.101, L3 = 0.119;
+
+  function trIk(x, y, z) {
+    var q1 = Math.atan2(y, x) * 180 / Math.PI;
+    var r = Math.sqrt(x*x + y*y);
+    var ze = L0 + L3 - z;
+    var d2 = r*r + ze*ze;
+    if (d2 > Math.pow(L1+L2, 2)) return null;
+    var d = Math.sqrt(d2);
+    var c3 = (d2 - L1*L1 - L2*L2) / (2*L1*L2);
+    if (c3 < -1 || c3 > 1) return null;
+    var q3 = Math.acos(c3) * 180 / Math.PI;
+    q3 = -q3;
+    var alpha = Math.atan2(L2 * Math.sin(q3*Math.PI/180), L1 + L2 * Math.cos(q3*Math.PI/180));
+    var q2 = Math.atan2(ze, r) * 180 / Math.PI - alpha * 180 / Math.PI;
+    var q4 = -90 - q2 - q3;
+    return [q1, q2, q3, q4, 0];
+  }
+
+  function trGenFig(shape, size, nEdge) {
+    var pts = [];
+    var verts;
+    if (shape === 'triangle') {
+      var h = size * Math.sqrt(3) / 2;
+      verts = [[0, h/3], [-size/2, -h/3 + h/2], [size/2, -h/3 + h/2]];
+    } else {
+      verts = [[-size/2, -size/2], [size/2, -size/2], [size/2, size/2], [-size/2, size/2]];
+    }
+    for (var i = 0; i < verts.length; i++) {
+      var y0 = verts[i][0], z0 = verts[i][1];
+      var y1 = verts[(i+1) % verts.length][0], z1 = verts[(i+1) % verts.length][1];
+      for (var j = 0; j < nEdge; j++) {
+        var f = j / nEdge;
+        pts.push({ wx: 0.13, wy: y0 + (y1-y0)*f, wz: 0.10 + z0 + (z1-z0)*f });
+      }
+    }
+    return pts;
+  }
+
+  function trDraw(pts, actuals) {
+    var canvas = document.getElementById('trCanvas');
+    var dpr = window.devicePixelRatio || 1;
+    var rect = canvas.parentElement.getBoundingClientRect();
+    var w = Math.max(200, rect.width - 4);
+    var h = 250;
+    canvas.width = w * dpr;
+    canvas.height = h * dpr;
+    canvas.style.width = w + 'px';
+    canvas.style.height = h + 'px';
+    var ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+    ctx.clearRect(0, 0, w, h);
+
+    var allY = pts.map(function(p) { return p.wy; });
+    var allZ = pts.map(function(p) { return p.wz; });
+    if (actuals.length) {
+      allY = allY.concat(actuals.map(function(p) { return p[0]; }));
+      allZ = allZ.concat(actuals.map(function(p) { return p[1]; }));
+    }
+    var minY = Math.min.apply(null, allY), maxY = Math.max.apply(null, allY);
+    var minZ = Math.min.apply(null, allZ), maxZ = Math.max.apply(null, allZ);
+    var pad = 30;
+    var rangeY = maxY - minY || 0.01;
+    var rangeZ = maxZ - minZ || 0.01;
+    rangeY *= 1.2; rangeZ *= 1.2;
+    var cy = (minY + maxY) / 2;
+    var cz = (minZ + maxZ) / 2;
+
+    function toX(y) { return pad + ((y - cy + rangeY/2) / rangeY) * (w - 2*pad); }
+    function toY(z) { return h - pad - ((z - cz + rangeZ/2) / rangeZ) * (h - 2*pad); }
+
+    /* Grid */
+    ctx.strokeStyle = '#e9ecf0';
+    ctx.lineWidth = 1;
+    for (var g = 0; g <= 4; g++) {
+      var gy = pad + (g/4)*(h-2*pad);
+      ctx.beginPath(); ctx.moveTo(pad, gy); ctx.lineTo(w-pad, gy); ctx.stroke();
+    }
+    for (var g = 0; g <= 4; g++) {
+      var gx = pad + (g/4)*(w-2*pad);
+      ctx.beginPath(); ctx.moveTo(gx, pad); ctx.lineTo(gx, h-pad); ctx.stroke();
+    }
+
+    /* Desired path */
+    ctx.strokeStyle = '#2b6cb0';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    for (var i = 0; i < pts.length; i++) {
+      var x = toX(pts[i].wy), y = toY(pts[i].wz);
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+
+    /* Actual path */
+    if (actuals.length > 1) {
+      ctx.strokeStyle = '#e53e3e';
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([4,3]);
+      ctx.beginPath();
+      for (var i = 0; i < actuals.length; i++) {
+        var x = toX(actuals[i][0]), y = toY(actuals[i][1]);
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    /* Labels */
+    ctx.fillStyle = '#88909c';
+    ctx.font = '9px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Y (m)', w/2, h - 3);
+    ctx.save();
+    ctx.translate(8, h/2);
+    ctx.rotate(-Math.PI/2);
+    ctx.fillText('Z (m)', 0, 0);
+    ctx.restore();
+
+    /* Legend */
+    ctx.fillStyle = '#2b6cb0';
+    ctx.fillRect(pad+4, pad+2, 12, 2);
+    ctx.fillStyle = '#1a365d';
+    ctx.font = '9px sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText('Deseada', pad+19, pad+6);
+    ctx.fillStyle = '#e53e3e';
+    ctx.fillRect(pad+64, pad+2, 12, 2);
+    ctx.fillText('Real', pad+79, pad+6);
+  }
+
+  document.getElementById('trStartBtn').onclick = function() {
+    if (trRunning) return;
+    trRunning = true;
+    trStopFlag = false;
+    document.getElementById('trStartBtn').disabled = true;
+    document.getElementById('trStopBtn').disabled = false;
+
+    var shape = document.getElementById('trFigSelect').value;
+    var size = parseFloat(document.getElementById('trSizeSelect').value);
+    var figName = shape === 'triangle' ? 'Tri\u00e1ngulo' : 'Cuadrado';
+    document.getElementById('trFigName').textContent = figName + ' ' + (size*100) + ' cm';
+
+    var pts = trGenFig(shape, size, 30);
+    var total = pts.length;
+    var i = 0;
+    var actuals = [];
+    var logEl = document.getElementById('trLog');
+    var ts = new Date().toTimeString().slice(0,8);
+    logEl.innerHTML = '<div><span class="time">' + ts + '</span> Iniciando trazado de ' + figName + ' ' + (size*100) + ' cm</div>' + logEl.innerHTML;
+
+    function step() {
+      if (trStopFlag || i >= total) {
+        trRunning = false;
+        document.getElementById('trStartBtn').disabled = false;
+        document.getElementById('trStopBtn').disabled = true;
+        document.getElementById('trProgress').textContent = trStopFlag ? 'Detenido' : 'Completado';
+        if (i >= total) {
+          trDraw(pts, actuals);
+          var ts2 = new Date().toTimeString().slice(0,8);
+          logEl.innerHTML = '<div><span class="time">' + ts2 + '</span> Trazado completado (' + total + ' puntos)</div>' + logEl.innerHTML;
+        }
+        return;
+      }
+
+      var pt = pts[i];
+      document.getElementById('trPoint').textContent = (i+1) + ' / ' + total;
+      document.getElementById('trProgress').textContent = Math.round((i/total)*100) + '%';
+
+      var q = trIk(pt.wx, pt.wy, pt.wz);
+      if (q) {
+        var pos = JOINTS.map(function(j, idx) { return q[idx] * Math.PI / 180; });
+        fetch('/api/command', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ name: JOINTS, position: pos })
+        });
+      }
+
+      /* Poll actual state for feedback */
+      setTimeout(function() {
+        if (!trStopFlag) {
+          fetch('/api/state').then(function(r) { return r.json(); }).then(function(s) {
+            actuals.push([s['waist']||0, s['shoulder']||0]);
+          }).catch(function() {});
+        }
+        i++;
+        setTimeout(step, 30);
+      }, 5);
+    }
+
+    step();
+    trDraw(pts, []);
+  };
+
+  document.getElementById('trStopBtn').onclick = function() {
+    trStopFlag = true;
+    document.getElementById('trStopBtn').disabled = true;
+  };
+
+  document.getElementById('trHomeBtn').onclick = function() {
+    trStopFlag = true;
+    fetch('/api/command', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ name: JOINTS, position: [0,0,0,0,0] })
+    });
+  };
+}
+
 try { buildAct4(); } catch(e) { logJSError(e.message, 'buildAct4'); }
 try { buildAct7(); } catch(e) { logJSError(e.message, 'buildAct7'); }
 try { buildAct8(); } catch(e) { logJSError(e.message, 'buildAct8'); }
@@ -1858,6 +2114,7 @@ try { buildAct9(); } catch(e) { logJSError(e.message, 'buildAct9'); }
 try { buildAct13(); } catch(e) { logJSError(e.message, 'buildAct13'); }
 try { buildDance(); } catch(e) { logJSError(e.message, 'buildDance'); }
 try { buildSinusoidal(); } catch(e) { logJSError(e.message, 'buildSinusoidal'); }
+try { buildTracing(); } catch(e) { logJSError(e.message, 'buildTracing'); }
 try { poll(); } catch(e) { logJSError(e.message, 'poll'); }
 </script>
 </body>
