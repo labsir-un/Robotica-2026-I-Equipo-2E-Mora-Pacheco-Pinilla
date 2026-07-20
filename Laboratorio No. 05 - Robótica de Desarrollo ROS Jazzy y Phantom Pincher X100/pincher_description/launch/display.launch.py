@@ -58,6 +58,7 @@ def _launch_setup(context):
             name='rviz2',
             output='screen',
             arguments=['-d', rviz_config],
+            parameters=[{'robot_description': robot_description}],
             condition=IfCondition(LaunchConfiguration('start_rviz')),
         ),
     ]
