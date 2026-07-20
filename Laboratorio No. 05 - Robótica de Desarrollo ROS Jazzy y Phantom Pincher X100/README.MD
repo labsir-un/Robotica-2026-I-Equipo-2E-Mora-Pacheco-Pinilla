@@ -432,6 +432,14 @@ Abrir `http://localhost:5050`, pestaña *Actividad 4*. Cada articulación tiene 
 
 **Análisis:** el patrón cola de comandos + sondeo permite que el nodo ROS 2 y el servidor HTTP coexistan sin bloqueos. La retroalimentación de `/joint_states` (~13–20 Hz según carga del bus serial) se usa para visualización; el control de posición real es responsabilidad de `pincher_controller`. La validación de límites en el backend evita que posiciones peligrosas lleguen siquiera al tópico de ROS 2.
 
+<div align="center">
+
+![Captura de pantalla — Actividad 4](screenshots/act4.png)
+
+*Figura 5.7: Pantallazo de la interfaz web — pestaña Actividad 4 (Movimiento individual de articulaciones).*
+
+</div>
+
 ### 5.3. Actividad 5 — Calibración de cero y error articular
 
 **Objetivo específico:** cuantificar el error sistemático de cada articulación enviando posiciones angulares conocidas y comparándolas con la posición reportada por el servomotor, y calcular el desplazamiento de cero necesario para corregir la calibración.
@@ -590,6 +598,14 @@ POST /api/command {name: [waist,shoulder,elbow,wrist,gripper],
 
 **Interfaz web:** pestaña *Actividad 7* con las 5 configuraciones predefinidas mostradas en inputs editables, cada una con botón *Ejecutar* que envía un único `POST /api/command`, más una sección de configuración personalizada y botón Home.
 
+<div align="center">
+
+![Captura de pantalla — Actividad 7](screenshots/act7.png)
+
+*Figura 6.3: Pantallazo de la interfaz web — pestaña Actividad 7 (Movimiento simultáneo).*
+
+</div>
+
 ### 6.3. Actividad 8 — Movimiento secuencial
 
 **Objetivo:** ejecutar una de las configuraciones anteriores moviendo las articulaciones una tras otra (Base → Hombro → Codo → Muñeca → Pinza) y comparar el resultado con el movimiento simultáneo.
@@ -619,6 +635,14 @@ El tiempo total de la secuencia en simulación depende únicamente de la latenci
 > **Nota:** en el simulador la transición es instantánea (< 50 ms) porque `command_callback` actualiza `current_joint_positions` de inmediato. Los valores estimados para el robot real se calcularon usando la velocidad del perfil AX-12A con `Moving Speed = 100` (11.1 RPM ≈ 66.6 °/s). La aceleración es un escalón teórico (el AX-12A no expone un perfil de aceleración configurable).
 
 **Interfaz web:** pestaña *Actividad 8* con selector de configuración (las de la Actividad 7), slider de delay y tres botones: *Ejecutar secuencial*, *Ejecutar simultáneo* y *Home*, mostrando el progreso (1/5 … 5/5) y el tiempo transcurrido de cada modo.
+
+<div align="center">
+
+![Captura de pantalla — Actividad 8](screenshots/act8.png)
+
+*Figura 6.4: Pantallazo de la interfaz web — pestaña Actividad 8 (Movimiento secuencial).*
+
+</div>
 
 ### 6.4. Actividad 9 — Interpolación de trayectorias
 
@@ -662,6 +686,14 @@ Adicionalmente, la pestaña *Actividad 9* de la interfaz web permite seleccionar
 
 *Figura 6.1: Comparación de interpolación lineal (izquierda) y cúbica (derecha) desde la Configuración A (home) a la Configuración B (85°, −20°, 55°, 25°, 0°). Se muestran posición, velocidad y aceleración para cada articulación. La interpolación cúbica presenta arranque y frenado suaves (velocidad cero en extremos), mientras que la lineal muestra cambios bruscos de velocidad en t=0 y t=T.*
 
+<div align="center">
+
+![Captura de pantalla — Actividad 9](screenshots/act9.png)
+
+*Figura 6.5: Pantallazo de la interfaz web — pestaña Actividad 9 (Interpolación de trayectorias).*
+
+</div>
+
 ### 6.5. Actividad 10 — Trayectoria sinusoidal
 
 Se implementó `sinusoidal.py` que ejecuta la trayectoria:
@@ -684,6 +716,14 @@ El script genera puntos a 50 Hz durante al menos 2 periodos, registra posición 
 ![Trayectoria sinusoidal](sinusoidal_resultados.png)
 
 *Figura 6.2: Trayectoria sinusoidal `q(t) = q_0 + A·sin(2πft)` sobre la articulación del hombro para 4 combinaciones de amplitud y frecuencia. Cada panel muestra la posición deseada y medida, junto con el error máximo y RMSE.*
+
+<div align="center">
+
+![Captura de pantalla — Actividad 10](screenshots/act10.png)
+
+*Figura 6.6: Pantallazo de la interfaz web — pestaña Actividad 10 (Trayectoria sinusoidal).*
+
+</div>
 
 ---
 
@@ -731,6 +771,14 @@ El script evalúa las 5 configuraciones de la Actividad 7 y las presenta en una 
 
 **Entry point:** `ros2 run lab05_code fk_dh`
 
+<div align="center">
+
+![Captura de pantalla — Actividad 11](screenshots/act11.png)
+
+*Figura 7.1: Pantallazo de la interfaz web — pestaña Actividad 11 (Cinemática directa).*
+
+</div>
+
 ### 7.3. Actividad 12 — Cinemática inversa
 
 Se implementó `ik.py` que recibe coordenadas `(x, y, z)` y calcula las configuraciones articulares `(q1, q2, q3, q4)` mediante:
@@ -747,6 +795,14 @@ Se implementó `ik.py` que recibe coordenadas `(x, y, z)` y calcula las configur
 El script prueba 6 puntos cartesianos predefinidos y verifica que FK(IK(punto)) ≈ punto con error < 1 mm. También incluye un modo interactivo.
 
 **Entry point:** `ros2 run lab05_code ik`
+
+<div align="center">
+
+![Captura de pantalla — Actividad 12](screenshots/act12.png)
+
+*Figura 7.2: Pantallazo de la interfaz web — pestaña Actividad 12 (Cinemática inversa).*
+
+</div>
 
 ---
 
@@ -823,6 +879,14 @@ flowchart TD
 3. Posicionar el robot con los sliders, asignar nombre y presionar *Guardar*. Repetir hasta tener al menos 8 poses, según pide la guía.
 4. Ajustar tiempo de transición y presionar *Reproducir*. Para detener, presionar *Detener*.
 
+<div align="center">
+
+![Captura de pantalla — Actividad 13](screenshots/act13.png)
+
+*Figura 8.1: Pantallazo de la interfaz web — pestaña Actividad 13 (Enseñanza y repetición de poses).*
+
+</div>
+
 ### 8.3. Actividad 14 — Trazado de una figura
 
 El trazado de figuras se implementó en dos modalidades:
@@ -845,6 +909,14 @@ El trazado de figuras se implementó en dos modalidades:
 **Entry point:** `ros2 run lab05_code tracing`
 
 **Comportamiento verificado:** triángulo y cuadrado se trazan completos y cerrados; la trayectoria deseada y la real coinciden en el canvas.
+
+<div align="center">
+
+![Captura de pantalla — Actividad 14](screenshots/act14.png)
+
+*Figura 8.2: Pantallazo de la interfaz web — pestaña Actividad 14 (Trazado de figuras).*
+
+</div>
 
 ---
 
@@ -939,6 +1011,14 @@ Abrir `http://localhost:5050`, pestaña *Baile — Coreografía*, presionar *Ini
 ```bash
 ros2 run lab05_code choreography ~/ros2_jazzy/pedro.mp3
 ```
+
+<div align="center">
+
+![Captura de pantalla — Actividad 15](screenshots/act15.png)
+
+*Figura 9.1: Pantallazo de la interfaz web — pestaña Actividad 15 (Coreografía robótica).*
+
+</div>
 
 ---
 
