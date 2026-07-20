@@ -603,7 +603,7 @@ HTML = r'''<!DOCTYPE html>
       <div style="display:flex;gap:12px;flex-wrap:wrap;">
         <div class="card" style="flex:1;min-width:300px;">
           <div class="card-title">Trayectoria (vista Y&ndash;Z)</div>
-          <canvas id="trCanvas" style="width:100%;height:250px;border:1px solid var(--border-light);border-radius:4px;"></canvas>
+          <canvas id="trCanvas" style="width:100%;height:350px;border:1px solid var(--border-light);border-radius:4px;"></canvas>
         </div>
         <div class="card" style="flex:1;min-width:250px;">
           <div class="card-title">Estado</div>
@@ -2104,7 +2104,8 @@ function buildTracing() {
     var verts;
     if (shape === 'triangle') {
       var h = size * Math.sqrt(3) / 2;
-      verts = [[0, h/3], [-size/2, -h/3 + h/2], [size/2, -h/3 + h/2]];
+      // Vértices centrados en (0,0): apex arriba, base abajo
+      verts = [[0, 2*h/3], [-size/2, -h/3], [size/2, -h/3]];
     } else {
       verts = [[-size/2, -size/2], [size/2, -size/2], [size/2, size/2], [-size/2, size/2]];
     }
@@ -2126,7 +2127,7 @@ function buildTracing() {
     var dpr = window.devicePixelRatio || 1;
     var rect = canvas.parentElement.getBoundingClientRect();
     var w = Math.max(200, rect.width - 4);
-    var h = 250;
+    var h = 350;
     canvas.width = w * dpr;
     canvas.height = h * dpr;
     canvas.style.width = w + 'px';
