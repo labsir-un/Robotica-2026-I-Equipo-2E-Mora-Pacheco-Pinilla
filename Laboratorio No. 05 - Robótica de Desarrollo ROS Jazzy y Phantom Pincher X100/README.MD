@@ -1007,6 +1007,7 @@ Laboratorio No. 05/
 
 </div>
 
+El video recorre todas las actividades del laboratorio: algunas se muestran en simulación (`use_hardware:=false`) y otras ejecutadas sobre el robot real, incluyendo la interfaz web en funcionamiento, las gráficas de calibración e interpolación, la verificación de cinemática directa e inversa, el trazado de figuras, y la coreografía robótica sincronizada con audio.
 
 ### 12.2. Capturas y gráficas
 
