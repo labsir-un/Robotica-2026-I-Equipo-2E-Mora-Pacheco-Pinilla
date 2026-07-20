@@ -2808,24 +2808,21 @@ class MovementNode(Node):
             self.publish_trajectory_marker(cmd['points'])
 
     def publish_trajectory_marker(self, points):
-        # Clear old markers
         marker = Marker()
         marker.header.frame_id = 'base_link'
         marker.header.stamp = self.get_clock().now().to_msg()
         marker.ns = 'tcp_traj'
         marker.id = 0
-        marker.action = Marker.DELETEALL
-        self.traj_pub.publish(marker)
-
         if not points:
+            marker.action = Marker.DELETEALL
+            self.traj_pub.publish(marker)
             return
 
-        # Publish LINE_STRIP
-        marker = Marker()
-        marker.header.frame_id = 'base_link'
-        marker.header.stamp = self.get_clock().now().to_msg()
-        marker.ns = 'tcp_traj'
-        marker.id = 0
+        # FK coordinates are in arm frame; transform to base_link by adding
+        # approximate offset from base_link to arm_base (kit_to_arm + case offsets)
+        # Actual offset: ~(0, 0, 0.07) but let user see trajectory at FK coords
+        # The FK origin corresponds approximately to base_link after kit offsets
+        # For now use FK coords as-is since the arm base_link is root
         marker.type = Marker.LINE_STRIP
         marker.action = Marker.ADD
         marker.pose.orientation.w = 1.0
@@ -2838,28 +2835,11 @@ class MovementNode(Node):
             pt = Point()
             pt.x = float(p[0]) if isinstance(p, list) else float(p.get('x', 0))
             pt.y = float(p[1]) if isinstance(p, list) else float(p.get('y', 0))
-            pt.z = float(p[2]) if isinstance(p, list) else float(p.get('z', 0))
+            # FK coords are from arm base, add offset to base_link
+            pt.z = (float(p[2]) if isinstance(p, list) else float(p.get('z', 0))) + 0.07
             marker.points.append(pt)
         self.traj_pub.publish(marker)
-        self.get_logger().info(f'Trajectory LINE_STRIP: {len(marker.points)} pts, first=({marker.points[0].x:.3f},{marker.points[0].y:.3f},{marker.points[0].z:.3f})')
-
-        # Also publish SPHERE_LIST for guaranteed visibility
-        marker2 = Marker()
-        marker2.header = marker.header
-        marker2.ns = 'tcp_spheres'
-        marker2.id = 0
-        marker2.type = Marker.SPHERE_LIST
-        marker2.action = Marker.ADD
-        marker2.pose.orientation.w = 1.0
-        marker2.scale.x = 0.01
-        marker2.scale.y = 0.01
-        marker2.scale.z = 0.01
-        marker2.color.r = 1.0
-        marker2.color.g = 0.0
-        marker2.color.b = 0.0
-        marker2.color.a = 0.6
-        marker2.points = list(marker.points)
-        self.traj_pub.publish(marker2)
+        self.get_logger().info(f'Trajectory LINE_STRIP: {len(marker.points)} pts')
 
 def main():
     rclpy.init()
