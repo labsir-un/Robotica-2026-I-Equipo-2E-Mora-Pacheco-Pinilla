@@ -71,49 +71,6 @@
   </joint>
 
 
-  <link name="canastilla_link">
-    <visual>
-      <origin xyz="0.155 0 0" rpy="0 0 0" />
-      <geometry>
-        <mesh filename="package://pincher_description/meshes/STL/canastilla.stl"
-              scale="0.001 0.001 0.001" />
-      </geometry>
-      <material name="blue" />
-    </visual>
-    <collision>
-        <origin xyz="-0.1365 0.0 0.0905" rpy="0 0 0" />
-        <geometry>
-            <box size="0.017 0.4 0.1855" />
-        </geometry>
-        <material name="blue" />
-    </collision>
-    <collision>
-        <origin xyz="0.4465 0.0 0.0905" rpy="0 0 0" />
-        <geometry>
-            <box size="0.017 0.4 0.1855" />
-        </geometry>
-        <material name="blue" />
-    </collision>
-    <collision>
-        <origin xyz="0.155 0.1915 0.0905" rpy="0 0 0" />
-        <geometry>
-            <box size="0.6 0.017 0.1855" />
-        </geometry>
-        <material name="blue" />
-    </collision>
-    <collision>
-        <origin xyz="0.155 -0.1915 0.0905" rpy="0 0 0" />
-        <geometry>
-            <box size="0.6 0.017 0.1855" />
-        </geometry>
-        <material name="blue" />
-    </collision>
-  </link>
-  <joint name="base_canastilla_joint" type="fixed">
-    <parent link="baseFija_link" />
-    <child link="canastilla_link" />
-    <origin xyz="0 0 0" rpy="0 0 0" />
-  </joint>
 
 
   <link name="ensambleSoporteCamara_link">
