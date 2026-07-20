@@ -446,7 +446,7 @@ $$\text{offset} = \frac{1}{N} \sum_{i=1}^{N} e_{q_i}$$
 
 Para aplicar la corrección en los servomotores AX-12A (rango de 0 a 1023 unidades para 300° de giro mecánico):
 
-$$\text{raw\_offset} = \text{offset}_{\text{grados}} \times \frac{1024}{300}$$
+$$\mathrm{raw\_offset} = \mathrm{offset}_{\mathrm{grados}} \times \frac{1024}{300}$$
 
 **Metodología (según la implementación real de `calibration.py`):** el nodo `CalibrationNode` automatiza el proceso completo. Para cada articulación, en el orden base → hombro → codo → muñeca → pinza:
 
