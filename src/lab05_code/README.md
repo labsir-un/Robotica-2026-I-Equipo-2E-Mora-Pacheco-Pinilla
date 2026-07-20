@@ -1125,7 +1125,11 @@ resueltos con cinemática inversa.
 
 ### 12.4. Implementación
 
-Script autónomo [`lab05_code/tracing.py`](lab05_code/tracing.py) que:
+La actividad se implementó de dos formas complementarias:
+
+#### 12.4.1. Script autónomo (`ros2 run lab05_code tracing`)
+
+El script [`lab05_code/tracing.py`](lab05_code/tracing.py):
 
 - Genera puntos cartesianos para triángulo y cuadrado en un plano vertical
 - Resuelve cada punto mediante cinemática inversa geométrica (4 GDL)
@@ -1141,6 +1145,35 @@ ros2 run lab05_code tracing
 ```
 Los resultados se guardan en `~/ros2_jazzy/phantom_ws/tracing_results/`.
 
+#### 12.4.2. Interfaz web (pestaña *Trazado* en `http://localhost:5050`)
+
+La interfaz web (incluida en `individual_movement.py`) permite trazar las figuras
+en tiempo real con visualización simultánea de la trayectoria deseada y real.
+
+**Características:**
+- Cinemática inversa implementada en JavaScript (`trIk`) con verificación de límites articulares
+- Cinemática directa en JavaScript (`trFk`) para convertir la realimentación articular a coordenadas cartesianas
+- Muestreo de posición a 10 Hz independiente del envío de comandos
+- Espera de drenaje de cola antes de graficar (3 s)
+- El robot se posiciona en el primer vértice antes de iniciar el trazado
+
+**Flujo de datos:**
+```
+trGenFig(shape, size) ──► puntos cartesianos
+        │
+        ▼
+trIk(x, y, z) ──► q (ángulos articulares en °)
+        │
+        ▼
+POST /api/command ──► command_queue ──► /pincher/command ──► control_servo
+        │
+        ▼ (muestreo a 10 Hz)
+GET /api/state ──► current_state ──► trFk(q_deg) ──► (y, z) real
+        │
+        ▼ (al finalizar)
+trDraw(pts, actuals) ──► canvas con ambas trayectorias
+```
+
 **Parámetros de dibujo:**
 | Parámetro | Valor |
 |-----------|-------|
@@ -1148,7 +1181,7 @@ Los resultados se guardan en `~/ros2_jazzy/phantom_ws/tracing_results/`.
 | Centro en Z | `0.10` m |
 | Tamaños | 4 cm y 6 cm |
 | Puntos por arista | 30 |
-| Frecuencia de envío | ~25 Hz |
+| Frecuencia de muestreo | 10 Hz |
 
 ---
 
@@ -1341,7 +1374,7 @@ lab05_code/
 | 11 | `ros2 run lab05_code fk_dh` | *(pendiente)* |
 | 12 | `ros2 run lab05_code ik` | *(pendiente)* |
 | 13 | `ros2 run lab05_code individual_movement` (pestaña 2) | `individual_movement.py` |
-| 14 | `ros2 run lab05_code tracing` | *(pendiente)* |
+| 14 | `ros2 run lab05_code tracing` + `ros2 run lab05_code individual_movement` (pestaña *Trazado*) | `tracing.py` + `individual_movement.py` |
 | 15 | `ros2 run lab05_code individual_movement` (pestaña 6) + `ros2 run lab05_code choreography` | `individual_movement.py` + `choreography.py` |
 
 ---
