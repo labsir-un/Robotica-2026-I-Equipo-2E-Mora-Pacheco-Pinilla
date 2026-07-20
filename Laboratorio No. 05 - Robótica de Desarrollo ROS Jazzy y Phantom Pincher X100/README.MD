@@ -1038,7 +1038,7 @@ Las gráficas de calibración (Actividad 5) están incluidas en la sección 5.3,
 
 ### Duvan Felipe Pacheco Rodriguez
 
-*Pendiente.*
+Este laboratorio representó un reto integral que abarcó desde la configuración del entorno de desarrollo hasta la implementación de algoritmos de cinemática sobre un manipulador real. Mi participación se centró en la estructuración del repositorio, asegurando que todo el código, los paquetes de control y descripción, y los resultados experimentales estuvieran organizados dentro de una jerarquía clara por laboratorio, facilitando la navegación y replicabilidad del proyecto. Además, trabajé en la corrección de la representación geométrica del robot, ajustando el diagrama de dimensiones para reflejar fielmente la posición vertical del brazo en home, y en la validación experimental de la Actividad 8, donde medí los tiempos de ejecución simultáneo y secuencial usando el simulador y estimé el comportamiento real del robot con base en las especificaciones del AX-12A. La integración de la cinemática directa e inversa en la interfaz web, junto con el trazado de figuras en el plano vertical, me permitió comprender la importancia de cerrar el ciclo entre la teoría DH y su validación visual en tiempo real. En particular, verificar que cada solución articular respetara los límites de seguridad antes de ser enviada al robot reforzó mi criterio de diseño responsable en sistemas robóticos. En conjunto, esta experiencia consolidó mi capacidad para diagnosticar, documentar y resolver problemas en un flujo de trabajo real con ROS 2.
 
 ### Juan Andres Mora Henao
 
