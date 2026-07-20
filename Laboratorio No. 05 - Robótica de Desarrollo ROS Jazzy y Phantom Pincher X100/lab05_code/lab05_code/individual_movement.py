@@ -627,6 +627,7 @@ var JOINTS = ['waist','shoulder','elbow','wrist','gripper'];
 var LIMITS = { waist:[-150,150], shoulder:[-150,150], elbow:[-150,150], wrist:[-150,150], gripper:[-90,90] };
 var LABELS = { waist:'Base', shoulder:'Hombro', elbow:'Codo', wrist:'Muneca', gripper:'Pinza' };
 var MAX_HIST = 120;
+var state = {};
 var history = {};
 JOINTS.forEach(function(j) { history[j] = []; });
 
@@ -1003,6 +1004,7 @@ function poll() {
   fetch('/api/state')
     .then(function(r) { return r.json(); })
     .then(function(d) {
+      state = d;
       var parts = JOINTS.map(function(j) {
         var v = (d[j] || 0) * 180 / Math.PI;
         var actEl = document.getElementById('tr-act-' + j);
