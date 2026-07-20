@@ -2106,68 +2106,61 @@ function buildTracing() {
           body: JSON.stringify({ name: JOINTS, position: pos })
         });
       }
-      setTimeout(startLoop, 400);
+      setTimeout(startLoop, 600);
     }
 
-    function startLoop() {
-      /* Registrar posición inicial */
+    function pollActual() {
       fetch('/api/state').then(function(r) { return r.json(); }).then(function(s) {
         var qDeg = JOINTS.map(function(j) { return (s[j]||0) * 180 / Math.PI; });
         var tcp = trFk(qDeg);
         actuals.push([tcp.y, tcp.z]);
-        i = 1; /* saltar el primer punto (ya estamos ahí) */
-        trDraw(pts, []);
-        step();
-      });
+      }).catch(function() {});
     }
 
-    function step() {
-      if (trStopFlag || i >= total) {
-        trRunning = false;
-        document.getElementById('trStartBtn').disabled = false;
-        document.getElementById('trStopBtn').disabled = true;
-        document.getElementById('trProgress').textContent = trStopFlag ? 'Detenido' : 'Completado';
-        if (i >= total) {
-          var ts2 = new Date().toTimeString().slice(0,8);
-          logEl.innerHTML = '<div><span class="time">' + ts2 + '</span> Trazado completado (' + total + ' puntos)</div>' + logEl.innerHTML;
+    function startLoop() {
+      pollActual();
+      i = 1;
+      trDraw(pts, []);
+      /* Muestrear posición cada 100ms mientras se envían comandos */
+      var sampleTimer = setInterval(pollActual, 100);
+      /* Enviar comandos rápido */
+      function sendCmd() {
+        if (trStopFlag || i >= total) {
+          /* No detener el timer aún: la cola sigue procesando */
           setTimeout(function() {
-            fetch('/api/state').then(function(r) { return r.json(); }).then(function(s) {
-              var qDeg = JOINTS.map(function(j) { return (s[j]||0) * 180 / Math.PI; });
-              var tcp = trFk(qDeg);
-              actuals.push([tcp.y, tcp.z]);
-              trDraw(pts, actuals);
-            });
-          }, 1500);
+            pollActual();
+            setTimeout(function() {
+              clearInterval(sampleTimer);
+              pollActual();
+              setTimeout(function() {
+                trRunning = false;
+                document.getElementById('trStartBtn').disabled = false;
+                document.getElementById('trStopBtn').disabled = true;
+                document.getElementById('trProgress').textContent = 'Completado';
+                trDraw(pts, actuals);
+                var ts2 = new Date().toTimeString().slice(0,8);
+                logEl.innerHTML = '<div><span class="time">' + ts2 + '</span> Trazado completado (' + total + ' puntos)</div>' + logEl.innerHTML;
+              }, 200);
+            }, 100);
+          }, 3000);
+          return;
         }
-        return;
-      }
-
-      var pt = pts[i];
-      document.getElementById('trPoint').textContent = (i+1) + ' / ' + total;
-      document.getElementById('trProgress').textContent = Math.round((i/total)*100) + '%';
-
-      var q = trIk(pt.wx, pt.wy, pt.wz);
-      if (q) {
-        var pos = JOINTS.map(function(j, idx) { return q[idx] * Math.PI / 180; });
-        fetch('/api/command', {
-          method: 'POST',
-          headers: {'Content-Type':'application/json'},
-          body: JSON.stringify({ name: JOINTS, position: pos })
-        });
-      }
-
-      /* Poll actual state for feedback */
-      setTimeout(function() {
-        if (!trStopFlag) {
-          fetch('/api/state').then(function(r) { return r.json(); }).then(function(s) {
-            var qDeg = JOINTS.map(function(j) { return (s[j]||0) * 180 / Math.PI; });
-            var tcp = trFk(qDeg);
-            actuals.push([tcp.y, tcp.z]);
-          }).catch(function() {});
+        var pt = pts[i];
+        var q = trIk(pt.wx, pt.wy, pt.wz);
+        if (q) {
+          var pos = JOINTS.map(function(j, idx) { return q[idx] * Math.PI / 180; });
+          fetch('/api/command', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({ name: JOINTS, position: pos })
+          });
         }
         i++;
-        setTimeout(step, 30);
-      }, 5);
+        document.getElementById('trPoint').textContent = i + ' / ' + total;
+        document.getElementById('trProgress').textContent = Math.round(((i-1)/total)*100) + '%';
+        setTimeout(sendCmd, 20);
+      }
+      sendCmd();
     }
 
     moveToStart();
