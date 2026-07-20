@@ -18,7 +18,7 @@ class RobotDescPublisher(Node):
             history=HistoryPolicy.KEEP_LAST,
         )
         self.pub = self.create_publisher(String, 'robot_description', qos)
-        self.timer = self.create_timer(2.0, lambda: self._publish(urdf))
+        self.timer = self.create_timer(0.5, lambda: self._publish(urdf))
 
     def _publish(self, urdf):
         msg = String(data=urdf)
