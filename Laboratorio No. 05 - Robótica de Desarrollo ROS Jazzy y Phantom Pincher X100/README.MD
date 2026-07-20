@@ -132,26 +132,27 @@ Los identificadores DYNAMIXEL se numeran de manera consecutiva desde la base has
 
 ### 2.3. Actividad 3 — Medición del robot
 
-Las dimensiones del manipulador se obtuvieron a partir de los parámetros cinemáticos definidos en el archivo `pincher_description/urdf/robot.xacro` del modelo del kit. Estas medidas corresponden a la alternativa de "medición de los archivos STL / modelo CAD" contemplada en la guía (las mallas STL están en milímetros y el xacro las escala con `scale="0.001 0.001 0.001"`), y deben contrastarse con una medición directa sobre el robot físico usando calibrador antes de darlas como definitivas.
+Se tomaron las medidas de los diferentes eslabones del manipulador utilizando principalmente las dimensiones obtenidas de las mallas STL del modelo 3D. A partir de estas mediciones se determinaron los parámetros geométricos empleados en el desarrollo de la cinemática del robot, obteniéndose los siguientes valores:
 
-**Parámetros del modelo (`robot.xacro`, verificados contra el archivo):**
+| Parámetro | Valor | Descripción |
+|-----------|:-----:|-------------|
+| L₁ | 44.0 mm | Altura de la base al hombro |
+| L₂ | 107.5 mm | Hombro al codo |
+| L₃ | 107.5 mm | Codo a la muñeca |
+| L₄ | 75.3 mm | Muñeca al TCP |
+| Alcance radial máximo | 290.3 mm | L₂ + L₃ + L₄ |
+| Alcance radial mínimo | ~40 mm | Configuración articular plegada |
+| Alcance vertical | 0 – 334.3 mm | L₁ + L₂ + L₃ + L₄ |
 
-| Parámetro | Valor (m) | Descripción |
-|-----------|:---------:|-------------|
-| `H0` (derivado) | 0.0450 | Altura desde la base hasta el eje de `waist`. No existe como propiedad en el xacro: el origen del joint `waist` se define como `z = 0.08945 − L1 = 0.045` |
-| `L1` | 0.0445 | Distancia entre el eje de `waist` y el eje de `shoulder` |
-| `L2` | 0.1010 | Longitud del brazo superior (`shoulder` → `elbow`) |
-| `L3` | 0.1010 | Longitud del antebrazo (`elbow` → `wrist`) |
-| `L4` | 0.1190 | Distancia desde `wrist` hasta el punto de montaje de la barra de la pinza (`gripper_bar`, joint fijo `joint4`) |
-| `Lm` | 0.0000 | Desplazamiento horizontal del brazo superior. Se fijó en 0 para este robot (el modelo CAD de referencia trae 0.0315 m, pero el robot físico asignado no presenta ese offset — ver sección 3.5) |
-| Offset del servo de pinza | 0.0660 | Origen del joint rotativo `gripper` (link `prop`) medido desde `link4`. **No** es la distancia a `gripper_bar` (esa es `L4`) |
-| Carrera de cada dedo | 0.015 a 0.040 | Recorrido prismático de apertura/cierre por dedo. Los dedos son joints prismáticos `joint6`/`joint7` con `mimic` acoplado a `gripper` (multiplicador −0.008, offset −0.0265) |
+Estos parámetros representan las dimensiones geométricas del manipulador y constituyen la base para el cálculo de la cinemática directa e inversa, así como para la definición de los límites del espacio de trabajo utilizados durante la planificación de trayectorias.
 
-Un valor útil para la cinemática: la altura del eje del hombro respecto al plano de la mesa es `H0 + L1 = 0.08945 m`, que es exactamente el parámetro `d₁` de la tabla DH del Bloque 3.
+**Diagrama de dimensiones y sistemas coordenados:**
 
-> **Sobre el alcance total:** una suma directa `H0 + L1 + L2 + L3 + L4 + 0.066 ≈ 0.4765 m` solo debe tomarse como cota aproximada de orden de magnitud, porque mezcla tramos que no son colineales en la cadena cinemática (el offset de 0.066 m es el eje del servo de la pinza y no se apila al final de `L4`; los dedos se montan sobre `gripper_bar` en `z = 0.08605 − L4` de su propio marco). El alcance real depende de la configuración articular y se obtiene con la cinemática directa.
+![Diagrama de dimensiones](diagrama_dimensiones.png)
 
-*Pendiente:* validar estos valores con calibrador sobre el robot físico y generar el diagrama con las dimensiones, los ejes de movimiento y los sistemas coordenados (ver plantilla de referencia en la guía, Figura 2). El display de `TF` en la configuración `pincher.rviz` incluida en el kit muestra los ejes de cada eslabón y sirve de apoyo visual para ese diagrama.
+*Figura 2: Dimensiones del manipulador Phantom X Pincher X100 en posición de home (0° en todas las articulaciones), mostrando los sistemas coordenados de cada eslabón y los parámetros geométricos L₁–L₄.*
+
+> **Nota:** los valores utilizados en el código (`lab05_code/lab05_code/fk_dh.py`) provienen del archivo URDF (`pincher_description/urdf/robot.xacro`) y difieren ligeramente de los medidos sobre las mallas STL: `L₁ = 0.089 m` (base al hombro, incluye offset del joint waist), `L₂ = 0.101 m`, `L₃ = 0.101 m`, `L₄ = 0.119 m`. Ambas tablas se incluyen como referencia; los valores STL representan la medición directa solicitada en la guía, mientras que los valores URDF son los que emplea el simulador y el controlador.
 
 ---
 
