@@ -265,6 +265,9 @@ HTML = r'''<!DOCTYPE html>
 
   <div id="act4" class="tab-content active">
     <div class="body" id="jointList"></div>
+    <div style="padding:0 24px 8px;">
+      <canvas id="act4Traj" style="width:100%;height:200px;border:1px solid var(--border-light);border-radius:4px;"></canvas>
+    </div>
     <div style="padding:0 24px 14px;">
       <div class="action-row"><button class="btn-home" id="homeBtn">Home (todas a 0&deg;)</button></div>
       <div class="log"><div class="entries" id="logEntries"></div></div>
@@ -766,6 +769,47 @@ function buildAct4() {
       drawSpark(j, canvas);
     });
   });
+
+  // TCP trajectory canvas
+  var trajCanvas = document.getElementById('act4Traj');
+  var trajCtx = trajCanvas.getContext('2d');
+  var trajPoints = [];
+  var MAX_TRAJ = 200;
+  resizeCanvas(trajCanvas);
+
+  setInterval(function() {
+    var q = JOINTS.map(function(j) { return (state[j] || 0) * 180 / Math.PI; });
+    var tcp = trFk(q);
+    trajPoints.push({x: tcp.x, z: tcp.z});
+    if (trajPoints.length > MAX_TRAJ) trajPoints.shift();
+    drawTraj();
+  }, 200);
+
+  function drawTraj() {
+    var ctx = trajCtx, w = trajCanvas.width, h = trajCanvas.height;
+    ctx.clearRect(0, 0, w, h);
+    if (trajPoints.length < 2) return;
+    var margin = 20, pw = w - 2*margin, ph = h - 2*margin;
+    var xs = trajPoints.map(function(p) { return p.x; });
+    var zs = trajPoints.map(function(p) { return p.z; });
+    var xMin = Math.min.apply(null, xs) - 0.01, xMax = Math.max.apply(null, xs) + 0.01;
+    var zMin = Math.min.apply(null, zs) - 0.01, zMax = Math.max.apply(null, zs) + 0.01;
+    if (xMax - xMin < 0.01) { xMin -= 0.005; xMax += 0.005; }
+    if (zMax - zMin < 0.01) { zMin -= 0.005; zMax += 0.005; }
+    function sx(v) { return margin + (v - xMin) / (xMax - xMin) * pw; }
+    function sy(v) { return h - margin - (v - zMin) / (zMax - zMin) * ph; }
+    ctx.strokeStyle = '#2b6cb0'; ctx.lineWidth = 1.5; ctx.beginPath();
+    for (var i = 0; i < trajPoints.length; i++) {
+      var px = sx(trajPoints[i].x), py = sy(trajPoints[i].z);
+      if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    }
+    ctx.stroke();
+    var last = trajPoints[trajPoints.length-1];
+    ctx.fillStyle = '#c53030'; ctx.beginPath();
+    ctx.arc(sx(last.x), sy(last.z), 3, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#1a202c'; ctx.font = '10px monospace';
+    ctx.fillText('XZ: (' + (last.x*1000).toFixed(0) + ', ' + (last.z*1000).toFixed(0) + ') mm', margin+2, margin+12);
+  }
 }
 
 document.getElementById('homeBtn').onclick = function() {
