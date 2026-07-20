@@ -2304,7 +2304,12 @@ function buildAct12() {
     var x_mm = parseFloat(document.getElementById('ikX').value) || 0;
     var y_mm = parseFloat(document.getElementById('ikY').value) || 0;
     var z_mm = parseFloat(document.getElementById('ikZ').value) || 0;
-    var q = trIk(x_mm/1000, y_mm/1000, z_mm/1000);
+    console.log('IK input mm:', x_mm, y_mm, z_mm);
+    var x_m = x_mm/1000, y_m = y_mm/1000, z_m = z_mm/1000;
+    console.log('IK input m:', x_m, y_m, z_m);
+    console.log('L0,L1,L2,L3:', L0, L1, L2, L3);
+    var q = trIk(x_m, y_m, z_m);
+    console.log('trIk result:', q);
     var errEl = document.getElementById('ikError');
     if (!q) {
       errEl.textContent = 'Sin soluci&oacute;n v&aacute;lida (fuera del espacio de trabajo o l&iacute;mites)';
