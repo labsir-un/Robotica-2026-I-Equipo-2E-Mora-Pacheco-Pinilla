@@ -2,7 +2,7 @@ import os
 
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, OpaqueFunction
+from launch.actions import DeclareLaunchArgument, OpaqueFunction, TimerAction
 from launch.conditions import IfCondition
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
@@ -39,6 +39,13 @@ def _launch_setup(context):
     ).toxml()
 
     return [
+        Node(
+            package='pincher_description',
+            executable='robot_desc_pub',
+            name='robot_desc_publisher',
+            output='screen',
+            parameters=[{'robot_description': robot_description}],
+        ),
         Node(
             package='robot_state_publisher',
             executable='robot_state_publisher',

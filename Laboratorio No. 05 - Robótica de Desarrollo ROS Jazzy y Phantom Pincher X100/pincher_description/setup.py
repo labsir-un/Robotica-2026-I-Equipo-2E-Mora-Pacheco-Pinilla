@@ -18,7 +18,7 @@ def _mesh_data_files():
 setup(
     name=package_name,
     version='0.1.0',
-    packages=[],
+    packages=[package_name],
     data_files=(
         [('share/ament_index/resource_index/packages', ['resource/' + package_name])] +
         [('share/' + package_name, ['package.xml'])] +
@@ -34,5 +34,5 @@ setup(
     description='URDF/Xacro, mallas y visualización RViz del PhantomX Pincher X100.',
     license='BSD-3-Clause',
     tests_require=['pytest'],
-    entry_points={'console_scripts': []},
+    entry_points={'console_scripts': ['robot_desc_pub = pincher_description.robot_desc_pub:main']},
 )
