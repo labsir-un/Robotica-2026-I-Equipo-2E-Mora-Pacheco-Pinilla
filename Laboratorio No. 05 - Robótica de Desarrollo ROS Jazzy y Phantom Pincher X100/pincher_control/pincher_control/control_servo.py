@@ -355,11 +355,15 @@ class PincherController(Node):
             return
 
         command_received = False
+        new_positions = list(self.current_joint_positions)
         for joint_index, radians in self._command_pairs(msg):
             command_received = True
             raw_goal = self._joint_radians_to_raw(radians, joint_index)
             clamped_radians = self._raw_to_joint_radians(raw_goal, joint_index)
             self.commanded_joint_positions[joint_index] = clamped_radians
+
+            if not self.use_hardware:
+                new_positions[joint_index] = clamped_radians
 
             if self.use_hardware:
                 if not self.hardware_ready or not self.torque_enabled:
@@ -375,8 +379,8 @@ class PincherController(Node):
                     raw_goal,
                     'Goal Position',
                 )
-            else:
-                self.current_joint_positions[joint_index] = clamped_radians
+        if not self.use_hardware:
+            self.current_joint_positions = new_positions
 
         if not command_received:
             self.get_logger().warning(
