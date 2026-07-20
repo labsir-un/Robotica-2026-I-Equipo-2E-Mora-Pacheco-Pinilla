@@ -2038,18 +2038,20 @@ function trIk(x, y, z) {
     var d = Math.max(0.0001, dWrist);
     var c3 = Math.max(-1, Math.min(1, (d*d - L1*L1 - L2*L2) / (2*L1*L2)));
     var q3r = Math.acos(c3);
-    var q3Try = -q3r * 180 / Math.PI;
-    var alpha = Math.atan2(L2 * Math.sin(q3r), L1 + L2 * Math.cos(q3r));
-    var q2Try = Math.atan2(zWristRel, rWrist) * 180 / Math.PI - alpha * 180 / Math.PI;
-    var q4Try = -90 - q2Try - q3Try;
-    var q = [q1, q2Try, q3Try, q4Try, 0];
-    var ok = true;
-    for (var k = 0; k < 5; k++) {
-      if (q[k] < limits[k][0] || q[k] > limits[k][1]) { ok = false; break; }
-    }
-    if (ok) {
-      var dist = Math.abs(phiDeg);
-      if (dist < bestDist) { bestDist = dist; best = q; }
+    for (var signIdx = 0; signIdx < 2; signIdx++) {
+      var q3Try = (signIdx === 0 ? -1 : 1) * q3r * 180 / Math.PI;
+      var alpha = Math.atan2(L2 * Math.sin(Math.abs(q3Try)*Math.PI/180), L1 + L2 * Math.cos(Math.abs(q3Try)*Math.PI/180));
+      var q2Try = Math.atan2(zWristRel, rWrist) * 180 / Math.PI - alpha * 180 / Math.PI;
+      var q4Try = -90 - q2Try - q3Try;
+      var q = [q1, q2Try, q3Try, q4Try, 0];
+      var ok = true;
+      for (var k = 0; k < 5; k++) {
+        if (q[k] < limits[k][0] || q[k] > limits[k][1]) { ok = false; break; }
+      }
+      if (ok) {
+        var dist = Math.abs(phiDeg);
+        if (dist < bestDist) { bestDist = dist; best = q; }
+      }
     }
   }
   return best;
@@ -2227,8 +2229,18 @@ function buildTracing() {
 
     var pts = trGenFig(shape, size, 30);
     var total = pts.length;
+    if (total === 0) { trRunning = false; return; }
     var i = 0;
     var actuals = [];
+    trDraw(pts, []);
+    document.getElementById('trProgress').textContent = 'Moviendo al inicio...';
+
+    // Clear old RViz trajectory
+    fetch('/api/trajectory', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ points: [] })
+    });
     var logEl = document.getElementById('trLog');
     var ts = new Date().toTimeString().slice(0,8);
     logEl.innerHTML = '<div><span class="time">' + ts + '</span> Iniciando trazado de ' + figName + ' ' + (size*100) + ' cm</div>' + logEl.innerHTML;
