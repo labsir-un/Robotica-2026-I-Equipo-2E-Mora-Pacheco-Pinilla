@@ -405,11 +405,12 @@ class PincherController(Node):
         if self.software_stop_active or not self.torque_enabled:
             return False
         success = True
+        new_positions = list(self.current_joint_positions)
         for index, raw_goal in enumerate(self.home_positions):
-            self.commanded_joint_positions[index] = self._raw_to_joint_radians(
-                raw_goal,
-                index,
-            )
+            commanded = self._raw_to_joint_radians(raw_goal, index)
+            self.commanded_joint_positions[index] = commanded
+            if not self.use_hardware:
+                new_positions[index] = commanded
             if self.use_hardware:
                 success = self._write_register(
                     self.dxl_ids[index],
@@ -418,8 +419,8 @@ class PincherController(Node):
                     raw_goal,
                     'Goal Position HOME',
                 ) and success
-            else:
-                self.current_joint_positions[index] = self.commanded_joint_positions[index]
+        if not self.use_hardware:
+            self.current_joint_positions = new_positions
         return success
 
     def home_callback(self, request: Trigger.Request, response: Trigger.Response) -> Trigger.Response:
