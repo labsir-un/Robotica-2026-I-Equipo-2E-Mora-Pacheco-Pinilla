@@ -234,7 +234,7 @@ pincher_controller:
 >
 > ```bash
 > ros2 run pincher_control control_servo --ros-args --params-file \
->   ~/ros2_jazzy/phantom_ws/src/pincher_control/config/ax12a.yaml \
+>   ~/ros2_jazzy/phantom_ws/src/Laboratorio\ No.\ 05/pincher_control/config/ax12a.yaml \
 >   -r __node:=pincher_controller -p use_hardware:=true
 > ```
 >
@@ -934,30 +934,33 @@ Debe incluirse aquí el plano de planta de la ubicación del robot dentro del es
 ```
 Laboratorio No. 05/
 ├── README.MD                          # Este documento (informe completo del laboratorio)
-├── calibration_results/               # Resultados válidos de calibración (Actividad 5, sesión 2026-07-08)
-│   ├── calibracion_waist.png
-│   ├── calibracion_shoulder.png
-│   ├── calibracion_elbow.png
-│   ├── calibracion_wrist.png
-│   ├── calibracion_gripper.png
-│   ├── calibracion_resumen.png
-│   ├── calibracion_resultados.yaml
-│   ├── offsets_recomendados.yaml
-│   └── README_calibracion.md          # Reporte autogenerado por calibration.py
-└── lab05_code/                        # Paquete ROS 2 con el código propio del laboratorio
-    ├── package.xml
-    ├── setup.py                       # Entry points (13 scripts registrados)
-    ├── setup.cfg
-    └── lab05_code/
-        ├── __init__.py
-        ├── individual_movement.py     # Act. 4, 7, 8, 9, 13, 14, 15: nodo + interfaz web unificada
-        ├── calibration.py             # Act. 5: calibración de cero y error articular
-        ├── interpolation.py           # Act. 9: interpolación de trayectorias (script)
-        ├── sinusoidal.py              # Act. 10: trayectoria sinusoidal (script)
-        ├── fk_dh.py                   # Act. 11: cinemática directa DH (script)
-        ├── ik.py                      # Act. 12: cinemática inversa (script)
-        ├── tracing.py                 # Act. 14: trazado de figuras CLI (script)
-        └── choreography.py            # Act. 15: coreografía robótica (script autónomo)
+├── calibration_results/               # Resultados válidos de calibración (Actividad 5)
+├── lab05_code/                        # Paquete ROS 2 con el código propio del laboratorio
+│   ├── package.xml
+│   ├── setup.py                       # Entry points (13 scripts registrados)
+│   ├── setup.cfg
+│   └── lab05_code/
+│       ├── __init__.py
+│       ├── individual_movement.py     # Act. 4, 7, 8, 9, 13, 14, 15: nodo + interfaz web
+│       ├── calibration.py             # Act. 5: calibración de cero y error articular
+│       ├── interpolation.py           # Act. 9: interpolación de trayectorias
+│       ├── sinusoidal.py              # Act. 10: trayectoria sinusoidal
+│       ├── fk_dh.py                   # Act. 11: cinemática directa DH
+│       ├── ik.py                      # Act. 12: cinemática inversa
+│       ├── tracing.py                 # Act. 14: trazado de figuras CLI
+│       └── choreography.py            # Act. 15: coreografía robótica
+├── pincher_control/                   # Paquete base: controlador DYNAMIXEL
+│   ├── config/ax12a.yaml
+│   ├── launch/pincher_system.launch.py
+│   └── pincher_control/
+│       ├── control_servo.py           # Nodo pincher_controller
+│       ├── dynamixel_profiles.py
+│       ├── pincher_gui.py
+│       └── scan_dynamixel.py
+└── pincher_description/               # Paquete base: modelo URDF y mallas
+    ├── urdf/robot.xacro
+    ├── meshes/                        # 8 mallas STL
+    └── rviz/pincher.rviz
 ```
     └── launch/                        # display.launch.py, display_gui.launch.py
 ```
