@@ -10,9 +10,6 @@ setup(
         'console_scripts': [
             'individual_movement = lab05_code.individual_movement:main',
             'calibration = lab05_code.calibration:main',
-            'safe_limits = lab05_code.safe_limits:main',
-            'simultaneous_movement = lab05_code.simultaneous_movement:main',
-            'sequential_movement = lab05_code.sequential_movement:main',
             'teach_and_repeat = lab05_code.individual_movement:main',
             'interpolation = lab05_code.interpolation:main',
             'sinusoidal = lab05_code.sinusoidal:main',

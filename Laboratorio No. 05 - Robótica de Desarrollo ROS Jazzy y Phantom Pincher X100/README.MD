@@ -300,13 +300,13 @@ El sistema completo se apoya en un único nodo externo, `pincher_controller` (en
 | `calibration` | 5 | `calibration.py` | Implementado |
 | `interpolation` | 9 (script autónomo con gráficas) | `interpolation.py` | Implementado |
 | `choreography` | 15 (script autónomo) | `choreography.py` | Implementado |
-| `teach_and_repeat` | 13 (alias de `individual_movement`) | `individual_movement.py` | Implementado |
 | `tracing` | 14 (script autónomo CLI con gráficas) | `tracing.py` | Implementado |
 | `sinusoidal` | 10 | `sinusoidal.py` | Implementado |
 | `fk_dh` | 11 | `fk_dh.py` | Implementado |
 | `ik` | 12 | `ik.py` | Implementado |
-| `safe_limits` | 6 | *(no implementado como script; valores en constantes de `individual_movement.py`)* | Cubierto vía constantes |
-| `simultaneous_movement` / `sequential_movement` | 7 / 8 como scripts independientes | *(funcionalidad cubierta por la interfaz web)* | Cubierto vía web |
+| `teach_and_repeat` | 13 (alias de `individual_movement`) | `individual_movement.py` | Implementado |
+| `tracing` | 14 (script autónomo CLI con gráficas) | `tracing.py` | Implementado |
+| `choreography` | 15 (script autónomo) | `choreography.py` | Implementado |
 
 > **Nota:** todos los entry points están declarados en `setup.py` y se invocan con `ros2 run lab05_code <nombre>`.
 
@@ -544,7 +544,7 @@ Los límites seguros se determinaron mediante pruebas experimentales en las que 
 | Muñeca       | −106.0°         | +124.0°         | 4.0°                |
 | Pinza        | −35.0°          | +35.0°          | 5.0°                |
 
-Estos límites se validan en el backend (`APIHandler.do_POST`) antes de encolar cualquier comando. Si un valor excede estos límites, el servidor responde con HTTP 400 y el comando no se ejecuta. No se implementó un script `safe_limits.py` independiente porque la determinación experimental se realizó manualmente y los valores se incorporaron directamente en la tabla de constantes.
+Estos límites se validan en el backend (`APIHandler.do_POST`) antes de encolar cualquier comando. Si un valor excede estos límites, el servidor responde con HTTP 400 y el comando no se ejecuta. La tabla `JOINT_LIMITS_DEG` en `individual_movement.py` contiene los límites del URDF para validación; los valores experimentales de esta sección se documentan con fines de referencia. No se implementó un script `safe_limits.py` independiente porque la determinación experimental se realizó manualmente.
 
 ---
 
@@ -1045,7 +1045,7 @@ Laboratorio No. 05/
 ├── calibration_results/               # Resultados válidos de calibración (Actividad 5)
 ├── lab05_code/                        # Paquete ROS 2 con el código propio del laboratorio
 │   ├── package.xml
-│   ├── setup.py                       # Entry points (13 scripts registrados)
+│   ├── setup.py                       # Entry points (9 scripts registrados)
 │   ├── setup.cfg
 │   └── lab05_code/
 │       ├── __init__.py

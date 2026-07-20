@@ -61,7 +61,7 @@ def nearest_solution(x, y, z, current_q=None):
 
 def main():
     print('Actividad 12 — Cinemática Inversa')
-    print(f'  L0={L0*1e3:.0f} L1={L1*1e3:.0f} L2={L2*1e3:.0f} L3={L3*1e3:.0f} mm')
+    print(f'  L0={L0b*1000:.0f} L1={L1b*1000:.0f} L2={L2b*1000:.0f} L3={L3b*1000:.0f} mm')
     tests = [
         ('Home FK',        0.321, 0.00, 0.089),
         ('Tri apex',       0.130, 0.00, 0.129),
