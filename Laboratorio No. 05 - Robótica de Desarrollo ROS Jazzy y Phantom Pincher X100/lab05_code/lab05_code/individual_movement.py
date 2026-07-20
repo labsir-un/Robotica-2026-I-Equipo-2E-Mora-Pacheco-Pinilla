@@ -543,11 +543,11 @@ HTML = r'''<!DOCTYPE html>
         <div class="card-title">IK &mdash; Cinem&aacute;tica Inversa</div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:10px;">
           <label style="font-size:.75rem;">x (m):</label>
-          <input type="number" id="ikX" value="0.25" step="0.01" style="width:80px;padding:4px;border:1px solid var(--border);border-radius:4px;font-size:.75rem;">
+          <input type="number" id="ikX" value="0.13" step="0.01" style="width:80px;padding:4px;border:1px solid var(--border);border-radius:4px;font-size:.75rem;">
           <label style="font-size:.75rem;margin-left:8px;">y (m):</label>
           <input type="number" id="ikY" value="0.0" step="0.01" style="width:80px;padding:4px;border:1px solid var(--border);border-radius:4px;font-size:.75rem;">
           <label style="font-size:.75rem;margin-left:8px;">z (m):</label>
-          <input type="number" id="ikZ" value="0.15" step="0.01" style="width:80px;padding:4px;border:1px solid var(--border);border-radius:4px;font-size:.75rem;">
+          <input type="number" id="ikZ" value="0.10" step="0.01" style="width:80px;padding:4px;border:1px solid var(--border);border-radius:4px;font-size:.75rem;">
           <label style="font-size:.75rem;margin-left:8px;">Codo:</label>
           <select id="ikElbow" style="padding:4px;border:1px solid var(--border);border-radius:4px;font-size:.75rem;">
             <option value="up">Arriba</option>
@@ -563,6 +563,7 @@ HTML = r'''<!DOCTYPE html>
         <div id="ikResults" style="font-size:.85rem;font-family:'SF Mono','Fira Code',monospace;">
           <div>q<sub>1</sub> = <span id="ikQ1">—</span>&deg; | q<sub>2</sub> = <span id="ikQ2">—</span>&deg; | q<sub>3</sub> = <span id="ikQ3">—</span>&deg; | q<sub>4</sub> = <span id="ikQ4">—</span>&deg;</div>
           <div id="ikError" style="color:var(--accent);font-weight:600;"></div>
+        <div style="font-size:.65rem;color:var(--text-muted);margin-top:4px;">Puntos de referencia: x=0.13 m, z≈0.05–0.35 m, y libre (l&iacute;mite radial ≈ 0.32 m)</div>
         </div>
       </div>
       <div class="log" style="margin-top:6px;">
