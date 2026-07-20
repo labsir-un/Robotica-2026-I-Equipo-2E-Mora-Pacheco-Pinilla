@@ -133,7 +133,9 @@ def generate_shape(shape, size=0.05, center_dist=0.14, center_z=0.10, n_pts_per_
     for i in range(nv):
         y0, z0 = verts[i]
         y1, z1 = verts[(i + 1) % nv]
-        for j in range(n_pts_per_edge):
+        last = (i == nv - 1)
+        limit = n_pts_per_edge if last else n_pts_per_edge - 1
+        for j in range(limit + 1):
             frac = j / n_pts_per_edge
             wy = y0 + (y1 - y0) * frac
             wz = center_z + z0 + (z1 - z0) * frac

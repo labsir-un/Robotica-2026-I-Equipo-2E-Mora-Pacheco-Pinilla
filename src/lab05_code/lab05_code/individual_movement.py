@@ -1968,7 +1968,9 @@ function buildTracing() {
     for (var i = 0; i < verts.length; i++) {
       var y0 = verts[i][0], z0 = verts[i][1];
       var y1 = verts[(i+1) % verts.length][0], z1 = verts[(i+1) % verts.length][1];
-      for (var j = 0; j < nEdge; j++) {
+      var last = (i === verts.length - 1);
+      var limit = last ? nEdge : nEdge - 1;
+      for (var j = 0; j <= limit; j++) {
         var f = j / nEdge;
         pts.push({ wx: 0.13, wy: y0 + (y1-y0)*f, wz: 0.10 + z0 + (z1-z0)*f });
       }
