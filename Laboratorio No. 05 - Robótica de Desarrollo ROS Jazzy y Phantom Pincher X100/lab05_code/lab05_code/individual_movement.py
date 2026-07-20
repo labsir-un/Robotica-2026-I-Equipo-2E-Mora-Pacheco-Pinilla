@@ -2126,9 +2126,10 @@ function buildTracing() {
 
   function trDraw(pts, actuals) {
     var canvas = document.getElementById('trCanvas');
+    if (!canvas) return;
     var dpr = window.devicePixelRatio || 1;
     var rect = canvas.parentElement.getBoundingClientRect();
-    var w = Math.max(200, rect.width - 4);
+    var w = Math.max(300, rect.width - 4);
     var h = 350;
     canvas.width = w * dpr;
     canvas.height = h * dpr;
@@ -2136,7 +2137,8 @@ function buildTracing() {
     canvas.style.height = h + 'px';
     var ctx = canvas.getContext('2d');
     ctx.scale(dpr, dpr);
-    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = '#fafafa';
+    ctx.fillRect(0, 0, w, h);
 
     var allY = pts.map(function(p) { return p.wy; });
     var allZ = pts.map(function(p) { return p.wz; });
