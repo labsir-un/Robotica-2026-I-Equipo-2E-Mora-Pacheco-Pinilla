@@ -1,13 +1,10 @@
 #!/usr/bin/env python3
-"""Actividad 12 — Cinemática Inversa (grid search sobre FK real)"""
+"""Actividad 12 — Cinemática Inversa (grid search sobre FK Bioloid real)"""
 import math
 from fk_dh import fk as fk_fn
 
-L0 = 0.089
-L1 = 0.101
-L2 = 0.101
-L3 = 0.119
-DEG = math.pi / 180.0
+L0b = 0.0540; L1b = 0.0995; L2b = 0.0995; L3b = 0.0835
+MAX_REACH = L0b + L1b + L2b + L3b
 
 JOINT_LIMITS_DEG = {
     'waist':    (-150, 150),

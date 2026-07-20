@@ -2045,47 +2045,50 @@ function trIk(x, y, z) {
   return best;
 }
 
-/* FK for Phantom X Pincher (returns world x,y,z from joint angles in degrees) */
+/* FK for Phantom X Pincher — Bioloid matrix chain */
+var PI = Math.PI;
+var aw = 0.038, ah = 0.032, fh = 0.0525, f10h = 0.004, f2h = 0.0265, fo = 0.001, fx = 0.019, fy = 0.0115;
+
 function trFk(qDeg) {
-  var q = qDeg.map(function(v) { return v * Math.PI / 180; });
-  var T = [[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]];
-  var params = [
-    {a:0, alpha:0, d:L0, theta:q[0]},
-    {a:0, alpha:-Math.PI/2, d:0, theta:q[1]},
-    {a:L1, alpha:0, d:0, theta:q[2]},
-    {a:L2, alpha:0, d:0, theta:q[3]},
-    {a:L3, alpha:0, d:0, theta:0},
-  ];
-  function dh(a, alpha, d, theta) {
-    var ct = Math.cos(theta), st = Math.sin(theta);
-    var ca = Math.cos(alpha), sa = Math.sin(alpha);
-    return [
-      [ct, -st, 0, a],
-      [st*ca, ct*ca, -sa, -d*sa],
-      [st*sa, ct*sa, ca, d*ca],
-      [0, 0, 0, 1]
-    ];
-  }
-  function mul(A, B) {
-    var R = [];
-    for (var i = 0; i < 4; i++) {
-      R[i] = [];
-      for (var j = 0; j < 4; j++) {
-        var s = 0;
-        for (var k = 0; k < 4; k++) s += A[i][k] * B[k][j];
-        R[i][j] = s;
-      }
-    }
-    return R;
-  }
-  for (var p = 0; p < params.length; p++) {
-    T = mul(T, dh(params[p].a, params[p].alpha, params[p].d, params[p].theta));
-  }
-  var R = [[T[0][0],T[0][1],T[0][2]],[T[1][0],T[1][1],T[1][2]],[T[2][0],T[2][1],T[2][2]]];
-  var roll = Math.atan2(R[2][1], R[2][2]) * 180 / Math.PI;
-  var pitch = Math.atan2(-R[2][0], Math.sqrt(R[2][1]*R[2][1] + R[2][2]*R[2][2])) * 180 / Math.PI;
-  var yaw = Math.atan2(R[1][0], R[0][0]) * 180 / Math.PI;
-  return { x: T[0][3], y: T[1][3], z: T[2][3], roll: roll, pitch: pitch, yaw: yaw };
+  var q = qDeg.map(function(v) { return v * PI / 180; });
+  var M = [[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]];
+
+  function Rx(a) { var ca=Math.cos(a), sa=Math.sin(a); return [[1,0,0],[0,ca,-sa],[0,sa,ca]]; }
+  function Ry(a) { var ca=Math.cos(a), sa=Math.sin(a); return [[ca,0,sa],[0,1,0],[-sa,0,ca]]; }
+  function Rz(a) { var ca=Math.cos(a), sa=Math.sin(a); return [[ca,-sa,0],[sa,ca,0],[0,0,1]]; }
+  function rpy(r,p,y) { return mul33(Rz(y), mul33(Ry(p), Rx(r))); }
+  function mul33(A,B) { return [[A[0][0]*B[0][0]+A[0][1]*B[1][0]+A[0][2]*B[2][0], A[0][0]*B[0][1]+A[0][1]*B[1][1]+A[0][2]*B[2][1], A[0][0]*B[0][2]+A[0][1]*B[1][2]+A[0][2]*B[2][2]], [A[1][0]*B[0][0]+A[1][1]*B[1][0]+A[1][2]*B[2][0], A[1][0]*B[0][1]+A[1][1]*B[1][1]+A[1][2]*B[2][1], A[1][0]*B[0][2]+A[1][1]*B[1][2]+A[1][2]*B[2][2]], [A[2][0]*B[0][0]+A[2][1]*B[1][0]+A[2][2]*B[2][0], A[2][0]*B[0][1]+A[2][1]*B[1][1]+A[2][2]*B[2][1], A[2][0]*B[0][2]+A[2][1]*B[1][2]+A[2][2]*B[2][2]]] }
+  function mul4(A,B) { var R=[[],[],[],[]]; for(var i=0;i<4;i++) for(var j=0;j<4;j++) { var s=0; for(var k=0;k<4;k++) s+=A[i][k]*B[k][j]; R[i][j]=s; } return R; }
+  function add(R,t) { var T=[[R[0][0],R[0][1],R[0][2],t[0]],[R[1][0],R[1][1],R[1][2],t[1]],[R[2][0],R[2][1],R[2][2],t[2]],[0,0,0,1]]; M = mul4(M,T); }
+
+  add(rpy(PI/2,0,PI/2), [0,0,0]);
+  add(rpy(-PI/2,PI/2,PI), [0,aw/2,0]);
+  add(Rz(-q[0]), [0,0,0]);
+  add(rpy(0,PI,0), [0,0,-ah-f10h+fo]);
+  add(Ry(q[1]), [0,0,0]);
+  add([[1,0,0],[0,1,0],[0,0,1]], [0,0,fh+f10h/2]);
+  add([[1,0,0],[0,1,0],[0,0,1]], [0,0,f10h]);
+  add([[1,0,0],[0,1,0],[0,0,1]], [0,0,f10h]);
+  add(rpy(0,PI,0), [0,0,f10h/2]);
+  add(rpy(0,PI,0), [0,0,-ah-f10h+fo]);
+  add(Ry(q[2]), [0,0,0]);
+  add([[1,0,0],[0,1,0],[0,0,1]], [0,0,fh+f10h/2]);
+  add([[1,0,0],[0,1,0],[0,0,1]], [0,0,f10h]);
+  add([[1,0,0],[0,1,0],[0,0,1]], [0,0,f10h]);
+  add(rpy(0,PI,0), [0,0,f10h/2]);
+  add(rpy(0,PI,0), [0,0,-ah-f10h+fo]);
+  add(Ry(q[3]), [0,0,0]);
+  add(rpy(0,PI,-PI), [0,0,f2h]);
+  add(rpy(PI/2,PI,PI/2), [0,0,-aw/2]);
+  add(rpy(PI,0,PI/2), [0,aw/2,0]);
+  add(rpy(PI/2,-PI/2,PI/2), [fx,0,0]);
+
+  var x = M[0][3], y = M[1][3], z = M[2][3];
+  var R = [[M[0][0],M[0][1],M[0][2]],[M[1][0],M[1][1],M[1][2]],[M[2][0],M[2][1],M[2][2]]];
+  var roll = Math.atan2(R[2][1], R[2][2]) * 180 / PI;
+  var pitch = Math.atan2(-R[2][0], Math.sqrt(R[2][1]*R[2][1] + R[2][2]*R[2][2])) * 180 / PI;
+  var yaw = Math.atan2(R[1][0], R[0][0]) * 180 / PI;
+  return { x: x, y: y, z: z, roll: roll, pitch: pitch, yaw: yaw };
 }
 
 function buildTracing() {
