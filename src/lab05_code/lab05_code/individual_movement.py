@@ -2096,9 +2096,17 @@ function buildTracing() {
         document.getElementById('trStopBtn').disabled = true;
         document.getElementById('trProgress').textContent = trStopFlag ? 'Detenido' : 'Completado';
         if (i >= total) {
-          trDraw(pts, actuals);
           var ts2 = new Date().toTimeString().slice(0,8);
           logEl.innerHTML = '<div><span class="time">' + ts2 + '</span> Trazado completado (' + total + ' puntos)</div>' + logEl.innerHTML;
+          /* Esperar que la cola de comandos se vacíe antes de graficar */
+          setTimeout(function() {
+            fetch('/api/state').then(function(r) { return r.json(); }).then(function(s) {
+              var qDeg = JOINTS.map(function(j) { return (s[j]||0) * 180 / Math.PI; });
+              var tcp = trFk(qDeg);
+              actuals.push([tcp.y, tcp.z]);
+              trDraw(pts, actuals);
+            });
+          }, 1500);
         }
         return;
       }
