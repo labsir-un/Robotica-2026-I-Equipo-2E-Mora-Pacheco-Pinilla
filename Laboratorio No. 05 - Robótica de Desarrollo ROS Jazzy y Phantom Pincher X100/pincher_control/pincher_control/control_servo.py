@@ -28,7 +28,7 @@ class PincherController(Node):
     def __init__(self) -> None:
         super().__init__('pincher_controller')
 
-        self.declare_parameter('motor_model', 'xl430')
+        self.declare_parameter('motor_model', 'ax12a')
         self.declare_parameter('use_hardware', False)
         self.declare_parameter('port', '/dev/ttyUSB0')
         self.declare_parameter('baudrate', 1000000)

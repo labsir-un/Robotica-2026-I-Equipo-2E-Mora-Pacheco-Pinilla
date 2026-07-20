@@ -17,7 +17,7 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
-        DeclareLaunchArgument('motor_model', default_value='xl430'),
+        DeclareLaunchArgument('motor_model', default_value='ax12a'),
         DeclareLaunchArgument('use_hardware', default_value='false'),
         DeclareLaunchArgument('port', default_value='/dev/ttyUSB0'),
         DeclareLaunchArgument('baudrate', default_value='1000000'),
