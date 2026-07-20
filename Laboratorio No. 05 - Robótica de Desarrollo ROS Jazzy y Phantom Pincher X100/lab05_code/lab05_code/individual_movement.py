@@ -18,6 +18,9 @@ from sensor_msgs.msg import JointState
 from std_srvs.srv import Trigger
 from visualization_msgs.msg import Marker
 from geometry_msgs.msg import Point
+import tf2_ros
+from tf2_ros.buffer import Buffer
+from tf2_ros.transform_listener import TransformListener
 
 try:
     import yaml
@@ -2756,6 +2759,8 @@ class MovementNode(Node):
                 history=HistoryPolicy.KEEP_LAST,
             ))
         self.traj_points = []
+        self.tf_buffer = Buffer()
+        self.tf_listener = TransformListener(self.tf_buffer, self)
         self.state_sub = self.create_subscription(
             JointState, '/joint_states', self.state_cb, 10)
         self.home_cli = self.create_client(Trigger, '/pincher/home')
@@ -2818,11 +2823,16 @@ class MovementNode(Node):
             self.traj_pub.publish(marker)
             return
 
-        # FK coordinates are in arm frame; transform to base_link by adding
-        # approximate offset from base_link to arm_base (kit_to_arm + case offsets)
-        # Actual offset: ~(0, 0, 0.07) but let user see trajectory at FK coords
-        # The FK origin corresponds approximately to base_link after kit offsets
-        # For now use FK coords as-is since the arm base_link is root
+        # Try to get the actual end_effector transform from TF
+        try:
+            now = rclpy.time.Time()
+            t = self.tf_buffer.lookup_transform('base_link', 'end_effector', now, timeout=rclpy.duration.Duration(seconds=1.0))
+            x, y, z = t.transform.translation.x, t.transform.translation.y, t.transform.translation.z
+            self.get_logger().info(f'TCP from TF: ({x:.3f}, {y:.3f}, {z:.3f})')
+        except Exception as e:
+            self.get_logger().warn(f'TF lookup failed: {e}')
+            x, y, z = 0.321, 0.0, 0.089
+
         marker.type = Marker.LINE_STRIP
         marker.action = Marker.ADD
         marker.pose.orientation.w = 1.0
@@ -2835,11 +2845,10 @@ class MovementNode(Node):
             pt = Point()
             pt.x = float(p[0]) if isinstance(p, list) else float(p.get('x', 0))
             pt.y = float(p[1]) if isinstance(p, list) else float(p.get('y', 0))
-            # FK coords are from arm base, add offset to base_link
             pt.z = (float(p[2]) if isinstance(p, list) else float(p.get('z', 0))) + 0.07
             marker.points.append(pt)
         self.traj_pub.publish(marker)
-        self.get_logger().info(f'Trajectory LINE_STRIP: {len(marker.points)} pts')
+        self.get_logger().info(f'Trajectory: {len(marker.points)} pts, TCP from TF: ({x:.3f}, {y:.3f}, {z:.3f})')
 
 def main():
     rclpy.init()
