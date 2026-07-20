@@ -58,7 +58,6 @@ def generate_launch_description():
                     LaunchConfiguration('home_on_startup'),
                     value_type=bool,
                 ),
-                'home_positions': [512, 819, 512, 512, 512],
             }],
         ),
         Node(
