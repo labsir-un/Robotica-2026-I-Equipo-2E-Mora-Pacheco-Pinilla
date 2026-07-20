@@ -1011,11 +1011,9 @@ Laboratorio No. 05/
 
 ### 12.2. Capturas y gráficas
 
-Las gráficas de calibración (Actividad 5) están incluidas en la sección 5.3, y las de interpolación (Actividad 9) se añadirán en la sección 6.4 una vez ejecutada la prueba física completa. Las capturas de terminal (`ros2 topic list`, `ros2 node list`, `rqt_graph`, etc.) tomadas durante las pruebas deben añadirse aquí como evidencia adicional.
+Las gráficas de calibración (Actividad 5) están incluidas en la sección 5.3, y las de interpolación (Actividad 9) se añadirán en la sección 6.4 una vez ejecutada la prueba física completa. Las capturas de terminal (`ros2 topic list`, `ros2 node list`, `rqt_graph`, etc.) tomadas durante las pruebas se añadirán aquí como evidencia adicional.
 
-```
-[ Capturas de terminal y rqt_graph pendientes de insertar ]
-```
+
 
 ---
 
