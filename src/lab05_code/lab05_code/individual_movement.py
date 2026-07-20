@@ -2094,6 +2094,33 @@ function buildTracing() {
     var ts = new Date().toTimeString().slice(0,8);
     logEl.innerHTML = '<div><span class="time">' + ts + '</span> Iniciando trazado de ' + figName + ' ' + (size*100) + ' cm</div>' + logEl.innerHTML;
 
+    /* Mover al primer punto antes de empezar a registrar la trayectoria */
+    function moveToStart() {
+      var first = pts[0];
+      var qFirst = trIk(first.wx, first.wy, first.wz);
+      if (qFirst) {
+        var pos = JOINTS.map(function(j, idx) { return qFirst[idx] * Math.PI / 180; });
+        fetch('/api/command', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ name: JOINTS, position: pos })
+        });
+      }
+      setTimeout(startLoop, 400);
+    }
+
+    function startLoop() {
+      /* Registrar posición inicial */
+      fetch('/api/state').then(function(r) { return r.json(); }).then(function(s) {
+        var qDeg = JOINTS.map(function(j) { return (s[j]||0) * 180 / Math.PI; });
+        var tcp = trFk(qDeg);
+        actuals.push([tcp.y, tcp.z]);
+        i = 1; /* saltar el primer punto (ya estamos ahí) */
+        trDraw(pts, []);
+        step();
+      });
+    }
+
     function step() {
       if (trStopFlag || i >= total) {
         trRunning = false;
@@ -2103,7 +2130,6 @@ function buildTracing() {
         if (i >= total) {
           var ts2 = new Date().toTimeString().slice(0,8);
           logEl.innerHTML = '<div><span class="time">' + ts2 + '</span> Trazado completado (' + total + ' puntos)</div>' + logEl.innerHTML;
-          /* Esperar que la cola de comandos se vacíe antes de graficar */
           setTimeout(function() {
             fetch('/api/state').then(function(r) { return r.json(); }).then(function(s) {
               var qDeg = JOINTS.map(function(j) { return (s[j]||0) * 180 / Math.PI; });
@@ -2144,8 +2170,7 @@ function buildTracing() {
       }, 5);
     }
 
-    step();
-    trDraw(pts, []);
+    moveToStart();
   };
 
   document.getElementById('trStopBtn').onclick = function() {
