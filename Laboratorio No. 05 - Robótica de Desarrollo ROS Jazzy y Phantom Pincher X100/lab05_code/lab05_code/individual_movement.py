@@ -2024,7 +2024,11 @@ function trFk(qDeg) {
   for (var p = 0; p < params.length; p++) {
     T = mul(T, dh(params[p].a, params[p].alpha, params[p].d, params[p].theta));
   }
-  return { x: T[0][3], y: T[1][3], z: T[2][3] };
+  var R = [[T[0][0],T[0][1],T[0][2]],[T[1][0],T[1][1],T[1][2]],[T[2][0],T[2][1],T[2][2]]];
+  var roll = Math.atan2(R[2][1], R[2][2]) * 180 / Math.PI;
+  var pitch = Math.atan2(-R[2][0], Math.sqrt(R[2][1]*R[2][1] + R[2][2]*R[2][2])) * 180 / Math.PI;
+  var yaw = Math.atan2(R[1][0], R[0][0]) * 180 / Math.PI;
+  return { x: T[0][3], y: T[1][3], z: T[2][3], roll: roll, pitch: pitch, yaw: yaw };
 }
 
 function buildTracing() {
@@ -2262,9 +2266,9 @@ function buildAct11() {
     document.getElementById('fkY').textContent = (tcp.y * 1000).toFixed(1);
     document.getElementById('fkZ').textContent = (tcp.z * 1000).toFixed(1);
     var roll = Math.atan2(tcp.ry || 0, tcp.rz || 0);
-    document.getElementById('fkRoll').textContent = '—';
-    document.getElementById('fkPitch').textContent = '—';
-    document.getElementById('fkYaw').textContent = '—';
+    document.getElementById('fkRoll').textContent = tcp.roll.toFixed(1);
+    document.getElementById('fkPitch').textContent = tcp.pitch.toFixed(1);
+    document.getElementById('fkYaw').textContent = tcp.yaw.toFixed(1);
     var el = document.getElementById('fkLog');
     var ts = new Date().toTimeString().slice(0,8);
     el.innerHTML = '<div><span class="time">' + ts + '</span> FK: q=[' + q1.toFixed(1) + ',' + q2.toFixed(1) + ',' + q3.toFixed(1) + ',' + q4.toFixed(1) + '] &rarr; TCP (' + (tcp.x*1000).toFixed(1) + ', ' + (tcp.y*1000).toFixed(1) + ', ' + (tcp.z*1000).toFixed(1) + ') mm</div>' + el.innerHTML;
