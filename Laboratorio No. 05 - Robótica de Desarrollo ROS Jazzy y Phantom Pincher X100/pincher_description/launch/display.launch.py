@@ -11,13 +11,13 @@ import xacro
 
 
 EXPECTED_MESHES = [
-    'visual/ax12.stl',
-    'visual/f2.stl',
-    'visual/f3.stl',
-    'visual/f4.stl',
-    'visual/finger.stl',
-    'visual/gripper_base.stl',
-    'visual/phantomx_pincher_mount.stl',
+    'visual/ax12.dae',
+    'visual/f2.dae',
+    'visual/f3.dae',
+    'visual/f4.dae',
+    'visual/finger.dae',
+    'visual/gripper_base.dae',
+    'visual/phantomx_pincher_mount.dae',
     'STL/caseBaseRobot.stl',
 ]
 

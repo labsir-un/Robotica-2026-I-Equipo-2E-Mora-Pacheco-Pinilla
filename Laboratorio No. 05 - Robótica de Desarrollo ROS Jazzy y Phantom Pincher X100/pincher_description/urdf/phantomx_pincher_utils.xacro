@@ -36,7 +36,7 @@
       <visual>
         <origin xyz="${mesh_offset_visual_xyz}" rpy="${mesh_offset_visual_rpy}"/>
         <geometry>
-          <mesh filename="package://pincher_description/meshes/visual/${mesh}.stl"/>
+          <mesh filename="package://pincher_description/meshes/visual/${mesh}.dae"/>
         </geometry>
       </visual>
 
