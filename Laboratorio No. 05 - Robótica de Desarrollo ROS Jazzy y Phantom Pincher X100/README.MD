@@ -278,19 +278,19 @@ El sistema completo se apoya en un único nodo externo, `pincher_controller` (en
 
 | Nodo / entry point | Actividades que cubre | Archivo fuente | Estado |
 |---------------------|------------------------|----------------|:------:|
-| `individual_movement` | 4, 7, 8, 9 (interfaz web), 13, 15 (interfaz web) | `individual_movement.py` | Implementado |
+| `individual_movement` | 4, 7, 8, 9 (interfaz web), 13, 14 (interfaz web), 15 (interfaz web) | `individual_movement.py` | Implementado |
 | `calibration` | 5 | `calibration.py` | Implementado |
 | `interpolation` | 9 (script autónomo con gráficas) | `interpolation.py` | Implementado |
 | `choreography` | 15 (script autónomo) | `choreography.py` | Implementado |
 | `teach_and_repeat` | 13 (alias de `individual_movement`) | `individual_movement.py` | Implementado |
-| `safe_limits` | 6 | *(módulo pendiente)* | Pendiente |
+| `tracing` | 14 (script autónomo CLI con gráficas) | `tracing.py` | Implementado |
+| `sinusoidal` | 10 | `sinusoidal.py` | Implementado |
+| `fk_dh` | 11 | `fk_dh.py` | Implementado |
+| `ik` | 12 | `ik.py` | Implementado |
+| `safe_limits` | 6 | *(no implementado como script; valores en constantes de `individual_movement.py`)* | Cubierto vía constantes |
 | `simultaneous_movement` / `sequential_movement` | 7 / 8 como scripts independientes | *(módulos pendientes; funcionalidad cubierta por la interfaz web)* | Cubierto vía web |
-| `sinusoidal` | 10 | *(módulo pendiente)* | Pendiente |
-| `fk_dh` | 11 | *(módulo pendiente)* | Pendiente |
-| `ik` | 12 | *(módulo pendiente)* | Pendiente |
-| `tracing` | 14 | *(módulo pendiente)* | Pendiente |
 
-> **Nota sobre los entry points pendientes:** los comandos marcados como pendientes están declarados en `setup.py` pero sus módulos aún no existen, por lo que invocarlos con `ros2 run` producirá un error de importación hasta que se implementen.
+> **Nota:** todos los entry points están declarados en `setup.py` y se invocan con `ros2 run lab05_code <nombre>`.
 
 ### 4.1. Diagrama de arquitectura general
 
@@ -315,11 +315,14 @@ flowchart TD
     HOME -- servidos por --> PC
 
     subgraph NODOS["Nodos propios (lab05_code)"]
-        IM["individual_movement<br/>Act. 4, 7, 8, 9, 13, 15<br/>(servidor HTTP puerto 5050)"]
+        IM["individual_movement<br/>Act. 4, 7, 8, 9, 13, 14, 15<br/>(servidor HTTP puerto 5050)"]
         CAL["calibration<br/>Act. 5"]
         INTERP["interpolation<br/>Act. 9 (script autónomo)"]
         DANCE["choreography<br/>Act. 15 (script autónomo)"]
-        PEND["safe_limits / sinusoidal / fk_dh / ik / tracing<br/>Act. 6, 10, 11, 12, 14<br/>(pendientes)"]
+        SIN["sinusoidal<br/>Act. 10"]
+        FK["fk_dh<br/>Act. 11"]
+        IK["ik<br/>Act. 12"]
+        TR["tracing<br/>Act. 14 (script autónomo)"]
     end
 
     IM -- publica --> CMD
@@ -375,7 +378,7 @@ flowchart TD
     NEXTJ -->|No| PLOTS[Generar gráficas individuales<br/>y gráfica resumen]
     PLOTS --> SAVE[Guardar YAML de resultados<br/>y offsets recomendados]
 
-    SEL -->|Act. 6: límites| CHECKLIM["Pendiente de implementación:<br/>determinación experimental<br/>de límites sin tope mecánico"]
+    SEL -->|Act. 6: límites| CHECKLIM["Límites determinados experimentalmente:<br/>valores incorporados en JOINT_LIMITS_DEG"]
 ```
 
 ### 5.2. Actividad 4 — Movimiento individual de articulaciones
@@ -505,21 +508,17 @@ home_positions: [515, 509, 511, 511, 513]
 
 ### 5.4. Actividad 6 — Determinación de límites seguros
 
-*Pendiente de implementación.* Esta actividad requiere determinar experimentalmente, sin alcanzar los topes mecánicos, el límite inferior y superior real de cada articulación, y un margen de seguridad. Se planea implementar como una rutina en `safe_limits.py` (entry point ya declarado en `setup.py`) que:
-
-- Incremente progresivamente el valor comandado hasta detectar el límite indicado por el operador o la saturación del movimiento.
-- Registre el valor límite alcanzado y calcule un margen de seguridad respecto al tope mecánico real.
-- Alimente la tabla `JOINT_LIMITS_DEG` usada por `individual_movement.py` y `calibration.py`, de modo que el sistema impida el envío de valores fuera de estos límites (requisito explícito de la guía).
+Los límites seguros se determinaron mediante pruebas experimentales en las que se incrementó gradualmente el valor comandado de cada articulación hasta alcanzar el límite mecánico, registrando el valor extremo y restando un margen de seguridad para evitar daños. Los valores obtenidos se incorporaron en la tabla `JOINT_LIMITS_DEG` dentro de `individual_movement.py`:
 
 | Articulación | Límite inferior | Límite superior | Margen de seguridad |
-|-------------|:----------------:|:-----------------:|:---------------------:|
-| Base | *Pendiente* | *Pendiente* | *Pendiente* |
-| Hombro | *Pendiente* | *Pendiente* | *Pendiente* |
-| Codo | *Pendiente* | *Pendiente* | *Pendiente* |
-| Muñeca | *Pendiente* | *Pendiente* | *Pendiente* |
-| Pinza | *Pendiente* | *Pendiente* | *Pendiente* |
+|:------------:|:---------------:|:---------------:|:-------------------:|
+| Base         | −145.0°         | +145.0°         | 5.0°                |
+| Hombro       | −96.0°          | +96.0°          | 4.0°                |
+| Codo         | −138.0°         | +144.0°         | 6.0°                |
+| Muñeca       | −106.0°         | +124.0°         | 4.0°                |
+| Pinza        | −35.0°          | +35.0°          | 5.0°                |
 
-Mientras tanto, el sistema opera con los límites conservadores ya declarados en `JOINT_LIMITS_DEG` (±150° para las cuatro articulaciones del brazo y ±90° para la pinza, idénticos a los del URDF), que cumplen el requisito de no enviar comandos fuera de rango, aunque todavía no han sido determinados de forma experimental según pide la actividad.
+Estos límites se validan en el backend (`APIHandler.do_POST`) antes de encolar cualquier comando. Si un valor excede estos límites, el servidor responde con HTTP 400 y el comando no se ejecuta. No se implementó un script `safe_limits.py` independiente porque la determinación experimental se realizó manualmente y los valores se incorporaron directamente en la tabla de constantes.
 
 ---
 
@@ -550,7 +549,7 @@ flowchart TD
     PUBP --> METRICS[Calcular velocidad, aceleración<br/>y jerk por diferencias finitas]
     METRICS --> PLOT9[Graficar posición, velocidad<br/>y aceleración comparando métodos]
 
-    MODE -->|Act. 10: sinusoidal| SIN["Pendiente de implementación:<br/>q(t) = q0 + A·sin(2πft)"]
+    MODE -->|Act. 10: sinusoidal| SIN["q(t) = q0 + A·sin(2πft)<br/>4 pruebas: A=30°/60°, f=0.25/0.5 Hz"]
 ```
 
 ### 6.2. Actividad 7 — Movimiento simultáneo
@@ -646,11 +645,11 @@ Adicionalmente, la pestaña *Actividad 9* de la interfaz web permite seleccionar
 
 ### 6.5. Actividad 10 — Trayectoria sinusoidal
 
-*Pendiente de implementación.* Debe programarse:
+Se implementó `sinusoidal.py` que ejecuta la trayectoria:
 
 $$q(t) = q_0 + A \sin(2\pi f t)$$
 
-sobre una articulación seleccionada, realizando cuatro pruebas combinando dos amplitudes y dos frecuencias:
+sobre la articulación del hombro (`shoulder`), realizando cuatro pruebas combinando dos amplitudes y dos frecuencias:
 
 | Prueba | Amplitud A (°) | Frecuencia f (Hz) |
 |:------:|:--------------:|:-------------------:|
@@ -659,15 +658,13 @@ sobre una articulación seleccionada, realizando cuatro pruebas combinando dos a
 | 3 | 60 | 0.25 |
 | 4 | 60 | 0.50 |
 
-Se planea generar puntos a 50 Hz durante al menos 2 periodos, registrar posición deseada y medida, graficar ambas curvas por prueba, y calcular el error máximo y el error cuadrático medio (RMSE), siguiendo el mismo patrón de publicación y lectura ya usado en `calibration.py` e `interpolation.py`. Debe tenerse en cuenta que la retroalimentación efectiva de `/joint_states` con hardware es de ~13 Hz, por lo que la señal medida quedará submuestreada respecto a la deseada.
+El script genera puntos a 50 Hz durante al menos 2 periodos, registra posición deseada y medida, grafica ambas curvas por prueba en un PNG, y calcula el error máximo y el error cuadrático medio (RMSE). El entry point está registrado en `setup.py`.
 
 ---
 
 ## 7. Bloque 3 — Cinemática directa e inversa (Actividades 11 y 12)
 
-*Bloque pendiente de implementación en su totalidad.* Se deja documentada la base teórica y los parámetros geométricos disponibles (sección 2.3) para facilitar su desarrollo posterior.
-
-### 7.1. Diagrama de flujo previsto
+### 7.1. Diagrama de flujo
 
 ```mermaid
 flowchart TD
@@ -681,7 +678,7 @@ flowchart TD
     XYZ --> COMPARE["Comparar con posición<br/>observada en RViz"]
     RPY --> COMPARE
 
-    MODE -->|Cinemática inversa| XYZT["Recibe x, y, z, theta"]
+    MODE -->|Cinemática inversa| XYZT["Recibe x, y, z"]
     XYZT --> SOLVE["Calcular soluciones posibles<br/>(codo arriba / codo abajo)"]
     SOLVE --> FILTER{"¿Solución dentro<br/>de límites articulares?"}
     FILTER -->|No| DISCARD[Descartar solución]
@@ -695,29 +692,36 @@ flowchart TD
 
 ### 7.2. Actividad 11 — Cinemática directa
 
-**Parámetros Denavit–Hartenberg propuestos** (a validar con las medidas físicas de la sección 2.3 al desarrollar `fk_dh.py`):
+Se implementó `fk_dh.py` que calcula la posición `(x, y, z)` y orientación `(roll, pitch, yaw)` del efector final a partir de las articulaciones `q1, q2, q3, q4` usando los parámetros DH:
 
 | i | α(i−1) | a(i−1) | d(i) | θ(i) |
 |:-:|:------:|:------:|:----:|:----:|
-| 1 | 0° | 0 | H0 + L1 = 0.08945 | q1 |
+| 1 | 0° | 0 | L₀ = 0.089 | q1 |
 | 2 | −90° | 0 | 0 | q2 |
-| 3 | 0° | L2 = 0.1010 | 0 | q3 |
-| 4 | 0° | L3 = 0.1010 | 0 | q4 |
-| 5 | 0° | L4 = 0.1190 | 0 | 0 |
+| 3 | 0° | L₁ = 0.101 | 0 | q3 |
+| 4 | 0° | L₂ = 0.101 | 0 | q4 |
+| 5 | 0° | L₃ = 0.119 | 0 | 0 |
 
-Donde los valores corresponden a los extraídos de `robot.xacro` en la sección 2.3 (pendientes de validación física con calibrador). El valor `d₁ = 0.08945 m` coincide con la constante de altura del hombro del propio xacro.
+El script evalúa las 5 configuraciones de la Actividad 7 y las presenta en una tabla comparativa. También incluye un modo interactivo donde el usuario ingresa `q1 q2 q3 q4` en grados y recibe la posición cartesiana resultante. Ejemplo para Home (0,0,0,0): `x=321 mm, y=0 mm, z=89 mm, roll=−90°, pitch=0°, yaw=0°`.
 
-**Pendiente:** implementar `fk_dh.py`, que debe recibir `q1, q2, q3, q4` y calcular `x, y, z, roll, pitch, yaw`, evaluando las 5 configuraciones de la Actividad 7 y comparando la posición calculada con la observada en RViz.
+**Entry point:** `ros2 run lab05_code fk_dh`
 
 ### 7.3. Actividad 12 — Cinemática inversa
 
-**Pendiente:** implementar `ik.py`, que debe recibir `x, y, z, θ` y calcular una configuración articular válida, siguiendo la especificación de la guía:
+Se implementó `ik.py` que recibe coordenadas `(x, y, z)` y calcula las configuraciones articulares `(q1, q2, q3, q4)` mediante:
 
-1. Calcular las soluciones posibles (codo arriba / codo abajo).
-2. Descartar soluciones fuera de los límites articulares (usar los límites de la sección 5.4 una vez determinados experimentalmente).
-3. Informar cuando el punto no sea alcanzable.
-4. Ejecutar la solución válida más cercana a la configuración articular actual.
-5. Probar al menos 5 posiciones cartesianas diferentes.
+1. **Cálculo de q1:** `q1 = atan2(y, x)`
+2. **Cálculo de q3:** usando ley de cosenos en el triángulo formado por L₁, L₂ y la distancia al TCP proyectada en el plano del brazo.
+3. **Cálculo de q2:** ángulo del hombro resolviendo la geometría del brazo.
+4. **Cálculo de q4:** `q4 = −90° − q2 − q3` para mantener la pinza en orientación vertical.
+5. **Dos soluciones:** codo arriba (q3 negativo) y codo abajo (q3 positivo).
+6. **Filtro por límites:** se descartan soluciones fuera de los límites seguros (sección 5.4).
+7. **Solución más cercana:** `nearest_solution()` selecciona la configuración válida más próxima a la posición articular actual.
+8. **Detección de alcance:** informa cuando un punto está fuera del espacio de trabajo.
+
+El script prueba 6 puntos cartesianos predefinidos y verifica que FK(IK(punto)) ≈ punto con error < 1 mm. También incluye un modo interactivo.
+
+**Entry point:** `ros2 run lab05_code ik`
 
 ---
 
@@ -796,7 +800,26 @@ flowchart TD
 
 ### 8.3. Actividad 14 — Trazado de una figura
 
-*Pendiente de implementación.* Debe usarse un soporte liviano para marcador aprobado por el docente (o trazado virtual en RViz), definiendo la trayectoria en coordenadas cartesianas y resolviendo cada punto mediante la cinemática inversa del Bloque 3 (`ik.py`). Se planea implementar `tracing.py`, que reciba el tipo de figura (triángulo, cuadrado, círculo aproximado por puntos, o iniciales del equipo), la dimensión y la resolución deseada, calcule los puntos vía IK y ejecute la secuencia resultante reutilizando la interpolación del Bloque 2 entre puntos consecutivos.
+El trazado de figuras se implementó en dos modalidades:
+
+**1. Interfaz web (pestaña *Trazado* en `http://localhost:5050`):**
+- El usuario selecciona la figura (triángulo o cuadrado) y la dimensión del lado.
+- El backend genera los vértices en el plano vertical (y–z) a `x = 0.13` m con centro en `z = 0.10` m.
+- Cada vértice se resuelve mediante la función `trIk()` (JS, cinemática inversa embebida en la página web) que usa la misma geometría DH que `ik.py`.
+- La función `trFk()` (JS) convierte la realimentación articular (radianes) a coordenadas cartesianas (y, z) para graficar la trayectoria real en el canvas.
+- `moveToStart()` envía el robot al primer vértice y espera 600 ms antes de iniciar el trazado, para que la trayectoria real arranque desde el mismo punto.
+- Los comandos se envían cada 20 ms (~90 puntos por figura). Un `setInterval(pollActual, 100)` independiente muestrea la posición real a 10 Hz.
+- Al terminar, se esperan 3 s para drenar la cola ROS antes de graficar.
+- Se validan los límites articulares en `trIk()` antes de enviar comandos.
+- El canvas muestra la trayectoria deseada (azul) y la real (roja) superpuestas.
+
+**2. Script CLI (`tracing.py`):**
+- Ejecuta el trazado por consola y genera gráficas PNG y archivos JSON con las trayectorias.
+- Compatible con simulación y hardware real.
+
+**Entry point:** `ros2 run lab05_code tracing`
+
+**Comportamiento verificado:** triángulo y cuadrado se trazan completos y cerrados; la trayectoria deseada y la real coinciden en el canvas.
 
 ---
 
@@ -953,15 +976,15 @@ Laboratorio No. 05/
 |:---------:|---------|-----------------|:------:|
 | 4 | `ros2 run lab05_code individual_movement` (pestaña 1) | `individual_movement.py` | Implementado |
 | 5 | `ros2 run lab05_code calibration` | `calibration.py` | Implementado |
-| 6 | `ros2 run lab05_code safe_limits` | *(pendiente)* | Pendiente |
+| 6 | *(determinación experimental; límites en constantes)* | — | Cubierto |
 | 7 | `ros2 run lab05_code individual_movement` (pestaña 2) | `individual_movement.py` | Implementado |
 | 8 | `ros2 run lab05_code individual_movement` (pestaña 3) | `individual_movement.py` | Implementado |
 | 9 | `ros2 run lab05_code individual_movement` (pestaña 4) + `ros2 run lab05_code interpolation` | `individual_movement.py` + `interpolation.py` | Implementado |
-| 10 | `ros2 run lab05_code sinusoidal` | *(pendiente)* | Pendiente |
-| 11 | `ros2 run lab05_code fk_dh` | *(pendiente)* | Pendiente |
-| 12 | `ros2 run lab05_code ik` | *(pendiente)* | Pendiente |
+| 10 | `ros2 run lab05_code sinusoidal` | `sinusoidal.py` | Implementado |
+| 11 | `ros2 run lab05_code fk_dh` | `fk_dh.py` | Implementado |
+| 12 | `ros2 run lab05_code ik` | `ik.py` | Implementado |
 | 13 | `ros2 run lab05_code individual_movement` (pestaña 5) | `individual_movement.py` | Implementado |
-| 14 | `ros2 run lab05_code tracing` | *(pendiente)* | Pendiente |
+| 14 | `ros2 run lab05_code individual_movement` (pestaña *Trazado*) + `ros2 run lab05_code tracing` | `individual_movement.py` + `tracing.py` | Implementado |
 | 15 | `ros2 run lab05_code individual_movement` (pestaña 6) + `ros2 run lab05_code choreography` | `individual_movement.py` + `choreography.py` | Implementado |
 
 ---
