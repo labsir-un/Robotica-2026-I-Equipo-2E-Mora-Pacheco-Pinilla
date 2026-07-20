@@ -962,8 +962,6 @@ Laboratorio No. 05/
     ├── meshes/                        # 8 mallas STL
     └── rviz/pincher.rviz
 ```
-    └── launch/                        # display.launch.py, display_gui.launch.py
-```
 
 ### 11.1. Entry points (scripts ejecutables)
 
