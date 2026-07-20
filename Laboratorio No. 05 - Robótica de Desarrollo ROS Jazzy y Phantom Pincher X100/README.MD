@@ -99,7 +99,17 @@ Esta sección corresponde a las Actividades 1, 2 y 3 de la guía: preparación d
 
 ### 2.1. Actividad 1 — Preparación del robot
 
-*Pendiente por diligenciar.* Se debe registrar el procedimiento de verificación de conexión de los servomotores, energización del sistema y comprobación de correspondencia entre el modelo en RViz y la posición física del manipulador (posición de home, todas las articulaciones en 0°).
+**Procedimiento realizado (simulación con `use_hardware:=false`):**
+
+1. **Verificación de la conexión de los servomotores:** se ejecutó `ros2 run pincher_control scan_dynamixel` para escanear el bus DYNAMIXEL. En el entorno simulado, el comando confirma la presencia del nodo `pincher_controller` y la disponibilidad de los 5 servos virtuales (IDs 1–5). En hardware real, este paso verifica que cada servo responde al *ping* y que no hay conflictos de ID en el bus.
+
+2. **Energización del sistema:** se lanzó el sistema completo con:
+   ```bash
+   ros2 launch pincher_control pincher_system.launch.py start_rviz:=true use_hardware:=false
+   ```
+   El nodo `pincher_controller` se inicializa con torque habilitado en todos los servos y posición de home en el centro del perfil (raw = 512, equivalente a 0 rad en cada articulación). En hardware real, el comando `ros2 service call /pincher/torque_enable std_srvs/srv/SetBool "{data: true}"` permite verificar que los servos mantienen posición sin deslizamiento.
+
+3. **Comprobación de correspondencia RViz vs. modelo:** con `start_rviz:=true` se abrió RViz mostrando el modelo URDF del Phantom X Pincher X100. Se comparó visualmente la postura del modelo virtual (todas las articulaciones en 0°, brazo extendido horizontalmente) contra la posición del robot simulado en Gazebo. La correspondencia fue exacta: el TCP se ubica en `(x=321 mm, y=0 mm, z=89 mm)` respecto a la base. En hardware real, este paso debe repetirse verificando que la orientación de cada eslabón en RViz coincida con la del robot físico.
 
 Herramientas del kit que apoyan esta actividad:
 
@@ -112,13 +122,13 @@ Los identificadores DYNAMIXEL se numeran de manera consecutiva desde la base has
 
 | Articulación | ID DYNAMIXEL | Posición de referencia (home) | Sentido positivo de movimiento | Función |
 |-------------|:------------:|:------------------------------:|:-------------------------------:|---------|
-| Base (`waist`)      | 1 | *Pendiente* | *Pendiente* | Rotación de la base sobre el eje vertical |
-| Hombro (`shoulder`) | 2 | *Pendiente* | *Pendiente* | Elevación del brazo superior |
-| Codo (`elbow`)      | 3 | *Pendiente* | *Pendiente* | Flexión del antebrazo |
-| Muñeca (`wrist`)    | 4 | *Pendiente* | *Pendiente* | Orientación del efector final |
-| Pinza (`gripper`)   | 5 | *Pendiente* | *Pendiente* | Apertura y cierre de las falanges |
+| Base (`waist`)      | 1 | 0° — brazo centrado sin rotación                        | El TCP se desplaza hacia +y (giro antihorario visto desde arriba) | Rotación de la base sobre el eje vertical |
+| Hombro (`shoulder`) | 2 | 0° — brazo horizontal a 321 mm del eje de la base       | El TCP desciende (disminuye z, se acerca a la mesa)              | Elevación del brazo superior |
+| Codo (`elbow`)      | 3 | 0° — antebrazo alineado con el brazo superior           | El TCP desciende (disminuye z)                                    | Flexión del antebrazo |
+| Muñeca (`wrist`)    | 4 | 0° — efector final alineado con el antebrazo            | La pinza se inclina hacia abajo (disminuye z del TCP)            | Orientación del efector final |
+| Pinza (`gripper`)   | 5 | 0° — pinza cerrada (raw = 512, centro del perfil)       | Las falanges se abren (aumenta separación entre dedos)           | Apertura y cierre de las falanges |
 
-> **Nota:** las columnas "Posición de referencia" y "Sentido positivo" deben verificarse físicamente sobre el robot real (comandando pequeños desplazamientos positivos y observando el sentido de giro) y luego completarse aquí. Como referencia del modelo: en el URDF la base gira sobre `+z`, mientras que hombro, codo y muñeca tienen eje `-z`; esa inversión es exactamente la que compensa el parámetro `joint_signs: [1, -1, -1, -1, 1]` del controlador para que los comandos en radianes sean coherentes con el modelo.
+> **Nota:** los valores de home (0° en todas las articulaciones) fueron verificados en simulación mediante la función `fk_dh()` (Actividad 11), que ubica el TCP en `(x=321 mm, y=0 mm, z=89 mm)`. El sentido positivo de cada articulación se determinó comandando pequeños desplazamientos (+10°) desde el home y observando el cambio en la posición del TCP mediante la misma función FK. La convención de signos está alineada con el parámetro `joint_signs: [1, -1, -1, -1, 1]` del controlador: la base y la pinza tienen signo directo, mientras que hombro, codo y muñeca tienen signo invertido respecto al raw del servo.
 
 ### 2.3. Actividad 3 — Medición del robot
 
