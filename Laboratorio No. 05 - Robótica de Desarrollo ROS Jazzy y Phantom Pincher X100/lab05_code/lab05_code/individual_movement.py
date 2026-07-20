@@ -2249,6 +2249,7 @@ function buildTracing() {
     function moveToStart() {
       var first = pts[0];
       var qFirst = trIk(first.wx, first.wy, first.wz);
+      console.log('moveToStart IK:', first.wx.toFixed(3), first.wy.toFixed(3), first.wz.toFixed(3), '→', qFirst ? qFirst.map(function(v){return v.toFixed(1)}) : 'NULL');
       if (qFirst) {
         var pos = JOINTS.map(function(j, idx) { return qFirst[idx] * Math.PI / 180; });
         fetch('/api/command', {
