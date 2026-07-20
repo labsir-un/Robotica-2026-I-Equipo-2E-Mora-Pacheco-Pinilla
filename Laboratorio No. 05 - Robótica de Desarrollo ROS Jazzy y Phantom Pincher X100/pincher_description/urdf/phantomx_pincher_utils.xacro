@@ -36,7 +36,7 @@
       <visual>
         <origin xyz="${mesh_offset_visual_xyz}" rpy="${mesh_offset_visual_rpy}"/>
         <geometry>
-          <mesh filename="package://phantomx_pincher_description/meshes/visual/${mesh}.dae"/>
+          <mesh filename="package://pincher_description/meshes/visual/${mesh}.dae"/>
         </geometry>
       </visual>
 
@@ -45,7 +45,7 @@
           <origin xyz="${mesh_offset_collision_xyz}" rpy="${mesh_offset_collision_rpy}"/>
           <geometry>
             <xacro:if value="${collision_type == 'mesh'}">
-              <mesh filename="package://phantomx_pincher_description/meshes/collision/${mesh}.stl"/>
+              <mesh filename="package://pincher_description/meshes/collision/${mesh}.stl"/>
             </xacro:if>
             <xacro:if value="${collision_type == 'box'}">
               <box size="${collision_box_size}"/>

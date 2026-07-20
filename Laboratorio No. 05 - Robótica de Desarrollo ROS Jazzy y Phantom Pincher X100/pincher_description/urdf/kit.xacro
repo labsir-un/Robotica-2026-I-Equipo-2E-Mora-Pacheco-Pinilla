@@ -33,7 +33,7 @@
     <visual>
       <origin xyz="0.155 0 0.000" rpy="0 0 -${PI/2}" />
       <geometry>
-        <mesh filename="package://phantomx_pincher_description/meshes/STL/baseElementosFijos.stl"
+        <mesh filename="package://pincher_description/meshes/STL/baseElementosFijos.stl"
               scale="0.001 0.001 0.001" />
       </geometry>
       <material name="black" />
@@ -51,7 +51,7 @@
     <visual>
       <origin xyz="0 0 0" rpy="${PI} 0 ${PI/2}" />
       <geometry>
-        <mesh filename="package://phantomx_pincher_description/meshes/STL/caseBaseRobot.stl"
+        <mesh filename="package://pincher_description/meshes/STL/caseBaseRobot.stl"
               scale="0.001 0.001 0.001" />
       </geometry>
       <material name="gray" />
@@ -75,7 +75,7 @@
     <visual>
       <origin xyz="0.155 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="package://phantomx_pincher_description/meshes/STL/canastilla.stl"
+        <mesh filename="package://pincher_description/meshes/STL/canastilla.stl"
               scale="0.001 0.001 0.001" />
       </geometry>
       <material name="blue" />
@@ -120,7 +120,7 @@
     <visual>
       <origin xyz="0.26028 0 0" rpy="0 0 -${PI/2}" />
       <geometry>
-        <mesh filename="package://phantomx_pincher_description/meshes/STL/ensambleSoporteCamara.stl"
+        <mesh filename="package://pincher_description/meshes/STL/ensambleSoporteCamara.stl"
               scale="0.001 0.001 0.001" />
       </geometry>
       <material name="gray" />
@@ -144,7 +144,7 @@
     <visual>
       <origin xyz="0 0 0" rpy="${PI} 0 0" />
       <geometry>
-        <mesh filename="package://phantomx_pincher_description/meshes/STL/zonaCircular146mm.stl"
+        <mesh filename="package://pincher_description/meshes/STL/zonaCircular146mm.stl"
               scale="0.001 0.001 0.001" />
       </geometry>
       <material name="white" />
@@ -168,7 +168,7 @@
     <visual>
       <origin xyz="0 0 0" rpy="${PI/2} 0 -${PI/2}" />
       <geometry>
-        <mesh filename="package://phantomx_pincher_description/meshes/STL/ensambleAirpump.stl"
+        <mesh filename="package://pincher_description/meshes/STL/ensambleAirpump.stl"
               scale="0.001 0.001 0.001" />
       </geometry>
       <material name="gray" />
@@ -192,7 +192,7 @@
     <visual>
       <origin xyz="0 0 0" rpy="-${PI/2} 0 ${PI/2}" />
       <geometry>
-        <mesh filename="package://phantomx_pincher_description/meshes/STL/manija.stl"
+        <mesh filename="package://pincher_description/meshes/STL/manija.stl"
               scale="0.001 0.001 0.001" />
       </geometry>
       <material name="gray" />
@@ -216,7 +216,7 @@
     <visual>
       <origin xyz="0 0 0" rpy="-${PI/2} 0 ${PI/2}" />
       <geometry>
-        <mesh filename="package://phantomx_pincher_description/meshes/STL/manija.stl"
+        <mesh filename="package://pincher_description/meshes/STL/manija.stl"
               scale="0.001 0.001 0.001" />
       </geometry>
       <material name="gray" />
@@ -240,7 +240,7 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 -${PI/2}" />
       <geometry>
-        <mesh filename="package://phantomx_pincher_description/meshes/STL/canecaGrande.stl"
+        <mesh filename="package://pincher_description/meshes/STL/canecaGrande.stl"
               scale="0.001 0.001 0.001" />
       </geometry>
       <material name="red" />
@@ -248,7 +248,7 @@
     <collision>
       <origin xyz="0 0 0" rpy="0 0 -${PI/2}" />
       <geometry>
-        <mesh filename="package://phantomx_pincher_description/meshes/STL/canecaGrande.stl"
+        <mesh filename="package://pincher_description/meshes/STL/canecaGrande.stl"
               scale="0.001 0.001 0.001" />
       </geometry>
       <material name="red" />        
@@ -265,7 +265,7 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 ${PI/2}" />
       <geometry>
-        <mesh filename="package://phantomx_pincher_description/meshes/STL/canecaGrande.stl"
+        <mesh filename="package://pincher_description/meshes/STL/canecaGrande.stl"
               scale="0.001 0.001 0.001" />
       </geometry>
       <material name="yellow" />
@@ -273,7 +273,7 @@
     <collision>
       <origin xyz="0 0 0" rpy="0 0 ${PI/2}" />
       <geometry>
-        <mesh filename="package://phantomx_pincher_description/meshes/STL/canecaGrande.stl"
+        <mesh filename="package://pincher_description/meshes/STL/canecaGrande.stl"
               scale="0.001 0.001 0.001" />
       </geometry>
       <material name="yellow" />
@@ -290,7 +290,7 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 ${PI*((180-25.5)/180)}" />
       <geometry>
-        <mesh filename="package://phantomx_pincher_description/meshes/STL/canecaGrande.stl"
+        <mesh filename="package://pincher_description/meshes/STL/canecaGrande.stl"
               scale="0.001 0.001 0.001" />
       </geometry>
       <material name="green" />
@@ -298,7 +298,7 @@
     <collision>
       <origin xyz="0 0 0" rpy="0 0 ${PI*((180-25.5)/180)}" />
       <geometry>
-        <mesh filename="package://phantomx_pincher_description/meshes/STL/canecaGrande.stl"
+        <mesh filename="package://pincher_description/meshes/STL/canecaGrande.stl"
               scale="0.001 0.001 0.001" />
       </geometry>
       <material name="green" />
@@ -315,7 +315,7 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 ${PI*(25.5/180) + PI}" />
       <geometry>
-        <mesh filename="package://phantomx_pincher_description/meshes/STL/canecaGrande.stl"
+        <mesh filename="package://pincher_description/meshes/STL/canecaGrande.stl"
               scale="0.001 0.001 0.001" />
       </geometry>
       <material name="blue" />
@@ -323,7 +323,7 @@
     <collision>
       <origin xyz="0 0 0" rpy="0 0 ${PI*(25.5/180) + PI}" />
       <geometry>
-        <mesh filename="package://phantomx_pincher_description/meshes/STL/canecaGrande.stl"
+        <mesh filename="package://pincher_description/meshes/STL/canecaGrande.stl"
               scale="0.001 0.001 0.001" />
       </geometry>
       <material name="blue" />
