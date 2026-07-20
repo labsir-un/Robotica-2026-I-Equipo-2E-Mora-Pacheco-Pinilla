@@ -2801,30 +2801,40 @@ class MovementNode(Node):
             self.publish_trajectory_marker(cmd['points'])
 
     def publish_trajectory_marker(self, points):
+        # Clear old markers
         marker = Marker()
         marker.header.frame_id = 'base_link'
         marker.header.stamp = self.get_clock().now().to_msg()
         marker.ns = 'tcp_traj'
         marker.id = 0
-        if not points:
-            marker.action = Marker.DELETE
-        else:
-            marker.type = Marker.LINE_STRIP
-            marker.action = Marker.ADD
-            marker.pose.orientation.w = 1.0
-            marker.scale.x = 0.005
-            marker.color.r = 1.0
-            marker.color.g = 0.2
-            marker.color.b = 0.2
-            marker.color.a = 1.0
-            for p in points:
-                pt = Point()
-                pt.x = float(p[0]) if isinstance(p, list) else float(p.get('x', 0))
-                pt.y = float(p[1]) if isinstance(p, list) else float(p.get('y', 0))
-                pt.z = float(p[2]) if isinstance(p, list) else float(p.get('z', 0))
-                marker.points.append(pt)
+        marker.action = Marker.DELETEALL
         self.traj_pub.publish(marker)
-        self.get_logger().info(f'Trajectory marker: {len(marker.points)} pts')
+
+        if not points:
+            return
+
+        # Publish LINE_STRIP
+        marker = Marker()
+        marker.header.frame_id = 'base_link'
+        marker.header.stamp = self.get_clock().now().to_msg()
+        marker.ns = 'tcp_traj'
+        marker.id = 0
+        marker.type = Marker.LINE_STRIP
+        marker.action = Marker.ADD
+        marker.pose.orientation.w = 1.0
+        marker.scale.x = 0.008
+        marker.color.r = 1.0
+        marker.color.g = 0.1
+        marker.color.b = 0.1
+        marker.color.a = 1.0
+        for p in points:
+            pt = Point()
+            pt.x = float(p[0]) if isinstance(p, list) else float(p.get('x', 0))
+            pt.y = float(p[1]) if isinstance(p, list) else float(p.get('y', 0))
+            pt.z = float(p[2]) if isinstance(p, list) else float(p.get('z', 0))
+            marker.points.append(pt)
+        self.traj_pub.publish(marker)
+        self.get_logger().info(f'Trajectory LINE_STRIP: {len(marker.points)} pts, first=({marker.points[0].x:.3f},{marker.points[0].y:.3f},{marker.points[0].z:.3f})')
 
 def main():
     rclpy.init()
