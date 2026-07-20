@@ -9,6 +9,7 @@ from std_msgs.msg import String
 class RobotDescPublisher(Node):
     def __init__(self):
         super().__init__('robot_desc_publisher')
+        self.declare_parameter('robot_description', '')
         urdf = self.get_parameter('robot_description').get_parameter_value().string_value
         qos = QoSProfile(
             depth=1,
@@ -22,7 +23,7 @@ class RobotDescPublisher(Node):
     def _publish(self, urdf):
         msg = String(data=urdf)
         self.pub.publish(msg)
-        self.get_logger().info('robot_description published (%d bytes)', len(urdf))
+        self.get_logger().info('robot_description published (%d bytes)' % len(urdf))
         self.timer.cancel()
         self.timer = self.create_timer(5.0, lambda: self.pub.publish(String(data=urdf)))
 
