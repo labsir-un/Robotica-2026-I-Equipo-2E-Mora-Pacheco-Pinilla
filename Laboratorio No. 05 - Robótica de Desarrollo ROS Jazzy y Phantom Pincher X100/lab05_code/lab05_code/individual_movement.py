@@ -2015,9 +2015,8 @@ function buildSinusoidal() {
 var trRunning = false;
 var trStopFlag = false;
 
-/* IK for Phantom X Pincher */
+/* IK for Phantom X Pincher — grid search over FK */
 var L0 = 0.089, L1 = 0.101, L2 = 0.101, L3 = 0.119;
-var MAX_ARM = L1 + L2;
 var MAX_REACH = L1 + L2 + L3;
 
 function trIk(x, y, z) {
@@ -2025,32 +2024,17 @@ function trIk(x, y, z) {
   var r = Math.sqrt(x*x + y*y);
   var zRel = z - L0;
   var dTcp = Math.sqrt(r*r + zRel*zRel);
-  if (dTcp > MAX_REACH + 0.002 || dTcp < 0.001) return null;
+  if (dTcp > MAX_REACH + 0.005) return null;
 
   var limits = [[-150,150],[-120,120],[-139,139],[-98,103],[-90,90]];
-  var best = null, bestDist = 1e9;
-  for (var phiDeg = -180; phiDeg <= 180; phiDeg += 5) {
-    var phi = phiDeg * Math.PI / 180;
-    var rWrist = r - L3 * Math.cos(phi);
-    var zWristRel = zRel - L3 * Math.sin(phi);
-    var dWrist = Math.sqrt(rWrist*rWrist + zWristRel*zWristRel);
-    if (dWrist > MAX_ARM + 0.001) continue;
-    var d = Math.max(0.0001, dWrist);
-    var c3 = Math.max(-1, Math.min(1, (d*d - L1*L1 - L2*L2) / (2*L1*L2)));
-    var q3r = Math.acos(c3);
-    for (var signIdx = 0; signIdx < 2; signIdx++) {
-      var q3Try = (signIdx === 0 ? -1 : 1) * q3r * 180 / Math.PI;
-      var alpha = Math.atan2(L2 * Math.sin(Math.abs(q3Try)*Math.PI/180), L1 + L2 * Math.cos(Math.abs(q3Try)*Math.PI/180));
-      var q2Try = Math.atan2(zWristRel, rWrist) * 180 / Math.PI - alpha * 180 / Math.PI;
-      var q4Try = -90 - q2Try - q3Try;
-      var q = [q1, q2Try, q3Try, q4Try, 0];
-      var ok = true;
-      for (var k = 0; k < 5; k++) {
-        if (q[k] < limits[k][0] || q[k] > limits[k][1]) { ok = false; break; }
-      }
-      if (ok) {
-        var dist = Math.abs(phiDeg);
-        if (dist < bestDist) { bestDist = dist; best = q; }
+  var best = null, bestErr = 1e9;
+  var step = 5;
+  for (var q2d = limits[1][0]; q2d <= limits[1][1]; q2d += step) {
+    for (var q3d = limits[2][0]; q3d <= limits[2][1]; q3d += step) {
+      for (var q4d = limits[3][0]; q4d <= limits[3][1]; q4d += step) {
+        var tcp = trFk([q1, q2d, q3d, q4d]);
+        var err = (tcp.x-x)*(tcp.x-x) + (tcp.y-y)*(tcp.y-y) + (tcp.z-z)*(tcp.z-z);
+        if (err < bestErr) { bestErr = err; best = [q1, q2d, q3d, q4d, 0]; }
       }
     }
   }
