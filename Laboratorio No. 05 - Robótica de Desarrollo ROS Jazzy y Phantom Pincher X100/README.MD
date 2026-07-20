@@ -1008,19 +1008,6 @@ Laboratorio No. 05/
 
 </div>
 
-| Marca de tiempo | Contenido |
-|:---------------:|-----------|
-| 0:00 | Introducción oficial LabSIR |
-| *Pendiente* | Presentación del equipo |
-| *Pendiente* | Actividades 1–3 — Preparación, identificación y medición |
-| *Pendiente* | Actividad 4 — Movimiento individual |
-| *Pendiente* | Actividad 5 — Calibración de cero |
-| *Pendiente* | Actividad 7 — Movimiento simultáneo |
-| *Pendiente* | Actividad 8 — Movimiento secuencial |
-| *Pendiente* | Actividad 9 — Interpolación de trayectorias |
-| *Pendiente* | Actividad 13 — Enseñanza y repetición de poses |
-| *Pendiente* | Actividad 15 — Coreografía robótica |
-| *Pendiente* | Conclusiones |
 
 ### 12.2. Capturas y gráficas
 
@@ -1034,7 +1021,6 @@ Las gráficas de calibración (Actividad 5) están incluidas en la sección 5.3,
 
 ## 13. Conclusiones individuales
 
-*Espacio reservado — pendiente de diligenciar por cada integrante.*
 
 ### Duvan Felipe Pacheco Rodriguez
 
