@@ -934,12 +934,10 @@ ros2 run lab05_code choreography ~/ros2_jazzy/pedro.mp3
 
 ## 10. Plano de planta
 
-*Espacio reservado — pendiente de adjuntar.*
-
-Debe incluirse aquí el plano de planta de la ubicación del robot dentro del espacio de trabajo del laboratorio: posición del robot sobre la mesa, zona de alcance del brazo (según la geometría de la sección 2.3), ubicación del soporte de marcador usado en la Actividad 14, y disposición del computador/fuente de alimentación respecto al robot. Puede elaborarse a partir del mismo diagrama geométrico solicitado en la Actividad 3, agregando la vista en planta (proyección sobre el plano de la mesa).
+El plano del Robot Phantom Pincher X100, es el siguiente:
 
 ```
-[ Imagen / diagrama del plano de planta pendiente de insertar aquí ]
+![Phantom Pincher X100](Plano_Lab5/PincherX-100.jpg)
 ```
 
 ---
