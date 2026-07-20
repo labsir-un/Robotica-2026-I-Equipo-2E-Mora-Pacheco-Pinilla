@@ -50,17 +50,9 @@
   <!--            -->
   <xacro:property name="base_link" value="base_link"/>
 
-  <link name="world"/>
-
   <!--       -->
   <!-- Robot -->
   <!--       -->
-
-  <joint name="world_to_pincher_joint" type="fixed">
-    <parent link="world"/>
-    <child link="$(arg prefix)${base_link}"/>
-    <origin xyz="0 0 0" rpy="0 0 0"/>
-  </joint>
 
   <!-- Base link that can be used for fixing the robot to the world -->
   <xacro:phantomx_pincher_dummy_link

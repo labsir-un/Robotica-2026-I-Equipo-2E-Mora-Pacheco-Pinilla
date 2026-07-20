@@ -32,7 +32,7 @@ Visualization Manager:
         Z: 0
       Plane: XY
       Plane Cell Count: 20
-      Reference Frame: world
+      Reference Frame: base_link
       Value: true
     - Class: rviz_default_plugins/RobotModel
       Collision Enabled: false
@@ -109,7 +109,7 @@ Visualization Manager:
       Name: Current View
       Near Clip Distance: 0.01
       Pitch: 0.55
-      Target Frame: world
+      Target Frame: base_link
       Value: Orbit (rviz)
       Yaw: 0.78
     Saved: ~
