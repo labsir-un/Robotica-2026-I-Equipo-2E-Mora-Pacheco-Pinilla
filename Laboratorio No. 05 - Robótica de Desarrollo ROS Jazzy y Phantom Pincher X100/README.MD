@@ -604,15 +604,19 @@ POST /api/command {name:[wrist],   position:[-0.35]} -> sleep(delay)
 POST /api/command {name:[gripper], position:[0.0]}
 ```
 
-El tiempo total de la secuencia es `5 × delay` más el tiempo de procesamiento de cada comando.
+El tiempo total de la secuencia en simulación depende únicamente de la latencia de publicación, mientras que en el robot real es la suma de los tiempos de movimiento individuales más `(n−1) × delay`.
 
-**Comparación simultáneo vs. secuencial (a completar tras las pruebas físicas):**
+**Comparación simultáneo vs. secuencial (medido en simulación, `use_hardware:=false`):**
 
 | Criterio | Simultáneo | Secuencial |
 |----------|:----------:|:----------:|
-| Tiempo de ejecución | *Pendiente de medir* | *Pendiente de medir* |
-| Trayectoria del TCP | *Pendiente de observar* | *Pendiente de observar* |
-| Suavidad del movimiento | *Pendiente de observar* | *Pendiente de observar* |
+| **Tiempo de ejecución** (simulador, Config 2) | ≈ 0.05 s (1 periodo de muestreo) | ≈ 0.05 s (instantáneo por articulación) |
+| **Tiempo de ejecución** (robot real estimado AX-12A 66.6 °/s, Config 2) | **0.38 s** (todas las articulaciones en paralelo) | **3.35 s** (suma de movimientos individuales + 4 delays de 0.5 s) |
+| **Distancia recorrida por el TCP** (home → Config 2, vía FK) | **214.1 mm** | **214.1 mm** |
+| **Velocidad articular máxima** (robot real estimado) | 66.6 °/s (Moving Speed 100) | 66.6 °/s (Moving Speed 100) |
+| **Suavidad** | Todas las articulaciones llegan simultáneamente; trayectoria del TCP suave y predecible | Cada articulación se mueve por separado; el TCP describe una trayectoria poligonal con cambios bruscos de dirección al inicio de cada movimiento articular |
+
+> **Nota:** en el simulador la transición es instantánea (< 50 ms) porque `command_callback` actualiza `current_joint_positions` de inmediato. Los valores estimados para el robot real se calcularon usando la velocidad del perfil AX-12A con `Moving Speed = 100` (11.1 RPM ≈ 66.6 °/s). La aceleración es un escalón teórico (el AX-12A no expone un perfil de aceleración configurable).
 
 **Interfaz web:** pestaña *Actividad 8* con selector de configuración (las de la Actividad 7), slider de delay y tres botones: *Ejecutar secuencial*, *Ejecutar simultáneo* y *Home*, mostrando el progreso (1/5 … 5/5) y el tiempo transcurrido de cada modo.
 
