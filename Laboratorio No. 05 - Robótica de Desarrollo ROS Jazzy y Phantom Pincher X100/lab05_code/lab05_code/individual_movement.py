@@ -2578,13 +2578,9 @@ class APIHandler(BaseHTTPRequestHandler):
             body = self.wfile if length == 0 else self.rfile.read(length)
             data = json.loads(body)
             pts = data.get('points', [])
-            if pts:
-                command_queue.put({'type': 'trajectory', 'points': pts})
-                self._set_headers()
-                self.wfile.write(b'{"status":"ok"}')
-            else:
-                self._set_headers(400)
-                self.wfile.write(b'{"status":"error","msg":"no points"}')
+            command_queue.put({'type': 'trajectory', 'points': pts})
+            self._set_headers()
+            self.wfile.write(b'{"status":"ok"}')
 
         elif self.path == '/api/poses':
             length = int(self.headers.get('Content-Length', 0))
