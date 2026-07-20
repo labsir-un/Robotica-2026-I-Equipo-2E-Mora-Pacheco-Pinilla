@@ -1125,9 +1125,30 @@ resueltos con cinemática inversa.
 
 ### 12.4. Implementación
 
-*Pendiente.* Se implementará como script que recibe el tipo de figura,
-dimensión y resolución, calcula los puntos vía IK y ejecuta la
-trayectoria.
+Script autónomo [`lab05_code/tracing.py`](lab05_code/tracing.py) que:
+
+- Genera puntos cartesianos para triángulo y cuadrado en un plano vertical
+- Resuelve cada punto mediante cinemática inversa geométrica (4 GDL)
+- Utiliza configuración codo arriba/abajo para maximizar el espacio alcanzable
+- Interpola movimientos suaves entre vértices
+- Modo hardware: publica en `/pincher/command`
+- Modo simulación: calcula la trayectoria real con FK y grafica el resultado
+- Exporta resultados a PNG y JSON
+
+**Uso (CLI):**
+```bash
+ros2 run lab05_code tracing
+```
+Los resultados se guardan en `~/ros2_jazzy/phantom_ws/tracing_results/`.
+
+**Parámetros de dibujo:**
+| Parámetro | Valor |
+|-----------|-------|
+| Plano de dibujo | vertical (y–z) a `x = 0.13` m |
+| Centro en Z | `0.10` m |
+| Tamaños | 4 cm y 6 cm |
+| Puntos por arista | 30 |
+| Frecuencia de envío | ~25 Hz |
 
 ---
 
