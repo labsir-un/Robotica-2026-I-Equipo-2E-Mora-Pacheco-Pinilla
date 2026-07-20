@@ -63,6 +63,7 @@ Visualization Manager:
       Name: TCP Trajectory
       Namespaces:
         tcp_traj: true
+        tcp_spheres: true
       Topic:
         Depth: 5
         Durability Policy: Transient Local

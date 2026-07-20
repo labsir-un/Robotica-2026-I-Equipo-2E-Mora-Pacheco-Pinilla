@@ -2836,6 +2836,24 @@ class MovementNode(Node):
         self.traj_pub.publish(marker)
         self.get_logger().info(f'Trajectory LINE_STRIP: {len(marker.points)} pts, first=({marker.points[0].x:.3f},{marker.points[0].y:.3f},{marker.points[0].z:.3f})')
 
+        # Also publish SPHERE_LIST for guaranteed visibility
+        marker2 = Marker()
+        marker2.header = marker.header
+        marker2.ns = 'tcp_spheres'
+        marker2.id = 0
+        marker2.type = Marker.SPHERE_LIST
+        marker2.action = Marker.ADD
+        marker2.pose.orientation.w = 1.0
+        marker2.scale.x = 0.01
+        marker2.scale.y = 0.01
+        marker2.scale.z = 0.01
+        marker2.color.r = 1.0
+        marker2.color.g = 0.0
+        marker2.color.b = 0.0
+        marker2.color.a = 0.6
+        marker2.points = list(marker.points)
+        self.traj_pub.publish(marker2)
+
 def main():
     rclpy.init()
     node = MovementNode()
