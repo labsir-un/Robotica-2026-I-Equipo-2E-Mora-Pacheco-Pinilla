@@ -19,7 +19,7 @@ LIM = [(JOINT_LIMITS_DEG[j]) for j in ['waist','shoulder','elbow','wrist']]
 
 
 def ik(x, y, z, elbow_up=False):
-    return _grid_ik(x, y, z, 3)
+    return _grid_ik(x, y, z, 5)
 
 
 def _grid_ik(x, y, z, step):
