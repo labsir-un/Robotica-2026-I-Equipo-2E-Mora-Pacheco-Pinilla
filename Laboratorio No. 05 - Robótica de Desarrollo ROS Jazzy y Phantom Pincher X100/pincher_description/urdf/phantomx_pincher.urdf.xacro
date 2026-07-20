@@ -76,8 +76,8 @@
     <!-- Child: base link of the PhantomX arm -->
     <child link="$(arg prefix)arm_base_link"/>
 
-    <!-- Rotate arm to vertical (matches global_rotation_rpy from kit.xacro) -->
-    <origin xyz="0.01325 0 0.016" rpy="0 ${-pi/2} 0"/>
+    <!-- Pose of the arm base relative to the kit (tuned in original repo) -->
+    <origin xyz="0.01325 0 0.016" rpy="0 0 0"/>
   </joint>
 
   <!-- Arm -->
