@@ -60,6 +60,14 @@ ACT7_CONFIGS = [
     {'name': 'Config 5',   'q': [ 80, -35,  55, -45,   0]},
 ]
 
+# Joint limits from the URDF arm.xacro
+JOINT_LIMITS_DEG = {
+    'waist':    (-150, 150),
+    'shoulder': (-120, 120),
+    'elbow':    (-139, 139),
+    'wrist':    (-98, 103),
+}
+
 
 def main():
     print()

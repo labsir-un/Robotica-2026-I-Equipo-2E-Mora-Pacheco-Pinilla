@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
 """Actividad 12 — Cinemática Inversa
-
-Recibe (x, y, z, θ) en metros y grados, calcula configuraciones
-articulares válidas (codo arriba/abajo) y retorna la más cercana
-a la configuración actual.
+Recibe (x, y, z) en metros, calcula configuraciones articulares.
 """
 import math
 
@@ -12,123 +9,136 @@ L1 = 0.101
 L2 = 0.101
 L3 = 0.119
 DEG = math.pi / 180.0
+MAX_ARM = L1 + L2
+MAX_REACH = L1 + L2 + L3
+SHOULDER_Z = L0
 
-JOINT_NAMES = ['waist', 'shoulder', 'elbow', 'wrist']
 JOINT_LIMITS_DEG = {
     'waist':    (-150, 150),
-    'shoulder': (-150, 150),
-    'elbow':    (-150, 150),
-    'wrist':    (-150, 150),
+    'shoulder': (-120, 120),
+    'elbow':    (-139, 139),
+    'wrist':    (-98, 103),
 }
 
 
 def ik(x, y, z, elbow_up=False):
+    """Solve IK for TCP (x,y,z). Returns [q1,q2,q3,q4]° or None."""
     q1 = math.degrees(math.atan2(y, x))
     r = math.sqrt(x*x + y*y)
-    z_eff = L0 + L3 - z
-    d_sq = r*r + z_eff*z_eff
-    max_reach = L1 + L2
-    if d_sq > max_reach * max_reach:
+    z_rel = z - SHOULDER_Z
+    d_tcp = math.sqrt(r*r + z_rel*z_rel)
+    if d_tcp > MAX_REACH + 0.002 or d_tcp < 0.001:
         return None
-    d = math.sqrt(d_sq)
-    cos_q3 = (d*d - L1*L1 - L2*L2) / (2 * L1 * L2)
-    if cos_q3 < -1 or cos_q3 > 1:
-        return None
-    q3 = math.degrees(math.acos(cos_q3))
-    if elbow_up:
-        q3 = -q3
-    alpha = math.atan2(L2 * math.sin(math.radians(q3)), L1 + L2 * math.cos(math.radians(q3)))
-    q2 = math.degrees(math.atan2(z_eff, r) - alpha)
-    q4 = -90 - q2 - q3
-    result = [q1, q2, q3, q4]
 
-    limits = [JOINT_LIMITS_DEG[j] for j in JOINT_NAMES]
-    for i in range(4):
-        if result[i] < limits[i][0] or result[i] > limits[i][1]:
-            return None
-    return result
+    # Buscar punto de muñeca resolviendo intersección de círculos:
+    #   muñeca a distancia ≤ MAX_ARM del hombro
+    #   muñeca a distancia = L3 del TCP
+    # Parametrizamos la dirección del segmento muñeca→TCP con ángulo phi
+    # muñeca = TCP - L3 * (cos(phi), sin(phi))
+    best = None
+    best_dist = float('inf')
+    for phi_deg in range(-180, 181, 5):
+        phi = math.radians(phi_deg)
+        r_wrist = r - L3 * math.cos(phi)
+        z_wrist_rel = z_rel - L3 * math.sin(phi)
+        d_wrist = math.sqrt(r_wrist*r_wrist + z_wrist_rel*z_wrist_rel)
+        if d_wrist > MAX_ARM + 0.001:
+            continue
+        d = max(0.0001, d_wrist)
+        cos_q3 = max(-1.0, min(1.0, (d*d - L1*L1 - L2*L2) / (2*L1*L2)))
+        q3r = math.acos(cos_q3)
+        q3_val = -math.degrees(q3r) if elbow_up else math.degrees(q3r)
+        alpha = math.atan2(L2 * math.sin(math.radians(q3_val)),
+                           L1 + L2 * math.cos(math.radians(q3_val)))
+        q2 = math.degrees(math.atan2(z_wrist_rel, r_wrist) - alpha)
+        q4 = -90 - q2 - q3_val
+        q = [q1, q2, q3_val, q4]
+        limits = [(JOINT_LIMITS_DEG[j]) for j in ['waist','shoulder','elbow','wrist']]
+        if any(q[i] < limits[i][0] or q[i] > limits[i][1] for i in range(4)):
+            continue
+        dist = abs(phi_deg)
+        if dist < best_dist:
+            best_dist = dist
+            best = q
+    return best
 
 
 def nearest_solution(x, y, z, current_q=None):
     sols = []
-    for elbow_up in [False, True]:
-        q = ik(x, y, z, elbow_up)
-        if q is not None:
-            sols.append((elbow_up, q))
+    q1 = math.degrees(math.atan2(y, x))
+    r = math.sqrt(x*x + y*y)
+    z_rel = z - SHOULDER_Z
+    d_tcp = math.sqrt(r*r + z_rel*z_rel)
+    if d_tcp > MAX_REACH + 0.002 or d_tcp < 0.001:
+        return None, None
+
+    for phi_deg in range(-180, 181, 5):
+        phi = math.radians(phi_deg)
+        r_wrist = r - L3 * math.cos(phi)
+        z_wrist_rel = z_rel - L3 * math.sin(phi)
+        d_wrist = math.sqrt(r_wrist*r_wrist + z_wrist_rel*z_wrist_rel)
+        if d_wrist > MAX_ARM + 0.001:
+            continue
+        d = max(0.0001, d_wrist)
+        cos_q3 = max(-1.0, min(1.0, (d*d - L1*L1 - L2*L2) / (2*L1*L2)))
+        for sign in [1, -1]:
+            q3_val = sign * math.degrees(math.acos(cos_q3))
+            alpha = math.atan2(L2 * math.sin(math.radians(q3_val)),
+                               L1 + L2 * math.cos(math.radians(q3_val)))
+            q2_val = math.degrees(math.atan2(z_wrist_rel, r_wrist) - alpha)
+            q4_val = -90 - q2_val - q3_val
+            q = [q1, q2_val, q3_val, q4_val]
+            limits = [(JOINT_LIMITS_DEG[j]) for j in ['waist','shoulder','elbow','wrist']]
+            if all(limits[i][0] <= q[i] <= limits[i][1] for i in range(4)):
+                sols.append((sign > 0, q))
     if not sols:
         return None, None
     if current_q is None or len(sols) == 1:
         return sols[0]
-    best = None
-    best_dist = float('inf')
-    for elbow_up, q in sols:
+    best, best_dist = None, float('inf')
+    for eu, q in sols:
         dist = sum((q[i] - current_q[i])**2 for i in range(4))
         if dist < best_dist:
             best_dist = dist
-            best = (elbow_up, q)
+            best = (eu, q)
     return best
 
 
 def main():
     print()
-    print('  ╔══════════════════════════════════════════════════╗')
-    print('  ║   Actividad 12 — Cinemática Inversa             ║')
-    print('  ╚══════════════════════════════════════════════════╝')
+    print('  Actividad 12 — Cinemática Inversa')
+    print(f'  L0={L0*1000:.0f} L1={L1*1000:.0f} L2={L2*1000:.0f} L3={L3*1000:.0f} mm')
+    print(f'  Espacio trabajo: {MAX_REACH*1000:.0f} mm max')
     print()
-    print(f'  L₀ = {L0*1000:.0f} mm, L₁ = {L1*1000:.0f} mm, L₂ = {L2*1000:.0f} mm, L₃ = {L3*1000:.0f} mm')
-    print()
-
-    TEST_POINTS = [
-        {'name': 'Frente centro',     'x': 0.13, 'y': 0.00, 'z': 0.10},
-        {'name': 'Frente derecha',    'x': 0.13, 'y': 0.04, 'z': 0.10},
-        {'name': 'Frente izquierda',  'x': 0.13, 'y':-0.04, 'z': 0.10},
-        {'name': 'Arriba',            'x': 0.13, 'y': 0.00, 'z': 0.14},
-        {'name': 'Abajo',             'x': 0.13, 'y': 0.00, 'z': 0.07},
-        {'name': 'Esquina lejana',    'x': 0.16, 'y': 0.05, 'z': 0.10},
+    tests = [
+        ('Home FK',        0.321, 0.00, 0.089),
+        ('Frente centro',  0.130, 0.00, 0.100),
+        ('Frente derecha', 0.130, 0.04, 0.100),
+        ('Arriba',         0.100, 0.00, 0.180),
+        ('Abajo',          0.100, 0.00, 0.050),
+        ('Cerca base',     0.080, 0.00, 0.050),
     ]
-
-    print('  Pruebas con 6 puntos cartesianos:')
-    print(f'  {"Punto":20s} {"x(mm)":>7s} {"y(mm)":>7s} {"z(mm)":>7s} {"Codo":>6s} {"q1°":>7s} {"q2°":>7s} {"q3°":>7s} {"q4°":>7s}')
-    print(f'  {"-"+("-"*76)}')
-
-    for pt in TEST_POINTS:
-        elbow_up, q = nearest_solution(pt['x'], pt['y'], pt['z'], current_q=[0, 0, 0, 0])
+    print(f'  {"Punto":20s} {"x":>6s} {"y":>6s} {"z":>6s} {"Codo":>6s} {"q1°":>7s} {"q2°":>7s} {"q3°":>7s} {"q4°":>7s}')
+    for name, x, y, z in tests:
+        eu, q = nearest_solution(x, y, z, current_q=[0,0,0,0])
         if q:
-            elbow_str = 'ARRIBA' if elbow_up else 'ABAJO'
-            print(f'  {pt["name"]:20s} {pt["x"]*1000:>7.1f} {pt["y"]*1000:>7.1f} {pt["z"]*1000:>7.1f} '
-                  f'{elbow_str:>6s} {q[0]:>7.2f} {q[1]:>7.2f} {q[2]:>7.2f} {q[3]:>7.2f}')
+            print(f'  {name:20s} {x*1000:>6.0f} {y*1000:>6.0f} {z*1000:>6.0f} {"ARRIBA" if eu else "ABAJO":>6s} {q[0]:>7.2f} {q[1]:>7.2f} {q[2]:>7.2f} {q[3]:>7.2f}')
         else:
-            print(f'  {pt["name"]:20s} {pt["x"]*1000:>7.1f} {pt["y"]*1000:>7.1f} {pt["z"]*1000:>7.1f} '
-                  f'{"—":>6s} [FUERA DE ALCANCE]')
-
+            print(f'  {name:20s} {x*1000:>6.0f} {y*1000:>6.0f} {z*1000:>6.0f}  NO ALCANZABLE')
     print()
-    print('  Prueba individual: ingresa x(mm) y(mm) z(mm)')
-    print('  o presiona Enter para salir.')
-    print()
+    print('  Manual: x(mm) y(mm) z(mm) o Enter para salir.')
     while True:
         try:
-            inp = input('  x y z > ').strip()
-            if not inp:
-                break
-            vals = [float(v) for v in inp.split()]
-            if len(vals) < 3:
-                print('  Se requieren x y z en mm.')
-                continue
-            x, y, z = vals[0] / 1000.0, vals[1] / 1000.0, vals[2] / 1000.0
-            print()
-            print(f'  Buscando soluciones para ({x*1000:.1f}, {y*1000:.1f}, {z*1000:.1f}) mm')
-            for elbow_up in [True, False]:
-                q = ik(x, y, z, elbow_up)
-                label = 'ARRIBA' if elbow_up else 'ABAJO '
-                if q:
-                    print(f'    Codo {label}: q=[{q[0]:>7.2f}, {q[1]:>7.2f}, {q[2]:>7.2f}, {q[3]:>7.2f}]°')
-                else:
-                    print(f'    Codo {label}: [FUERA DE ALCANCE O LÍMITES]')
-        except (ValueError, EOFError):
-            break
-    print()
+            inp = input('  > ').strip()
+            if not inp: break
+            x,y,z = [float(v)/1000.0 for v in inp.split()[:3]]
+            eu, q = nearest_solution(x, y, z, [0,0,0,0])
+            if q:
+                print(f'    Codo {"ARRIBA" if eu else "ABAJO"}: q=[{q[0]:.2f}, {q[1]:.2f}, {q[2]:.2f}, {q[3]:.2f}]°')
+            else:
+                print('    NO ALCANZABLE')
+        except: break
     print('  Hecho.')
-
 
 if __name__ == '__main__':
     main()

@@ -1967,29 +1967,44 @@ function buildSinusoidal() {
 var trRunning = false;
 var trStopFlag = false;
 
-/* IK for Phantom X Pincher (same as Python tracing.py) */
+/* IK for Phantom X Pincher */
 var L0 = 0.089, L1 = 0.101, L2 = 0.101, L3 = 0.119;
+var MAX_ARM = L1 + L2;
+var MAX_REACH = L1 + L2 + L3;
 
 function trIk(x, y, z) {
   var q1 = Math.atan2(y, x) * 180 / Math.PI;
   var r = Math.sqrt(x*x + y*y);
-  var ze = L0 + L3 - z;
-  var d2 = r*r + ze*ze;
-  if (d2 > Math.pow(L1+L2, 2)) return null;
-  var d = Math.sqrt(d2);
-  var c3 = (d2 - L1*L1 - L2*L2) / (2*L1*L2);
-  if (c3 < -1 || c3 > 1) return null;
-  var q3 = Math.acos(c3) * 180 / Math.PI;
-  q3 = -q3;
-  var alpha = Math.atan2(L2 * Math.sin(q3*Math.PI/180), L1 + L2 * Math.cos(q3*Math.PI/180));
-  var q2 = Math.atan2(ze, r) * 180 / Math.PI - alpha * 180 / Math.PI;
-  var q4 = -90 - q2 - q3;
-  var q = [q1, q2, q3, q4, 0];
-  var limits = [[-150,150],[-150,150],[-150,150],[-150,150],[-90,90]];
-  for (var k = 0; k < 5; k++) {
-    if (q[k] < limits[k][0] || q[k] > limits[k][1]) return null;
+  var zRel = z - L0;
+  var dTcp = Math.sqrt(r*r + zRel*zRel);
+  if (dTcp > MAX_REACH + 0.002 || dTcp < 0.001) return null;
+
+  var limits = [[-150,150],[-120,120],[-139,139],[-98,103],[-90,90]];
+  var best = null, bestDist = 1e9;
+  for (var phiDeg = -180; phiDeg <= 180; phiDeg += 5) {
+    var phi = phiDeg * Math.PI / 180;
+    var rWrist = r - L3 * Math.cos(phi);
+    var zWristRel = zRel - L3 * Math.sin(phi);
+    var dWrist = Math.sqrt(rWrist*rWrist + zWristRel*zWristRel);
+    if (dWrist > MAX_ARM + 0.001) continue;
+    var d = Math.max(0.0001, dWrist);
+    var c3 = Math.max(-1, Math.min(1, (d*d - L1*L1 - L2*L2) / (2*L1*L2)));
+    var q3r = Math.acos(c3);
+    var q3Try = -q3r * 180 / Math.PI;
+    var alpha = Math.atan2(L2 * Math.sin(q3r), L1 + L2 * Math.cos(q3r));
+    var q2Try = Math.atan2(zWristRel, rWrist) * 180 / Math.PI - alpha * 180 / Math.PI;
+    var q4Try = -90 - q2Try - q3Try;
+    var q = [q1, q2Try, q3Try, q4Try, 0];
+    var ok = true;
+    for (var k = 0; k < 5; k++) {
+      if (q[k] < limits[k][0] || q[k] > limits[k][1]) { ok = false; break; }
+    }
+    if (ok) {
+      var dist = Math.abs(phiDeg);
+      if (dist < bestDist) { bestDist = dist; best = q; }
+    }
   }
-  return q;
+  return best;
 }
 
 /* FK for Phantom X Pincher (returns world x,y,z from joint angles in degrees) */
