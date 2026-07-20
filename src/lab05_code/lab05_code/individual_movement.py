@@ -1914,7 +1914,12 @@ function buildTracing() {
     var alpha = Math.atan2(L2 * Math.sin(q3*Math.PI/180), L1 + L2 * Math.cos(q3*Math.PI/180));
     var q2 = Math.atan2(ze, r) * 180 / Math.PI - alpha * 180 / Math.PI;
     var q4 = -90 - q2 - q3;
-    return [q1, q2, q3, q4, 0];
+    var q = [q1, q2, q3, q4, 0];
+    var limits = [[-150,150],[-150,150],[-150,150],[-150,150],[-90,90]];
+    for (var k = 0; k < 5; k++) {
+      if (q[k] < limits[k][0] || q[k] > limits[k][1]) return null;
+    }
+    return q;
   }
 
   /* FK for Phantom X Pincher (returns world x,y,z from joint angles in degrees) */
