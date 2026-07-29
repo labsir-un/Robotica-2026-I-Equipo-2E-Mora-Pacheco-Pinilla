@@ -25,7 +25,8 @@ soldadura y empaque de PCBs.
 14. [Estructura del Repositorio](#14-estructura-del-repositorio)
 15. [Instrucciones de Puesta en Marcha](#15-instrucciones-de-puesta-en-marcha)
 16. [Seguridad](#16-seguridad)
-17. [Referencias](#17-referencias)
+17. [Conclusiones](#17-conclusiones)
+18. [Referencias](#18-referencias)
 
 ---
 
@@ -1327,7 +1328,49 @@ Proyecto Final/
 
 ---
 
-## 17. Referencias
+## 17. Conclusiones
+
+La automatizacion de la Etapa 4 de la linea de ensamblaje de PCBs demostro la
+viabilidad de integrar un robot industrial ABB IRB 140 con un sistema electronico
+embebido basado en Arduino Uno para el control de una herramienta de bajo costo.
+El proyecto abordo exitosamente los cuatro pilares de la robotica industrial:
+mecanica, electronica, programacion y control.
+
+El principal desafio fue la **compatibilidad de senales** entre el controlador
+IRC5 (24 V, logica ON/OFF) y el servomotor SG90 (5 V, PWM). La solucion implementada
+con optoacopladores PC817 para aislamiento galvanico, el convertidor LM2596 para
+la fuente de alimentacion y el modulo de reles para el retorno de senales demostro
+ser robusta y repetible. El firmware del Arduino, disenado con una arquitectura no
+bloqueante basada en `millis()`, garantiza control suave del servo mediante pasos
+incrementales de 2&deg; y libera el actuador en reposo para prevenir
+sobrecalentamiento, logrando un sistema confiable para operacion continua.
+
+La **programacion en RAPID** permitio implementar un ciclo de produccion completo
+para dos PCBs con manejo de banda transportadora, calibracion automatica y rutinas
+de parada de emergencia. La integracion con RobotStudio facilito la validacion
+previa en simulacion, reduciendo riesgos en la puesta en marcha fisica.
+
+La **interfaz HMI** desarrollada como aplicacion web estatica conectada por Web
+Serial API proporciona supervision en tiempo real de todas las senales del sistema,
+un panel de comandos remotos, visualizacion animada del gripper y registro
+cronologico de eventos. Su arquitectura autocontenida (HTML+CSS+JS sin dependencias)
+la hace portable y de facil despliegue en cualquier navegador compatible.
+
+Desde el punto de vista del **diseno mecanico**, el gripper paralelo impreso en 3D
+basado en el modelo EEZYbotARM MK2, junto con los soportes laterales de la banda
+transportadora, cumplio con los requisitos de agarre lateral de la PCB y guiado
+de las cajas de empaque. La calibracion experimental de los angulos del servo
+(10&deg; abierto, 100&deg; cerrado) garantiza repetibilidad en la sujecion sin
+danar las pestanas de la PCB.
+
+El proyecto evidencio la importancia de una **documentacion estructurada** que
+abarque desde los diagramas de conexionado electronico hasta las maquinas de
+estados del firmware y del programa RAPID, facilitando la trazabilidad del diseno
+y la transferencia del conocimiento a futuros equipos de trabajo.
+
+---
+
+## 18. Referencias
 
 1. Guia del Proyecto Final &mdash; Robotica Industrial 2026-I. Automatizacion del
    Proceso de Ensamblaje, Soldadura y Empaque de PCBs. Universidad Nacional de
