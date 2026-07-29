@@ -125,6 +125,8 @@ y se ubican a ambos lados de la banda, a la altura de la zona de trabajo del rob
 
 ![Soportes laterales para cierre de caja](./evidencias/sopostes%20que%20cieeran%20la%20caja%20pocicionados.jpg)
 
+![Caja cerrándose mediante los soportes laterales](./evidencias/caja%20cerandose.jpeg)
+
 ### 2.4. Entradas y salidas de la estacion
 
 | Concepto | Detalle |
