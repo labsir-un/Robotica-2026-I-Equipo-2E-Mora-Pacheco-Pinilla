@@ -5,6 +5,8 @@
 Automatizacion de la estacion de empaque dentro de la linea simulada de ensamblaje,
 soldadura y empaque de PCBs.
 
+![Estacion Completa](./evidencias/estacion_completa.png)
+
 ---
 
 ## Tabla de Contenido
@@ -16,13 +18,16 @@ soldadura y empaque de PCBs.
 5. [Diseno Electronico y de Potencia](#5-diseno-electronico-y-de-potencia)
 6. [Firmware del Controlador de la Herramienta](#6-firmware-del-controlador-de-la-herramienta)
 7. [Programacion del Robot (RAPID)](#7-programacion-del-robot-rapid)
-8. [Diagrama de Flujo del Proceso](#8-diagrama-de-flujo-del-proceso)
-9. [Manejo de Fallas](#9-manejo-de-fallas)
-10. [Interfaz de Supervision (UART)](#10-interfaz-de-supervision-uart)
-11. [Estructura del Repositorio](#11-estructura-del-repositorio)
-12. [Instrucciones de Puesta en Marcha](#12-instrucciones-de-puesta-en-marcha)
-13. [Seguridad](#13-seguridad)
-14. [Referencias](#14-referencias)
+8. [Diagramas de Flujo del Proceso](#8-diagramas-de-flujo-del-proceso)
+9. [Maquinas de Estados](#9-maquinas-de-estados)
+10. [Simulacion vs. Planta Real](#10-simulacion-vs-planta-real)
+11. [Manejo de Fallas](#11-manejo-de-fallas)
+12. [Interfaz de Supervision (UART)](#12-interfaz-de-supervision-uart)
+13. [Estructura del Repositorio](#13-estructura-del-repositorio)
+14. [Instrucciones de Puesta en Marcha](#14-instrucciones-de-puesta-en-marcha)
+15. [Evidencias](#15-evidencias)
+16. [Seguridad](#16-seguridad)
+17. [Referencias](#17-referencias)
 
 ---
 
@@ -83,8 +88,10 @@ proveniente de la Etapa 3 (robot Yaskawa Motoman MH6 "El Chambeador"), realiza e
 empaque de dos PCBs en cajas individuales que avanzan sobre una banda transportadora,
 y envia el lote completo hacia la salida.
 
-```
-... Etapa 3 (Soldadura) --> ETAPA 4 (Abel: Empaque) --> Producto final (2 PCBs empacadas por ciclo)
+```mermaid
+flowchart LR
+    A[Etapa 3<br/>Soldadura<br/>El Chambeador] -->|PCB soldada| B[ETAPA 4<br/>Embalaje y Envio<br/>Abel IRB 140]
+    B -->|2 PCBs empacadas| C[Producto Final<br/>Banda de salida]
 ```
 
 ### 2.2. Componentes fisicos de la estacion
@@ -95,11 +102,31 @@ y envia el lote completo hacia la salida.
 | Mesa de trabajo | Superficie donde se ubican las PCBs para recoger | `Mesa.sat` |
 | Pedestal del robot | Base de montaje del IRB 140 | `Pedestal.sat` |
 | Banda transportadora | Transporta las cajas de empaque hacia y desde el robot | `Banda tranportadora.sat` |
+| Soportes de la banda | Soportes disenados para el cierre y guia de las cajas sobre la banda | `Banda tranportadora.sat` |
 | Caja de empaque | Contenedor donde se deposita cada PCB | `caja.sat` |
 | PCB | Placa de circuito impreso a manipular (2 por ciclo) | `pcb.sat` |
 | Gripper | Herramienta de sujecion montada en la brida del robot | `gripper2.zip` |
 
-### 2.3. Entradas y salidas de la estacion
+### 2.3. Soportes de la banda transportadora
+
+Para garantizar que las cajas de empaque permanezcan correctamente posicionadas
+y alineadas durante el ciclo de produccion, se disenaron **soportes laterales**
+integrados al modelo CAD de la banda transportadora. Estos soportes cumplen tres
+funciones:
+
+1. **Guia lateral**: mantienen las cajas centradas sobre la banda durante el
+   avance, evitando que se desalineen por vibracion o inercia.
+2. **Tope de posicionamiento**: definen la posicion exacta de parada de cada caja
+   frente al robot, asegurando repetibilidad en el punto de deposito.
+3. **Cierre de caja**: ejercen presion lateral controlada sobre las solapas de la
+   caja, facilitando el cierre una vez la PCB ha sido depositada en su interior.
+
+Los soportes estan modelados como parte integral del archivo `Banda tranportadora.sat`
+y se ubican a ambos lados de la banda, a la altura de la zona de trabajo del robot.
+
+> **Evidencia**: Ver `evidencias/soportes_banda.png`
+
+### 2.4. Entradas y salidas de la estacion
 
 | Concepto | Detalle |
 |----------|---------|
@@ -109,7 +136,7 @@ y envia el lote completo hacia la salida.
 | Entradas digitales | DI_01 (inicio de ciclo), DI_02 (calibracion), DI_03 (reservada), DI_04 (gripOK), DI_05 (home remoto), DI_06 (start remoto) |
 | Salidas digitales | DO_01 al DO_03 (senalizacion luminosa), DO_04 (comando gripper), DO_05 (reservada), DO_06 (falla), FWD_Conveyor, BWD_Conveyor |
 
-### 2.4. Secuencia general del ciclo de produccion
+### 2.5. Secuencia general del ciclo de produccion
 
 Cada ciclo completo procesa **2 PCBs** en **2 cajas**:
 
@@ -130,6 +157,8 @@ Antes del ciclo productivo, el operario puede ejecutar un **modo de calibracion*
 activando DI_02, que hace avanzar la banda 3.8 s y luego retroceder 5 s para
 posicionar la primera caja en la marca inicial.
 
+> **Evidencia**: Ver `evidencias/ciclo_produccion.png`
+
 ---
 
 ## 3. Diseno Mecanico
@@ -143,7 +172,7 @@ Todos los componentes pasivos de la estacion fueron modelados en formato SAT
 |---------|-------------|:------:|
 | `Mesa.sat` | Mesa de trabajo con dos zonas de entrega de PCB | 44 KB |
 | `Pedestal.sat` | Base de montaje del robot IRB 140 | 13 KB |
-| `Banda tranportadora.sat` | Banda transportadora con rodillos | 89 KB |
+| `Banda tranportadora.sat` | Banda transportadora con rodillos y soportes laterales | 89 KB |
 | `caja.sat` | Caja de empaque individual | 38 KB |
 | `pcb.sat` | Placa de circuito impreso con pestanas de agarre | 278 KB |
 | `gripper2.zip` | Gripper paralelo completo (comprimido) | 34 MB |
@@ -157,6 +186,22 @@ de entrega de PCB.
 
 El gripper se monta directamente sobre la brida del eje 6 del robot mediante un
 acople disenado a medida.
+
+```mermaid
+block-beta
+    columns 5
+    space:1 Robot["Robot IRB 140\n+ Pedestal"] space:1 space:1
+    space:1 space:1 space:1 Mesa["Mesa de\nPCBs"]
+    Banda["Banda Transportadora\n+ Soportes"]:5
+```
+
+> **Evidencia**: Ver `evidencias/layout_planta.png`
+
+### 3.3. Vista de la estacion en RobotStudio
+
+> **Pantallazo RobotStudio**: `evidencias/robotstudio_estacion.png`
+
+![Vista de la estacion](./evidencias/robotstudio_estacion.png)
 
 ---
 
@@ -180,6 +225,8 @@ garantizando un agarre centrado.
 | Senal de control | PWM, 50 Hz (periodo 20 ms) |
 | Alimentacion | 5 V DC |
 | Engranajes | Plasticos (limitacion: sin realimentacion de posicion ni control de fuerza) |
+
+> **Evidencia**: Ver `evidencias/gripper_montaje.png`
 
 ### 4.3. Angulos de operacion calibrados
 
@@ -242,7 +289,74 @@ ALIMENTACION: LM2596 (24V -> 5V) ----> Arduino VIN + Servo VCC
                                        GND comun
 ```
 
-### 5.3. Componentes principales
+> **Evidencia**: Ver `evidencias/diagrama_conexionado.png` y `evidencias/circuito_montaje.png`
+
+### 5.3. Esquematico de conexionado completo
+
+```mermaid
+graph TB
+    subgraph "ZONA 24V - IRC5"
+        DO04[DO_04<br/>24V DC]
+        DO06[DO_06<br/>24V DC]
+        DI04_IRC[DI_04<br/>gripOK]
+        DI05_IRC[DI_05<br/>home]
+        DI06_IRC[DI_06<br/>start]
+    end
+
+    subgraph "AISLAMIENTO"
+        R1[R 2.2kΩ]
+        R2[R 2.2kΩ]
+        PC1[PC817 #1]
+        PC2[PC817 #2]
+        PD1[R 10kΩ<br/>pull-down]
+        PD2[R 10kΩ<br/>pull-down]
+    end
+
+    subgraph "POTENCIA"
+        LM[LM2596<br/>24V→5V]
+        C1[1000µF]
+        C2[100nF]
+    end
+
+    subgraph "ARDUINO UNO"
+        D2[D2 INPUT]
+        D4[D4 INPUT]
+        D5[D5 OUTPUT]
+        D6[D6 OUTPUT]
+        D7[D7 OUTPUT]
+        D9[D9 PWM]
+        D13[D13 LED]
+    end
+
+    subgraph "RELES"
+        REL1[Rele #1]
+        REL2[Rele #2]
+        REL3[Rele #3]
+    end
+
+    subgraph "ACTUADOR"
+        SG90[Servo SG90]
+    end
+
+    DO04 --> R1 --> PC1 --> D2
+    DO06 --> R2 --> PC2 --> D4
+    PD1 --> D2
+    PD2 --> D4
+    
+    LM -->|5V| D5
+    LM -->|5V| D6
+    LM -->|5V| D7
+    LM -->|5V| SG90
+    C1 --> SG90
+    C2 --> LM
+    
+    D5 --> REL1 --> DI04_IRC
+    D6 --> REL2 --> DI05_IRC
+    D7 --> REL3 --> DI06_IRC
+    D9 --> SG90
+```
+
+### 5.4. Componentes principales
 
 | Componente | Referencia | Cant. | Funcion |
 |------------|------------|:-----:|--------|
@@ -256,7 +370,7 @@ ALIMENTACION: LM2596 (24V -> 5V) ----> Arduino VIN + Servo VCC
 | Condensador | 1000 &micro;F / 16 V | 1 | Filtro en alimentacion del servo |
 | Condensador | 100 nF | 1 | Desacople en alimentacion del Arduino |
 
-### 5.4. Aislamiento galvanico
+### 5.5. Aislamiento galvanico
 
 Las senales DO_04 y DO_06 del IRC5 ingresan a los optoacopladores PC817 a traves
 de resistencias limitadoras de 2.2 k&Omega;. Cuando el IRC5 activa una salida (24 V),
@@ -270,7 +384,7 @@ de 10 k&Omega; (no se activa `INPUT_PULLUP`). Esto garantiza que, en ausencia de
 senal del optoacoplador, el pin lea un nivel bajo estable (0 V), evitando falsas
 lecturas por ruido electromagnetico.
 
-### 5.5. Retorno de senales al IRC5
+### 5.6. Retorno de senales al IRC5
 
 Las salidas del Arduino hacia el IRC5 (DI_04, DI_05, DI_06) utilizan **reles de
 contacto seco**. Esto significa que el Arduino no impone ningun nivel de tension
@@ -284,7 +398,7 @@ reles empleado opera con logica activa en alto (`RELE_ON = HIGH`).
 - **DI_06 (start)**: senal de **pulso** (300 ms). Indica al programa RAPID que debe
   iniciar un ciclo de produccion.
 
-### 5.6. Alimentacion
+### 5.7. Alimentacion
 
 La alimentacion del sistema se toma de la fuente de 24 V DC disponible en el
 controlador IRC5 o en el armario electrico del puesto de trabajo. El modulo LM2596
@@ -295,7 +409,7 @@ Se incluye un condensador electrolitico de 1000 &micro;F en paralelo con la
 alimentacion del servo para absorber los picos de corriente durante el arranque
 del motor, y un condensador ceramico de 100 nF para filtrar ruido de alta frecuencia.
 
-### 5.7. Mapa completo de pines del Arduino Uno
+### 5.8. Mapa completo de pines del Arduino Uno
 
 | Pin Arduino | Modo | Conectado a | Senal | Tipo |
 |-------------|------|-------------|-------|------|
@@ -309,7 +423,7 @@ del motor, y un condensador ceramico de 100 nF para filtrar ruido de alta frecue
 | VIN | POWER | Salida 5V del LM2596 | Alimentacion | 5 V DC |
 | GND | POWER | Tierra comun | Referencia | 0 V |
 
-### 5.8. Senales no gestionadas por el Arduino
+### 5.9. Senales no gestionadas por el Arduino
 
 Las siguientes senales se utilizan en el programa RAPID pero no pasan por el Arduino;
 estan cableadas directamente en el puesto de trabajo:
@@ -338,7 +452,7 @@ de forma controlada y devolver senales de confirmacion al robot.
 
 ### 6.2. Estructura del programa
 
-El `loop()` principal ejecuta seis tareas de forma no bloqueante (basadas en
+El `loop()` principal ejecuta siete tareas de forma no bloqueante (basadas en
 `millis()`), sin usar `delay()`:
 
 | Funcion | Proposito |
@@ -401,6 +515,8 @@ Para evitar fragmentacion de heap (el ATmega328P solo dispone de 2 KB de SRAM),
 el firmware utiliza un buffer de caracteres de tamano fijo (24 bytes) en lugar de
 la clase `String` de Arduino. Los caracteres que exceden la capacidad del buffer
 se descartan silenciosamente para prevenir desbordamiento.
+
+> **Evidencia**: Ver `evidencias/arduino_montaje.png` y `evidencias/monitor_serie.png`
 
 ---
 
@@ -528,7 +644,7 @@ Se activa mediante DI_01. Procesa un lote de 2 PCBs:
 ### 7.10. Rutinas auxiliares
 
 El programa incluye rutinas adicionales para manejo de parada de emergencia y
-senalizacion, aunque algunas no son llamadas desde el flujo principal actual:
+senalizacion:
 
 | Rutina | Funcion |
 |--------|---------|
@@ -540,91 +656,266 @@ senalizacion, aunque algunas no son llamadas desde el flujo principal actual:
 
 ---
 
-## 8. Diagrama de Flujo del Proceso
+## 8. Diagramas de Flujo del Proceso
 
+### 8.1. Flujo principal del sistema
+
+```mermaid
+flowchart TD
+    START([INICIO]) --> HOME[HOME seguro<br/>Gripper abierto, banda detenida]
+    HOME --> CHECK{Entrada activa?}
+    
+    CHECK -->|DI_02 = 1| CAL[Modo Calibracion]
+    CHECK -->|DI_01 = 1| CICLO[Ciclo de Produccion]
+    CHECK -->|Ninguna| WAIT[Esperar 200 ms]
+    WAIT --> CHECK
+    
+    CAL --> CAL1[Avance banda 3.8 s]
+    CAL1 --> CAL2[Esperar soltar DI_02]
+    CAL2 --> HOME
+    
+    CICLO --> C1[Avance banda 5 s<br/>Trae Caja 1]
+    C1 --> C2[Tomar PCB 1<br/>MoveJ approach<br/>MoveL grab<br/>Cerrar gripper<br/>MoveL retreat]
+    C2 --> C3[Depositar en Caja 1<br/>MoveJ approach<br/>MoveL place<br/>Abrir gripper<br/>MoveL retreat]
+    C3 --> C4[Avance banda 5 s<br/>Evacua Caja 1<br/>Trae Caja 2]
+    C4 --> C5[Tomar PCB 2<br/>Analogo a PCB 1]
+    C5 --> C6[Depositar en Caja 2]
+    C6 --> C7[Expulsion banda 6 s<br/>Lote completo]
+    C7 --> C8[HOME<br/>Destello DO_01<br/>Esperar DI_01=0]
+    C8 --> HOME
 ```
-                          INICIO
-                            |
-                            v
-                    +-----------------+
-                    |   HOME seguro   |
-                    |  (gripper abierto,|
-                    |   banda detenida) |
-                    +-----------------+
-                            |
-                  +---------+---------+
-                  |                   |
-             DI_02 = 1           DI_01 = 1
-                  |                   |
-                  v                   v
-          +--------------+    +-----------------+
-          | MODO         |    | CICLO DE        |
-          | CALIBRACION  |    | PRODUCCION      |
-          +--------------+    +-----------------+
-          | Avance 3.8 s |    | Avance banda 5 s |
-          | Espera soltar|    | (trae Caja 1)    |
-          | DI_02        |    +--------+--------+
-          +------+-------+             |
-                 |                     v
-                 |             +---------------+
-                 |             | TOMAR PCB 1   |
-                 |             | MoveJ approach|
-                 |             | MoveL grab    |
-                 |             | Cerrar gripper|
-                 |             | MoveL retreat |
-                 |             +-------+-------+
-                 |                     |
-                 |                     v
-                 |             +---------------+
-                 |             | DEPOSITAR EN  |
-                 |             | CAJA 1        |
-                 |             | MoveJ approach|
-                 |             | MoveL place   |
-                 |             | Abrir gripper |
-                 |             | MoveL retreat |
-                 |             +-------+-------+
-                 |                     |
-                 |                     v
-                 |             +---------------+
-                 |             | Avance banda  |
-                 |             | 5 s (Caja 2)  |
-                 |             +-------+-------+
-                 |                     |
-                 |                     v
-                 |             +---------------+
-                 |             | TOMAR PCB 2   |
-                 |             | (analogo PCB1)|
-                 |             +-------+-------+
-                 |                     |
-                 |                     v
-                 |             +---------------+
-                 |             | DEPOSITAR EN  |
-                 |             | CAJA 2        |
-                 |             +-------+-------+
-                 |                     |
-                 |                     v
-                 |             +---------------+
-                 |             | Expulsion     |
-                 |             | banda 6 s     |
-                 |             +-------+-------+
-                 |                     |
-                 |                     v
-                 |             +---------------+
-                 |             | HOME          |
-                 |             | Esperar DI_01=0|
-                 |             +-------+-------+
-                 |                     |
-                 +---------------------+
-                            |
-                            v
-                       (repetir)
+
+### 8.2. Flujo detallado: Pick and Place
+
+```mermaid
+flowchart TD
+    subgraph "TOMAR PCB"
+        T1[AbrirGripper<br/>SetDO DO_04,0<br/>WaitTime 1s] --> T2{PCB 1 o 2?}
+        T2 -->|PCB 1| T3A[MoveJ pPCB1_Approach<br/>v300, z20]
+        T2 -->|PCB 2| T3B[MoveJ pPCB2_Approach<br/>v300, z20]
+        T3A --> T4A[MoveL pPCB1Grab<br/>v50, fine]
+        T3B --> T4B[MoveL pPCB2Grab<br/>v50, fine]
+        T4A --> T5[CerrarGripper<br/>SetDO DO_04,1<br/>WaitTime 1s]
+        T4B --> T5
+        T5 --> T6[MoveL retreat<br/>v100, z20]
+    end
+    
+    subgraph "DEPOSITAR EN CAJA"
+        D1[MoveJ pCajaApproach<br/>v300, z10] --> D2[MoveL pCajaPlace<br/>v50, fine]
+        D2 --> D3[AbrirGripper<br/>SetDO DO_04,0<br/>WaitTime 1s]
+        D3 --> D4[MoveL pCajaApproach<br/>v100, fine]
+    end
+    
+    T6 --> D1
+```
+
+### 8.3. Flujo del firmware Arduino
+
+```mermaid
+flowchart TD
+    BOOT([BOOT]) --> SETUP[setup<br/>Configurar pines<br/>Serial 9600<br/>Servo en 10°<br/>Activar gripOK]
+    SETUP --> LOOP
+    
+    LOOP --> L1[leerEntradas<br/>DO_04 y DO_06<br/>+ antirrebote 30ms]
+    L1 --> L2[moverServo<br/>Paso 2° cada 15ms]
+    L2 --> L3[gestionarGripOK<br/>Actualizar DI_04]
+    L3 --> L4[gestionarDetach<br/>Liberar servo si abierto > 800ms]
+    L4 --> L5[gestionarPulsos<br/>Cerrar pulsos DI_05/DI_06]
+    L5 --> L6[atenderSerie<br/>Procesar comandos UART]
+    L6 --> L7[enviarTelemetria<br/>Trama cada 500ms]
+    L7 --> LOOP
 ```
 
 ---
 
-## 9. Manejo de Fallas
+## 9. Maquinas de Estados
 
-### 9.1. Estrategia general
+### 9.1. Maquina de estados del firmware Arduino
+
+El firmware del Arduino implementa una maquina de estados implicita gobernada
+por el comando recibido desde el IRC5 y la posicion actual del servo.
+
+```mermaid
+stateDiagram-v2
+    [*] --> BOOT
+    
+    state BOOT {
+        [*] --> ConfigurandoPines
+        ConfigurandoPines --> IniciandoSerial
+        IniciandoSerial --> PosicionandoServo
+        PosicionandoServo --> Listo
+    }
+    
+    BOOT --> ABIERTO_REPOSO
+    
+    state "ABIERTO_REPOSO" as ABIERTO_REPOSO {
+        [*] --> ServoEn10
+        ServoEn10 --> gripOK_activo : DI_04 = ON
+        gripOK_activo --> ServoLiberado : detach() tras 800ms
+    }
+    
+    state "CERRANDO" as CERRANDO {
+        [*] --> gripOK_inactivo : DI_04 = OFF
+        gripOK_inactivo --> MoviendoServo : Paso 2° cada 15ms
+        MoviendoServo --> MoviendoServo : angulo < objetivo
+        MoviendoServo --> ALCANZADO : angulo == 100°
+    }
+    
+    state "ABRIENDO" as ABRIENDO {
+        [*] --> gripOK_inactivo2 : DI_04 = OFF
+        gripOK_inactivo2 --> MoviendoServo2 : Paso 2° cada 15ms
+        MoviendoServo2 --> MoviendoServo2 : angulo > objetivo
+        MoviendoServo2 --> ALCANZADO2 : angulo == 10°
+    }
+    
+    ABIERTO_REPOSO --> CERRANDO : DO_04 = 1
+    CERRANDO --> ALCANZADO
+    state ALCANZADO {
+        [*] --> gripOK_activo2 : DI_04 = ON
+        gripOK_activo2 --> SUJETANDO : servo activo
+    }
+    SUJETANDO --> ABIERTO_REPOSO : DO_04 = 0
+    ALCANZADO2 --> ABIERTO_REPOSO
+    ABRIENDO --> ALCANZADO2
+    ALCANZADO --> ABRIENDO : DO_04 = 0
+```
+
+### 9.2. Maquina de estados del programa RAPID
+
+El programa RAPID implementa una maquina de estados gobernada por las entradas
+digitales del operador y la secuencia del ciclo de produccion.
+
+```mermaid
+stateDiagram-v2
+    [*] --> INICIALIZANDO
+    
+    state INICIALIZANDO {
+        [*] --> ConfigurandoMonitoreo
+        ConfigurandoMonitoreo --> ReseteandoBanda
+        ReseteandoBanda --> YendoAHome
+    }
+    
+    INICIALIZANDO --> IDLE
+    
+    IDLE --> CALIBRANDO : DI_02 = 1
+    IDLE --> PRODUCIENDO : DI_01 = 1
+    
+    state CALIBRANDO {
+        [*] --> AvanzandoBandaCal : FWD_Conveyor ON, 3.8s
+        AvanzandoBandaCal --> EsperandoLiberacion : DI_02 debe ser 0
+        EsperandoLiberacion --> [*]
+    }
+    
+    CALIBRANDO --> IDLE
+    
+    state PRODUCIENDO {
+        [*] --> Avance1 : FWD_Conveyor ON, 5s
+        Avance1 --> TomarPCB1 : MoveJ/L + Cerrar
+        TomarPCB1 --> Depositar1 : MoveJ/L + Abrir
+        Depositar1 --> Avance2 : FWD_Conveyor ON, 5s
+        Avance2 --> TomarPCB2 : MoveJ/L + Cerrar
+        TomarPCB2 --> Depositar2 : MoveJ/L + Abrir
+        Depositar2 --> Expulsion : FWD_Conveyor ON, 6s
+        Expulsion --> Finalizando : IrAHome + SenalarDone
+        Finalizando --> EsperandoReset : DI_01 debe ser 0
+        EsperandoReset --> [*]
+    }
+    
+    PRODUCIENDO --> IDLE
+
+    state PARADA_EMERGENCIA {
+        [*] --> DetenerBanda : Reset FWD + BWD
+        DetenerBanda --> IrAHomeEmergencia : MoveAbsJ Home
+        IrAHomeEmergencia --> AbrirGripperEmergencia
+        AbrirGripperEmergencia --> [*]
+    }
+    
+    IDLE --> PARADA_EMERGENCIA : Emergencia
+    PRODUCIENDO --> PARADA_EMERGENCIA : Emergencia
+    PARADA_EMERGENCIA --> IDLE : Reset
+```
+
+### 9.3. Maquina de estados combinada IRC5-Arduino
+
+```mermaid
+stateDiagram-v2
+    direction LR
+    
+    state "IRC5 (RAPID)" as IRC5 {
+        IDLE_R --> PRODUCIENDO_R : DI_01
+        PRODUCIENDO_R --> IDLE_R : Ciclo completo
+        IDLE_R --> CALIBRANDO_R : DI_02
+        CALIBRANDO_R --> IDLE_R : Fin calibracion
+    }
+    
+    state "Arduino (Gripper)" as ARD {
+        ABIERTO_A --> CERRANDO_A : DO_04 = 1
+        CERRANDO_A --> SUJETANDO_A : ang = 100
+        SUJETANDO_A --> ABRIENDO_A : DO_04 = 0
+        ABRIENDO_A --> ABIERTO_A : ang = 10
+    }
+    
+    IRC5 --> ARD : DO_04 (comando)
+    ARD --> IRC5 : DI_04 (gripOK)
+```
+
+---
+
+## 10. Simulacion vs. Planta Real
+
+### 10.1. Relacion entre simulacion e implementacion fisica
+
+El proyecto fue desarrollado bajo una metodologia que integra el entorno simulado
+(RobotStudio) con la implementacion fisica (robot IRB 140 real + circuito Arduino).
+Ambos entornos comparten el mismo codigo RAPID y la misma configuracion de senales
+E/S, lo que permite validar la logica en simulacion antes de la puesta en marcha real.
+
+| Aspecto | Simulacion (RobotStudio) | Planta Real |
+|---------|--------------------------|-------------|
+| Robot | Controlador virtual IRC5 + IRB 140 | Controlador IRC5 fisico + robot IRB 140 |
+| Programa RAPID | `Module1.mod` cargado en VC | `Module1.mod` cargado en IRC5 real |
+| E/S | Simuladas desde ventana de senales | Conexion fisica via DeviceNet (Board10, d652) |
+| Gripper | Modelo CAD 3D animado | Gripper fisico impreso en 3D + SG90 |
+| Arduino | No participa en la simulacion (senales simuladas manualmente) | Arduino Uno + PC817 + reles conectados al IRC5 |
+| Banda transportadora | Modelo CAD con animacion de avance | Banda fisica (si esta disponible en el puesto) |
+| Targets | Ensenados en el entorno virtual | Re-ensena|
+
+dos fisicamente sobre el robot real |
+
+### 10.2. Diferencias y consideraciones
+
+1. **Senales del gripper**: en RobotStudio, DO_04, DI_04, DI_05 y DI_06 se activan
+   manualmente desde el panel de E/S. En la planta real, estas senales fluyen a
+   traves del circuito Arduino + optoacopladores + reles.
+
+2. **Tiempos de respuesta**: en simulacion, los tiempos de espera (`WaitTime 1` en
+   `AbrirGripper`/`CerrarGripper`) son conservadores. En la planta real, estos
+   tiempos pueden ajustarse una vez validada la respuesta del servo.
+
+3. **Precision de targets**: los targets ensenados en RobotStudio deben ser
+   re-ensenados en el robot fisico, ya que la posicion absoluta de la mesa, banda
+   y pedestal puede variar ligeramente.
+
+4. **Calibracion del gripper**: los angulos de 10&deg; y 100&deg; calibrados en
+   el gripper impreso pueden requerir ajuste en funcion del material, desgaste de
+   engranajes o tolerancias de impresion.
+
+### 10.3. Evidencias comparativas
+
+| Evidencia | Simulacion | Planta Real |
+|-----------|:----------:|:-----------:|
+| Estacion completa | ![Sim](./evidencias/robotstudio_estacion.png) | ![Real](./evidencias/planta_real_estacion.png) |
+| Robot en HOME | *(pantallazo)* | *(foto)* |
+| Agarre de PCB | *(pantallazo)* | *(foto)* |
+| Deposito en caja | *(pantallazo)* | *(foto)* |
+| Banda en avance | *(pantallazo)* | *(foto)* |
+| Circuito electronico | N/A (no aplica) | *(foto)* |
+
+---
+
+## 11. Manejo de Fallas
+
+### 11.1. Estrategia general
 
 El sistema implementa tres niveles de proteccion:
 
@@ -636,7 +927,7 @@ El sistema implementa tres niveles de proteccion:
 3. **Nivel operador**: botonera fisica (DI_01, DI_02, DI_03), parada de emergencia
    del sistema IRC5.
 
-### 9.2. Fallas contempladas
+### 11.2. Fallas contempladas
 
 | Falla | Deteccion | Accion del sistema |
 |-------|-----------|-------------------|
@@ -646,7 +937,7 @@ El sistema implementa tres niveles de proteccion:
 | Parada de emergencia | Senal del sistema IRC5 | El servo pierde fuerza (el Arduino mantiene la posicion pero sin torque). La pieza puede caer; se recomienda que la zona bajo el gripper este despejada. |
 | Banda atascada o sin cajas | Ausencia visual de cajas | El robot deposita la PCB en el vacio. Se asume responsabilidad del operario en mantener el suministro de cajas. |
 
-### 9.3. Rutina de parada
+### 11.3. Rutina de parada
 
 La rutina `VerificarParada` (invocable ante condiciones de error) ejecuta:
 
@@ -654,16 +945,43 @@ La rutina `VerificarParada` (invocable ante condiciones de error) ejecuta:
 2. `IrAHome` (dos llamadas) &mdash; retorna el robot a posicion segura.
 3. `AbrirGripper` &mdash; libera cualquier pieza que pudiera estar sujeta.
 
+### 11.4. Diagrama de manejo de fallas
+
+```mermaid
+flowchart TD
+    NORMAL([Operacion Normal]) --> DETECT{Falla detectada?}
+    DETECT -->|No| NORMAL
+    DETECT -->|Si| TIPO{Tipo de falla?}
+    
+    TIPO -->|Parada Emergencia| E1[Reset FWD/BWD Conveyor]
+    E1 --> E2[IrAHome x2]
+    E2 --> E3[AbrirGripper]
+    E3 --> WAIT_RESET[Esperar reset del sistema]
+    WAIT_RESET --> RECOVER[Reinicializar<br/>CalibrarBanda<br/>IrAHome]
+    RECOVER --> NORMAL
+    
+    TIPO -->|Fallo Sujecion| F1[VerificarParada]
+    F1 --> F2[IrAHome]
+    F2 --> F3[AbrirGripper]
+    F3 --> RETRY{Reintentar?}
+    RETRY -->|Si| NORMAL
+    RETRY -->|No| ALARM[Alarma operador]
+    
+    TIPO -->|Sin cajas/PCB| ALARM
+    ALARM --> OPERATOR[Operador repone material]
+    OPERATOR --> NORMAL
+```
+
 ---
 
-## 10. Interfaz de Supervision (UART)
+## 12. Interfaz de Supervision (UART)
 
-### 10.1. Puerto serie
+### 12.1. Puerto serie
 
 El Arduino mantiene un enlace USB/UART a **9600 baudios** que permite monitorear
 el estado del sistema y enviar comandos en tiempo real.
 
-### 10.2. Trama de telemetria
+### 12.2. Trama de telemetria
 
 Cada 500 ms el Arduino publica una linea de estado con el formato:
 
@@ -681,7 +999,7 @@ ST,<estado>,<comando>,<angulo>,<gripOK>,<timestamp>
 
 Ejemplo: `ST,OK,ABIERTO,10,1,45230`
 
-### 10.3. Comandos disponibles
+### 12.3. Comandos disponibles
 
 | Comando | Accion |
 |---------|--------|
@@ -691,7 +1009,7 @@ Ejemplo: `ST,OK,ABIERTO,10,1,45230`
 | `CMD,CAL,0,<angulo>` | Recalibra el angulo de apertura (0-180) |
 | `CMD,CAL,1,<angulo>` | Recalibra el angulo de cierre (0-180) |
 
-### 10.4. Ejemplos de interaccion
+### 12.4. Ejemplos de interaccion
 
 ```
 > CMD,HOME
@@ -710,15 +1028,17 @@ Ejemplo: `ST,OK,ABIERTO,10,1,45230`
 < EV,CAL,1,95
 ```
 
+> **Evidencia**: Ver `evidencias/monitor_serie.png`
+
 ---
 
-## 11. Estructura del Repositorio
+## 13. Estructura del Repositorio
 
 ```
 Proyecto Final/
 ├── README.md                          # Este documento
 ├── cad/                               # Modelos CAD de la estacion
-│   ├── Banda tranportadora.sat        #   - Banda transportadora
+│   ├── Banda tranportadora.sat        #   - Banda transportadora + soportes laterales
 │   ├── Mesa.sat                       #   - Mesa de trabajo
 │   ├── Pedestal.sat                   #   - Pedestal del robot
 │   ├── caja.sat                       #   - Caja de empaque
@@ -738,14 +1058,26 @@ Proyecto Final/
 │       ├── Station/                   #     Datos de la estacion 3D
 │       ├── Controller Data/           #     Configuracion del controlador
 │       └── Virtual Controllers/       #     Controlador virtual IRC5
-└── evidencias/                        # Videos y fotos (por completar)
+└── evidencias/                        # Imagenes, fotos y capturas
+    ├── estacion_completa.png          #   Vista general de la estacion
+    ├── layout_planta.png              #   Layout / plano de planta
+    ├── soportes_banda.png             #   Soportes de la banda transportadora
+    ├── robotstudio_estacion.png       #   Pantallazo RobotStudio
+    ├── ciclo_produccion.png           #   Secuencia del ciclo
+    ├── gripper_montaje.png            #   Gripper montado en la brida
+    ├── diagrama_conexionado.png       #   Diagrama de conexionado electronico
+    ├── circuito_montaje.png           #   Foto del circuito armado
+    ├── arduino_montaje.png            #   Arduino + modulos conectados
+    ├── monitor_serie.png              #   Monitor serie Arduino
+    ├── planta_real_estacion.png       #   Foto de la estacion en planta real
+    └── (videos y fotos adicionales)
 ```
 
 ---
 
-## 12. Instrucciones de Puesta en Marcha
+## 14. Instrucciones de Puesta en Marcha
 
-### 12.1. Montaje electronico
+### 14.1. Montaje electronico
 
 1. **Ajustar el LM2596**: con un multimetro, ajustar el trimmer del convertidor
    DC-DC hasta obtener exactamente 5.0 V en la salida, **sin carga conectada**.
@@ -768,7 +1100,7 @@ Proyecto Final/
    - 24 V del armario/controlador a la entrada del LM2596.
    - Salida 5 V del LM2596 a VIN del Arduino y a +5 V del servo.
 
-### 12.2. Carga del firmware
+### 14.2. Carga del firmware
 
 1. Conectar el Arduino Uno al PC via USB.
 2. Abrir `firmware/gripper_control/gripper_control.ino` en el Arduino IDE.
@@ -782,7 +1114,7 @@ Proyecto Final/
 6. Verificar que el LED D13 se enciende al enviar `CMD,CAL,1,100` (simula cierre)
    y se apaga solo al volver a abrir.
 
-### 12.3. Prueba de senales sin servo
+### 14.3. Prueba de senales sin servo
 
 1. Con el servo **desconectado**, abrir el Monitor Serie.
 2. Simular DO_04 en alto (aplicar 5 V al pin D2 a traves del PC817 o con un cable
@@ -790,7 +1122,7 @@ Proyecto Final/
 3. Retirar la senal: debe aparecer `EV,CMD,ABIERTO`.
 4. Verificar que DI_04 se activa con el rele al alcanzar la posicion simulada.
 
-### 12.4. Calibracion del gripper
+### 14.4. Calibracion del gripper
 
 1. Montar el gripper impreso en el servo, con los dedos instalados.
 2. Enviar `CMD,CAL,0,10` y verificar que las mordazas esten completamente abiertas,
@@ -801,7 +1133,7 @@ Proyecto Final/
 4. Anotar los valores definitivos en el codigo (`angAbierto`, `angCerrado`) y
    volver a cargar el firmware.
 
-### 12.5. Simulacion en RobotStudio
+### 14.5. Simulacion en RobotStudio
 
 1. Abrir RobotStudio 2021.
 2. Ir a File &rarr; Open &rarr; seleccionar `simulacion/Project3/Project3.rsproj`.
@@ -810,7 +1142,7 @@ Proyecto Final/
 5. En la pestana Simulation, hacer clic en Play.
 6. Para iniciar un ciclo, activar DI_01 desde la ventana de senales E/S.
 
-### 12.6. Prueba con robot real
+### 14.6. Prueba con robot real
 
 1. Verificar que todas las conexiones electricas esten firmes y aisladas.
 2. Cargar el programa RAPID en el controlador IRC5 fisico.
@@ -821,7 +1153,63 @@ Proyecto Final/
 
 ---
 
-## 13. Seguridad
+## 15. Evidencias
+
+### 15.1. Simulacion en RobotStudio
+
+| Descripcion | Captura |
+|-------------|---------|
+| Vista general de la estacion en RobotStudio | ![RS Estacion](./evidencias/robotstudio_estacion.png) |
+| Robot en posicion HOME | *(pantallazo pendiente)* |
+| Agarrando PCB de la mesa | *(pantallazo pendiente)* |
+| Depositando PCB en caja sobre banda | *(pantallazo pendiente)* |
+| Banda en movimiento | *(pantallazo pendiente)* |
+| Panel de senales E/S | *(pantallazo pendiente)* |
+| Ejecucion de programa RAPID en FlexPendant virtual | *(pantallazo pendiente)* |
+
+### 15.2. Implementacion real
+
+| Descripcion | Foto |
+|-------------|------|
+| Montaje completo de la estacion | ![Real Estacion](./evidencias/planta_real_estacion.png) |
+| Gripper impreso montado en la brida del IRB 140 | *(foto pendiente)* |
+| Gripper sujetando PCB | *(foto pendiente)* |
+| Circuito electronico (Arduino + LM2596 + PC817 + reles) | *(foto pendiente)* |
+| Conexionado al controlador IRC5 | *(foto pendiente)* |
+| Robot ejecutando ciclo real | *(foto pendiente)* |
+| Detalle de la caja con PCB depositada | *(foto pendiente)* |
+
+### 15.3. Diseno CAD
+
+| Descripcion | Imagen |
+|-------------|--------|
+| Banda transportadora con soportes laterales | *(imagen pendiente)* |
+| Mesa de trabajo con posiciones de PCB | *(imagen pendiente)* |
+| Gripper paralelo (despiece) | *(imagen pendiente)* |
+| Pedestal del robot | *(imagen pendiente)* |
+| Layout de planta (vista superior) | ![Layout](./evidencias/layout_planta.png) |
+
+### 15.4. Electronica
+
+| Descripcion | Imagen |
+|-------------|--------|
+| Diagrama de conexionado completo | ![Diagrama](./evidencias/diagrama_conexionado.png) |
+| Esquematico del circuito | *(imagen pendiente)* |
+| Arduino Uno con modulos conectados | *(foto pendiente)* |
+| Monitor Serie Arduino (telemetria) | ![Monitor](./evidencias/monitor_serie.png) |
+
+### 15.5. Videos
+
+| Descripcion | Enlace |
+|-------------|--------|
+| Video de simulacion completa en RobotStudio | *(enlace pendiente)* |
+| Video de implementacion real (ciclo completo) | *(enlace pendiente)* |
+| Video de calibracion del gripper | *(enlace pendiente)* |
+| Video de prueba de senales Arduino-IRC5 | *(enlace pendiente)* |
+
+---
+
+## 16. Seguridad
 
 - **Proteccion ESD**: usar pulsera antiestatica y superficie disipativa al
   manipular la PCB y el Arduino. Las descargas electrostaticas pueden danar el
@@ -844,7 +1232,7 @@ Proyecto Final/
 
 ---
 
-## 14. Referencias
+## 17. Referencias
 
 1. Guia del Proyecto Final &mdash; Robotica Industrial 2026-I. Automatizacion del
    Proceso de Ensamblaje, Soldadura y Empaque de PCBs. Universidad Nacional de
@@ -860,4 +1248,4 @@ Proyecto Final/
 
 ---
 
-_Ultima actualizacion: julio 2026 &mdash; Version 2.0 &mdash; Documentacion completa del proyecto_
+_Ultima actualizacion: julio 2026 &mdash; Version 3.0 &mdash; Documentacion completa con diagramas, maquinas de estados y evidencias_
