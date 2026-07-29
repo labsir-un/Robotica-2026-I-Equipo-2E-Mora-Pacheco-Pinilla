@@ -1,3 +1,32 @@
+<div align="center">
+
+<img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&height=180&section=header&text=Proyecto%20Final%20%E2%80%A2%20Etapa%204&fontSize=36&desc=Embalaje%20y%20Env%C3%ADo%20por%20Banda%20%E2%80%A2%20ABB%20IRB%20140%20%22Abel%22&descSize=14&animation=fadeIn" width="100%" />
+
+<a href="https://new.abb.com/products/robotics/robotstudio"><img src="https://img.shields.io/badge/RobotStudio-2021-00F5FF?style=for-the-badge&logo=abb&logoColor=white&labelColor=0a0a1a" /></a>
+<a href="https://new.abb.com/products/robotics/robots/articulated-robots/irb-140"><img src="https://img.shields.io/badge/Robot-ABB%20IRB140-7B2FBE?style=for-the-badge&logoColor=white&labelColor=0a0a1a" /></a>
+<a href="https://www.arduino.cc/"><img src="https://img.shields.io/badge/Arduino-Uno%20R3-00979D?style=for-the-badge&logo=arduino&logoColor=white&labelColor=0a0a1a" /></a>
+<a href=""><img src="https://img.shields.io/badge/Language-RAPID-FF006E?style=for-the-badge&logoColor=white&labelColor=0a0a1a" /></a>
+<a href="https://www.solidworks.com/"><img src="https://img.shields.io/badge/CAD-SolidWorks-FFD700?style=for-the-badge&logo=dassaultsystemes&logoColor=black&labelColor=0a0a1a" /></a>
+
+</div>
+
+---
+
+<div align="center">
+
+```
+╔══════════════════════════════════════════════════════════════════╗
+║   Etapa 4 — Embalaje y Envio por Banda — ABB IRB 140 "Abel"   ║
+║   Gripper SG90  ·  Arduino Uno  ·  RAPID  ·  RobotStudio       ║
+╚══════════════════════════════════════════════════════════════════╝
+```
+
+</div>
+
+> **Resumen del proyecto:** Automatizacion de la estacion de empaque dentro de la linea simulada de ensamblaje, soldadura y empaque de PCBs. Proyecto final del curso *Robotica Industrial 2026-I* &mdash; Universidad Nacional de Colombia.
+
+---
+
 # Proyecto Final &mdash; Robotica Industrial 2026-I
 
 ## Etapa 4: Embalaje y Envio por Banda &mdash; Robot ABB IRB 140 "Abel"
@@ -1383,4 +1412,31 @@ y la transferencia del conocimiento a futuros equipos de trabajo.
 
 ---
 
-_Ultima actualizacion: julio 2026 &mdash; Version 3.3 &mdash; Documentacion completa con HMI interactiva_
+## Autores
+
+<div align="center">
+
+| Integrante | GitHub |
+|---|---|
+| **Duvan Felipe Pacheco Rodriguez** | <a href="https://github.com/dupachecor"><img src="https://img.shields.io/badge/GitHub-%40dupachecor-00F5FF?style=for-the-badge&logo=github&logoColor=white&labelColor=0a0a1a" /></a> |
+| **Juan Andres Mora Henao** | <a href="https://github.com/JuanMora345"><img src="https://img.shields.io/badge/GitHub-%40JuanMora345-7B2FBE?style=for-the-badge&logo=github&logoColor=white&labelColor=0a0a1a" /></a> |
+| **Andres Gustavo Pinilla Martinez** | <a href="https://github.com/AndresPinilla20"><img src="https://img.shields.io/badge/GitHub-%40AndresPinilla20-002FBE?style=for-the-badge&logo=github&logoColor=white&labelColor=0a0a1a" /></a> |
+
+</div>
+
+---
+
+## Licencia
+
+Este proyecto esta bajo la licencia indicada en [`LICENSE`](../LICENSE).
+
+---
+
+<div align="center">
+
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:0d003b,30:1a0533,60:0d0d2b,100:0a0a1a&height=120&section=footer&text=LabSIR%20%E2%80%A2%20Robotica%20Industrial%202026-I&fontSize=18&fontColor=7B2FBE&animation=twinkling" width="100%" />
+
+<img src="https://img.shields.io/badge/Last%20updated-2026-FF006E?style=flat-square&labelColor=0a0a1a" />
+<img src="https://img.shields.io/badge/Universidad%20Nacional%20de%20Colombia-FFD700?style=flat-square&labelColor=0a0a1a" />
+
+</div>
