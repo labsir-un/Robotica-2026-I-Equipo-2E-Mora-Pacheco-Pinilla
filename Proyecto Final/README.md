@@ -50,9 +50,9 @@ soldadura y empaque de PCBs.
 
 | Nombre | Rol / responsabilidad principal |
 |--------|--------------------------------|
-| Juan David Mora | _(por completar)_ |
-| Juan Pablo Pacheco | _(por completar)_ |
-| Santiago Pinilla | _(por completar)_ |
+| Duvan Felipe Pacheco Rodriguez | **Lider del proyecto** &mdash; Arquitectura del sistema electronico (LM2596, PC817, reles), firmware Arduino Uno, desarrollo de la HMI (Web Serial API), integracion Arduino-IRC5 y documentacion tecnica |
+| Juan Andres Mora Henao | Programacion RAPID del robot ABB IRB 140, configuracion de senales E/S, simulacion en RobotStudio y pruebas de validacion |
+| Andres Gustavo Pinilla Martinez | Diseno CAD de la estacion (SolidWorks/SAT), modelado del gripper paralelo y los soportes de la banda transportadora, montaje mecanico |
 
 ### 1.3. Objetivos
 
@@ -932,13 +932,6 @@ dos fisicamente sobre el robot real |
   <em>Figura 8. Simulacion de la Etapa 4 en RobotStudio con el robot IRB 140 y la banda transportadora.</em>
 </p>
 
-### 10.4. Video demostrativo
-
-Video unico que integra la simulacion en RobotStudio y la implementacion real
-sobre el robot ABB IRB 140:
-
-- **Video**: [Simulacion + Implementacion Real &mdash; Etapa 4](./evidencias/video_demostracion.mp4)
-
 ---
 
 ## 11. Manejo de Fallas
@@ -1220,8 +1213,7 @@ Proyecto Final/
     ├── foto del circuto del gripper...jpg   #   - Circuito electronico
     ├── pcb pocoonada en cajas.jpeg          #   - PCB depositada en caja
     ├── pantallazo simulacion...studio.png   #   - Simulacion en RobotStudio
-    ├── pantallazoHMI.png                    #   - Pantallazo de la HMI
-    └── video_demostracion.mp4               #   - Video: simulacion + implementacion
+    └── pantallazoHMI.png                    #   - Pantallazo de la HMI
 ```
 
 ---
