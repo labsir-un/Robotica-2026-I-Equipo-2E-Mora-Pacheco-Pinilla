@@ -220,11 +220,11 @@ acople disenado a medida.
   <em>Figura 6. Modelado CAD del gripper paralelo de dos dedos.</em>
 </p>
 
-Se utiliza un **gripper paralelo de dos dedos**, impreso en 3D, basado en el modelo
-_Parallel Gripper for EEZYbotARM MK2_ (autor: sthone, Printables, licencia CC BY-NC 4.0).
-El mecanismo emplea un sistema de engranajes que convierte el movimiento rotatorio
-de un servomotor SG90 en desplazamiento lineal simultaneo y opuesto de ambos dedos,
-garantizando un agarre centrado.
+Se diseno un **gripper paralelo de dos dedos**, impreso en 3D, basado en un
+mecanismo de cuatro barras que convierte el movimiento rotatorio de un servomotor
+SG90 en desplazamiento lineal simultaneo y opuesto de ambos dedos, garantizando
+un agarre centrado y simetrico. El diseno fue modelado en SolidWorks y fabricado
+mediante impresion 3D en PLA.
 
 ### 4.2. Actuador
 
@@ -1356,8 +1356,7 @@ un panel de comandos remotos, visualizacion animada del gripper y registro
 cronologico de eventos. Su arquitectura autocontenida (HTML+CSS+JS sin dependencias)
 la hace portable y de facil despliegue en cualquier navegador compatible.
 
-Desde el punto de vista del **diseno mecanico**, el gripper paralelo impreso en 3D
-basado en el modelo EEZYbotARM MK2, junto con los soportes laterales de la banda
+Desde el punto de vista del **diseno mecanico**, el gripper paralelo impreso en 3D disenado con un mecanismo de cuatro barras, junto con los soportes laterales de la banda
 transportadora, cumplio con los requisitos de agarre lateral de la PCB y guiado
 de las cajas de empaque. La calibracion experimental de los angulos del servo
 (10&deg; abierto, 100&deg; cerrado) garantiza repetibilidad en la sujecion sin
@@ -1375,15 +1374,13 @@ y la transferencia del conocimiento a futuros equipos de trabajo.
 1. Guia del Proyecto Final &mdash; Robotica Industrial 2026-I. Automatizacion del
    Proceso de Ensamblaje, Soldadura y Empaque de PCBs. Universidad Nacional de
    Colombia.
-2. sthone. _Parallel Gripper for EEZYbotARM MK2_. Printables, 2022. Licencia
-   CC BY-NC 4.0. https://www.printables.com/model/275802-parallel-gripper-for-eezybotarm-mk2/files
-3. ABB Robotics. _Product Manual IRC5_ y _Product Manual IRB 140_.
-4. ABB Robotics. _Technical Reference Manual &mdash; RAPID Instructions, Functions
+2. ABB Robotics. _Product Manual IRC5_ y _Product Manual IRB 140_.
+3. ABB Robotics. _Technical Reference Manual &mdash; RAPID Instructions, Functions
    and Data Types_.
-5. TowerPro. _SG90 Micro Servo Datasheet_.
-6. Sharp. _PC817 Series Photocoupler Datasheet_.
-7. Texas Instruments. _LM2596 Step-Down Voltage Regulator Datasheet_.
+4. TowerPro. _SG90 Micro Servo Datasheet_.
+5. Sharp. _PC817 Series Photocoupler Datasheet_.
+6. Texas Instruments. _LM2596 Step-Down Voltage Regulator Datasheet_.
 
 ---
 
-_Ultima actualizacion: julio 2026 &mdash; Version 3.2 &mdash; Documentacion completa con HMI interactiva_
+_Ultima actualizacion: julio 2026 &mdash; Version 3.3 &mdash; Documentacion completa con HMI interactiva_
