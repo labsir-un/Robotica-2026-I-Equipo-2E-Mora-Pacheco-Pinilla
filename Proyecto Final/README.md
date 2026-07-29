@@ -21,10 +21,11 @@ soldadura y empaque de PCBs.
 10. [Simulacion vs. Planta Real](#10-simulacion-vs-planta-real)
 11. [Manejo de Fallas](#11-manejo-de-fallas)
 12. [Interfaz de Supervision (UART)](#12-interfaz-de-supervision-uart)
-13. [Estructura del Repositorio](#13-estructura-del-repositorio)
-14. [Instrucciones de Puesta en Marcha](#14-instrucciones-de-puesta-en-marcha)
-15. [Seguridad](#15-seguridad)
-16. [Referencias](#16-referencias)
+13. [Interfaz Grafica HMI](#13-interfaz-grafica-hmi)
+14. [Estructura del Repositorio](#14-estructura-del-repositorio)
+15. [Instrucciones de Puesta en Marcha](#15-instrucciones-de-puesta-en-marcha)
+16. [Seguridad](#16-seguridad)
+17. [Referencias](#17-referencias)
 
 ---
 
@@ -1057,7 +1058,129 @@ Ejemplo: `ST,OK,ABIERTO,10,1,45230`
 
 ---
 
-## 13. Estructura del Repositorio
+## 13. Interfaz Grafica HMI
+
+Se desarrollo una interfaz grafica HMI (_Human-Machine Interface_) como dashboard web
+para la supervision y control remoto de la Etapa 4. La herramienta se comunica directamente
+con el Arduino Uno a traves del puerto COM via **Web Serial API**, decodificando en
+tiempo real todas las tramas del protocolo UART documentado en la seccion anterior.
+
+<p align="center">
+  <img src="./evidencias/pantallazoHMI.png" alt="Pantallazo de la HMI" width="750"/>
+  <br/>
+  <em>Figura 10. Interfaz HMI para supervision de la Etapa 4. Conexion por puerto COM (9600 baud) con visualizacion en tiempo real de senales, gripper, proceso y registro de eventos.</em>
+</p>
+
+### 13.1. Tecnologia y arquitectura
+
+La HMI se implemento como una aplicacion web estatica (**HTML + CSS + JavaScript puro**),
+sin dependencias externas ni servidores. Se abre directamente en el navegador (Chrome o Edge)
+y utiliza la **Web Serial API** para establecer comunicacion bidireccional con el Arduino
+a 9600 baudios.
+
+```
+NAVEGADOR (Chrome/Edge)          USB / UART (9600 baud)          ARDUINO UNO
+=======================    <===============================>    =============
+  index.html                                                      Gripper
+  - Web Serial API                                                Etapa 4 v5
+  - Dashboard en tiempo real
+  - Comandos: HOME, START, PING, CAL
+```
+
+### 13.2. Paneles y funcionalidades
+
+| Panel | Que muestra | Acciones disponibles |
+|-------|------------|---------------------|
+| **KPIs superiores** | Angulo actual del servo, estado del sistema (OK/FALLA), numero de ciclos completados, tiempo activo desde la conexion | -- |
+| **Gripper animado** | Mordazas que abren y cierran suavemente con la PCB entre ellas. Color cambia: verde (abierto), naranja (cerrado) | -- |
+| **Dial de angulo** | Medidor circular de 0&deg; a 180&deg; con transicion animada del arco | -- |
+| **Comandos** | Botones de accion directa | HOME (pulso DI_05), START (pulso DI_06), PING (forzar telemetria) |
+| **Calibracion** | Sliders para ajustar angulos de apertura y cierre | Envio de `CMD,CAL,0,<ang>` y `CMD,CAL,1,<ang>` |
+| **Senales INPUT** | DO_04 (comando gripper), DO_06 (falla), DI_01 (inicio ciclo), DI_02 (calibracion) con indicadores LED verdes/rojos | -- |
+| **Senales OUTPUT** | DI_04 (gripOK), DI_05 (home), DI_06 (start), FWD y BWD (banda) con indicadores LED | -- |
+| **Proceso** | 8 pasos del ciclo de produccion con barra de progreso, banda transportadora animada, contador de PCBs empacadas y cajas utilizadas | -- |
+| **Log de eventos** | Registro cronologico de todas las tramas serie (ST, EV, CMD, ER) con timestamp, coloreado por tipo | Boton para limpiar el registro |
+| **Diagrama conexionado** | Referencia visual del cableado completo IRC5-Arduino-SG90 | -- |
+| **Protocolo UART** | Resumen de todas las tramas serie y comandos disponibles | -- |
+
+### 13.3. Modo demo automatico
+
+Cuando no hay un Arduino conectado al puerto COM, la HMI entra en un **modo de
+demostracion** que simula un ciclo completo de produccion:
+
+1. El gripper alterna entre abierto (10&deg;) y cerrado (100&deg;) cada 2 segundos.
+2. Las senales INPUT/OUTPUT se actualizan coherentemente con el estado del gripper.
+3. El indicador de proceso avanza por los 8 pasos del ciclo (HOME &rarr; Avance
+   Banda &rarr; Tomar PCB 1 &rarr; Depositar Caja 1 &rarr; Avance &rarr; Tomar
+   PCB 2 &rarr; Depositar Caja 2 &rarr; Expulsion).
+4. Los contadores de PCBs y cajas se incrementan automaticamente.
+5. La banda transportadora se anima en los pasos de avance.
+
+Al conectar un Arduino real, el modo demo se desactiva inmediatamente y todos los
+datos pasan a reflejar las lecturas reales del puerto serie.
+
+### 13.4. Flujo de datos
+
+```mermaid
+sequenceDiagram
+    participant N as Navegador (HMI)
+    participant A as Arduino Uno
+    participant I as IRC5
+
+    N->>A: Abre puerto COM (9600 baud)
+    A-->>N: EV,BOOT,Gripper Abel Etapa 4 v5.0
+    A-->>N: EV,READY,Posicion inicial alcanzada
+
+    loop Cada 500 ms
+        A-->>N: ST,OK,ABIERTO,10,1,45230
+        N->>N: Actualiza KPIs, gripper, senales
+    end
+
+    N->>A: CMD,START
+    A->>I: Pulso 300ms en DI_06
+    A-->>N: EV,ACK,START
+
+    I->>A: DO_04 = 1 (cerrar gripper)
+    A-->>N: EV,CMD,CERRADO
+    N->>N: Actualiza gripper animado
+
+    A->>I: DI_04 = ON (gripOK)
+    A-->>N: EV,ACK,GRIP_OK
+    N->>N: Indicador gripOK verde
+
+    I->>A: DO_04 = 0 (abrir gripper)
+    A-->>N: EV,CMD,ABIERTO
+    N->>N: Gripper vuelve a abierto
+```
+
+### 13.5. Uso practico
+
+1. **Abrir la HMI**: hacer doble clic en `hmi/index.html` desde Chrome o Edge.
+2. **Conectar Arduino**: hacer clic en "Conectar", seleccionar el puerto COM del
+   Arduino Uno en el dialogo del navegador.
+3. **Supervisar**: observar el dashboard en tiempo real: angulo del servo, estado
+   de cada senal, progreso del ciclo.
+4. **Comandar**: usar los botones HOME, START o PING para enviar comandos al
+   Arduino, que los retransmite al IRC5 via reles.
+5. **Calibrar**: ajustar los sliders de apertura y cierre y enviar los nuevos
+   valores con `Set`. El Arduino recalibra en caliente sin necesidad de reiniciar.
+6. **Auditar**: el log de eventos mantiene un historial completo de toda la
+   actividad, incluyendo tramas de telemetria, comandos enviados y eventos del
+   sistema.
+
+### 13.6. Requisitos tecnicos
+
+- **Navegador**: Google Chrome 89+ o Microsoft Edge 89+ (soportan Web Serial API).
+  Firefox y Safari **no** son compatibles.
+- **Sistema operativo**: Windows, macOS, Linux o ChromeOS.
+- **Arduino**: Arduino Uno con el firmware `gripper_control.ino` cargado y
+  conectado por USB.
+- **No requiere**: instalacion de software adicional, servidores, ni dependencias
+  externas. El archivo HTML es completamente autocontenido.
+
+---
+
+## 14. Estructura del Repositorio
 
 ```
 Proyecto Final/
@@ -1097,14 +1220,15 @@ Proyecto Final/
     ├── foto del circuto del gripper...jpg   #   - Circuito electronico
     ├── pcb pocoonada en cajas.jpeg          #   - PCB depositada en caja
     ├── pantallazo simulacion...studio.png   #   - Simulacion en RobotStudio
+    ├── pantallazoHMI.png                    #   - Pantallazo de la HMI
     └── video_demostracion.mp4               #   - Video: simulacion + implementacion
 ```
 
 ---
 
-## 14. Instrucciones de Puesta en Marcha
+## 15. Instrucciones de Puesta en Marcha
 
-### 14.1. Montaje electronico
+### 15.1. Montaje electronico
 
 1. **Ajustar el LM2596**: con un multimetro, ajustar el trimmer del convertidor
    DC-DC hasta obtener exactamente 5.0 V en la salida, **sin carga conectada**.
@@ -1127,7 +1251,7 @@ Proyecto Final/
    - 24 V del armario/controlador a la entrada del LM2596.
    - Salida 5 V del LM2596 a VIN del Arduino y a +5 V del servo.
 
-### 14.2. Carga del firmware
+### 15.2. Carga del firmware
 
 1. Conectar el Arduino Uno al PC via USB.
 2. Abrir `firmware/gripper_control/gripper_control.ino` en el Arduino IDE.
@@ -1141,7 +1265,7 @@ Proyecto Final/
 6. Verificar que el LED D13 se enciende al enviar `CMD,CAL,1,100` (simula cierre)
    y se apaga solo al volver a abrir.
 
-### 14.3. Prueba de senales sin servo
+### 15.3. Prueba de senales sin servo
 
 1. Con el servo **desconectado**, abrir el Monitor Serie.
 2. Simular DO_04 en alto (aplicar 5 V al pin D2 a traves del PC817 o con un cable
@@ -1149,7 +1273,7 @@ Proyecto Final/
 3. Retirar la senal: debe aparecer `EV,CMD,ABIERTO`.
 4. Verificar que DI_04 se activa con el rele al alcanzar la posicion simulada.
 
-### 14.4. Calibracion del gripper
+### 15.4. Calibracion del gripper
 
 1. Montar el gripper impreso en el servo, con los dedos instalados.
 2. Enviar `CMD,CAL,0,10` y verificar que las mordazas esten completamente abiertas,
@@ -1160,7 +1284,7 @@ Proyecto Final/
 4. Anotar los valores definitivos en el codigo (`angAbierto`, `angCerrado`) y
    volver a cargar el firmware.
 
-### 14.5. Simulacion en RobotStudio
+### 15.5. Simulacion en RobotStudio
 
 1. Abrir RobotStudio 2021.
 2. Ir a File &rarr; Open &rarr; seleccionar `simulacion/Project3/Project3.rsproj`.
@@ -1169,7 +1293,7 @@ Proyecto Final/
 5. En la pestana Simulation, hacer clic en Play.
 6. Para iniciar un ciclo, activar DI_01 desde la ventana de senales E/S.
 
-### 14.6. Prueba con robot real
+### 15.6. Prueba con robot real
 
 1. Verificar que todas las conexiones electricas esten firmes y aisladas.
 2. Cargar el programa RAPID en el controlador IRC5 fisico.
@@ -1180,7 +1304,7 @@ Proyecto Final/
 
 ---
 
-## 15. Seguridad
+## 16. Seguridad
 
 - **Proteccion ESD**: usar pulsera antiestatica y superficie disipativa al
   manipular la PCB y el Arduino. Las descargas electrostaticas pueden danar el
@@ -1203,7 +1327,7 @@ Proyecto Final/
 
 ---
 
-## 16. Referencias
+## 17. Referencias
 
 1. Guia del Proyecto Final &mdash; Robotica Industrial 2026-I. Automatizacion del
    Proceso de Ensamblaje, Soldadura y Empaque de PCBs. Universidad Nacional de
@@ -1219,4 +1343,4 @@ Proyecto Final/
 
 ---
 
-_Ultima actualizacion: julio 2026 &mdash; Version 3.1 &mdash; Documentacion completa con diagramas Mermaid y maquinas de estados_
+_Ultima actualizacion: julio 2026 &mdash; Version 3.2 &mdash; Documentacion completa con HMI interactiva_
