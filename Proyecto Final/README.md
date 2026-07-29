@@ -314,61 +314,61 @@ ALIMENTACION: LM2596 (24V -> 5V) ----> Arduino VIN + Servo VCC
 
 ```mermaid
 graph TB
-    subgraph "ZONA 24V - IRC5"
-        DO04[DO_04<br/>24V DC]
-        DO06[DO_06<br/>24V DC]
-        DI04_IRC[DI_04<br/>gripOK]
-        DI05_IRC[DI_05<br/>home]
-        DI06_IRC[DI_06<br/>start]
+    subgraph IRC5["ZONA 24V - IRC5"]
+        DO04["DO_04 (24V DC)"]
+        DO06["DO_06 (24V DC)"]
+        DI04_IRC["DI_04 (gripOK)"]
+        DI05_IRC["DI_05 (home)"]
+        DI06_IRC["DI_06 (start)"]
     end
 
-    subgraph "AISLAMIENTO"
-        R1[R 2.2kΩ]
-        R2[R 2.2kΩ]
-        PC1[PC817 #1]
-        PC2[PC817 #2]
-        PD1[R 10kΩ<br/>pull-down]
-        PD2[R 10kΩ<br/>pull-down]
+    subgraph AISLAMIENTO["AISLAMIENTO"]
+        R1["R 2.2k"]
+        R2["R 2.2k"]
+        PC1["PC817 #1"]
+        PC2["PC817 #2"]
+        PD1["R 10k (pull-down)"]
+        PD2["R 10k (pull-down)"]
     end
 
-    subgraph "POTENCIA"
-        LM[LM2596<br/>24V→5V]
-        C1[1000µF]
-        C2[100nF]
+    subgraph POTENCIA["POTENCIA"]
+        LM["LM2596 (24V a 5V)"]
+        C1["1000uF"]
+        C2["100nF"]
     end
 
-    subgraph "ARDUINO UNO"
-        D2[D2 INPUT]
-        D4[D4 INPUT]
-        D5[D5 OUTPUT]
-        D6[D6 OUTPUT]
-        D7[D7 OUTPUT]
-        D9[D9 PWM]
-        D13[D13 LED]
+    subgraph ARDUINO["ARDUINO UNO"]
+        D2["D2 (INPUT)"]
+        D4["D4 (INPUT)"]
+        D5["D5 (OUTPUT)"]
+        D6["D6 (OUTPUT)"]
+        D7["D7 (OUTPUT)"]
+        D9["D9 (PWM)"]
+        D13["D13 (LED)"]
     end
 
-    subgraph "RELES"
-        REL1[Rele #1]
-        REL2[Rele #2]
-        REL3[Rele #3]
+    subgraph RELES["RELES"]
+        REL1["Rele 1"]
+        REL2["Rele 2"]
+        REL3["Rele 3"]
     end
 
-    subgraph "ACTUADOR"
-        SG90[Servo SG90]
+    subgraph ACTUADOR["ACTUADOR"]
+        SG90["Servo SG90"]
     end
 
     DO04 --> R1 --> PC1 --> D2
     DO06 --> R2 --> PC2 --> D4
     PD1 --> D2
     PD2 --> D4
-    
+
     LM -->|5V| D5
     LM -->|5V| D6
     LM -->|5V| D7
     LM -->|5V| SG90
     C1 --> SG90
     C2 --> LM
-    
+
     D5 --> REL1 --> DI04_IRC
     D6 --> REL2 --> DI05_IRC
     D7 --> REL3 --> DI06_IRC
