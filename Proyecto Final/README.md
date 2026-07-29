@@ -932,6 +932,13 @@ dos fisicamente sobre el robot real |
   <em>Figura 8. Simulacion de la Etapa 4 en RobotStudio con el robot IRB 140 y la banda transportadora.</em>
 </p>
 
+### 10.4. Video demostrativo
+
+Video unico que integra la simulacion en RobotStudio y la implementacion real
+sobre el robot ABB IRB 140:
+
+- **Video**: [Simulacion + Implementacion Real -- Etapa 4](./evidencias/video_demostracion.mp4)
+
 ---
 
 ## 11. Manejo de Fallas
@@ -1213,7 +1220,8 @@ Proyecto Final/
     ├── foto del circuto del gripper...jpg   #   - Circuito electronico
     ├── pcb pocoonada en cajas.jpeg          #   - PCB depositada en caja
     ├── pantallazo simulacion...studio.png   #   - Simulacion en RobotStudio
-    └── pantallazoHMI.png                    #   - Pantallazo de la HMI
+    ├── pantallazoHMI.png                    #   - Pantallazo de la HMI
+    └── video_demostracion.mp4               #   - Video: simulacion + implementacion
 ```
 
 ---
