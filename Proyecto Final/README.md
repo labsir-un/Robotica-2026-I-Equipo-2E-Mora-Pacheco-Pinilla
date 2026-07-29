@@ -50,9 +50,9 @@ soldadura y empaque de PCBs.
 
 | Nombre | Rol / responsabilidad principal |
 |--------|--------------------------------|
-| Duvan Felipe Pacheco Rodriguez | **Lider del proyecto** &mdash; Arquitectura del sistema electronico (LM2596, PC817, reles), firmware Arduino Uno, desarrollo de la HMI (Web Serial API), integracion Arduino-IRC5 y documentacion tecnica |
-| Juan Andres Mora Henao | Programacion RAPID del robot ABB IRB 140, configuracion de senales E/S, simulacion en RobotStudio y pruebas de validacion |
-| Andres Gustavo Pinilla Martinez | Diseno CAD de la estacion (SolidWorks/SAT), modelado del gripper paralelo y los soportes de la banda transportadora, montaje mecanico |
+| Duvan Felipe Pacheco Rodriguez | **Lider del proyecto** &mdash; Arquitectura del sistema electronico (LM2596, PC817, reles), firmware Arduino Uno, desarrollo de la HMI (Web Serial API), programacion RAPID del robot ABB IRB 140, integracion Arduino-IRC5 y documentacion tecnica |
+| Juan Andres Mora Henao | Diseno CAD de la estacion (SolidWorks/SAT), modelado del gripper paralelo y los soportes de la banda transportadora, simulacion en RobotStudio y pruebas de validacion |
+| Andres Gustavo Pinilla Martinez | Diseno CAD de la estacion (SolidWorks/SAT), montaje mecanico, ensamble del gripper, puesta a punto y asistencia en el ensamble general de la estacion |
 
 ### 1.3. Objetivos
 
