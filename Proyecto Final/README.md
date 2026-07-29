@@ -104,6 +104,8 @@ flowchart LR
 | PCB | Placa de circuito impreso a manipular (2 por ciclo) | `pcb.sat` |
 | Gripper | Herramienta de sujecion montada en la brida del robot | `gripper2.zip` |
 
+![PCBs sobre la mesa de trabajo](./evidencias/pcbs%20sobe%20las%20mesas.jpg)
+
 ### 2.3. Soportes de la banda transportadora
 
 Para garantizar que las cajas de empaque permanezcan correctamente posicionadas
@@ -120,6 +122,8 @@ funciones:
 
 Los soportes estan modelados como parte integral del archivo `Banda tranportadora.sat`
 y se ubican a ambos lados de la banda, a la altura de la zona de trabajo del robot.
+
+![Soportes laterales para cierre de caja](./evidencias/sopostes%20que%20cieeran%20la%20caja%20pocicionados.jpg)
 
 ### 2.4. Entradas y salidas de la estacion
 
@@ -180,6 +184,8 @@ de entrega de PCB.
 El gripper se monta directamente sobre la brida del eje 6 del robot mediante un
 acople disenado a medida.
 
+![Planta real de la estacion](./evidencias/foto%20de%20planta.jpg)
+
 ```mermaid
 block-beta
     columns 5
@@ -188,7 +194,7 @@ block-beta
     Banda["Banda Transportadora\n+ Soportes"]:5
 ```
 
-![Vista de la estacion en RobotStudio](./evidencias/robotstudio_estacion.png)
+![Vista general de la estacion](./evidencias/robot%20completo%20con%20el%20gripper.jpg)
 
 ---
 
@@ -213,7 +219,9 @@ garantizando un agarre centrado.
 | Alimentacion | 5 V DC |
 | Engranajes | Plasticos (limitacion: sin realimentacion de posicion ni control de fuerza) |
 
-![Gripper montado en brida del IRB 140](./evidencias/gripper_montaje.png)
+![Gripper montado sobre la brida del IRB 140](./evidencias/gripper%20sobre%20el%20robot.jpg)
+
+![Gripper sujetando PCB por las pestanas laterales](./evidencias/griper%20agarrando%20la%20pcb.jpg)
 
 ### 4.3. Angulos de operacion calibrados
 
@@ -276,7 +284,7 @@ ALIMENTACION: LM2596 (24V -> 5V) ----> Arduino VIN + Servo VCC
                                        GND comun
 ```
 
-![Circuito electronico armado](./evidencias/circuito_montaje.png)
+![Circuito electronico: Arduino, LM2596, PC817 y reles](./evidencias/foto%20del%20circuto%20del%20gripper%20y%20el%20robot.jpg)
 
 ### 5.3. Esquematico de conexionado completo
 
@@ -887,7 +895,7 @@ dos fisicamente sobre el robot real |
    el gripper impreso pueden requerir ajuste en funcion del material, desgaste de
    engranajes o tolerancias de impresion.
 
-![Estacion: simulacion vs planta real](./evidencias/comparativa_sim_vs_real.png)
+![PCB depositada en caja sobre banda transportadora](./evidencias/pcb%20pocoonada%20en%20cajas.jpeg)
 
 ### 10.4. Video demostrativo
 
@@ -1013,8 +1021,6 @@ Ejemplo: `ST,OK,ABIERTO,10,1,45230`
 < EV,CAL,1,95
 ```
 
-![Monitor Serie Arduino - telemetria en tiempo real](./evidencias/monitor_serie.png)
-
 ---
 
 ## 13. Estructura del Repositorio
@@ -1044,13 +1050,14 @@ Proyecto Final/
 │       ├── Controller Data/           #     Configuracion del controlador
 │       └── Virtual Controllers/       #     Controlador virtual IRC5
 └── evidencias/                        # Imagenes, fotos y video del proyecto
-    ├── robotstudio_estacion.png        #   - Pantallazo de la simulacion
-    ├── layout_planta.png               #   - Plano de planta
-    ├── gripper_montaje.png             #   - Gripper montado en brida
-    ├── circuito_montaje.png            #   - Circuito electronico armado
-    ├── comparativa_sim_vs_real.png     #   - Comparacion simulacion vs real
-    ├── monitor_serie.png               #   - Monitor serie Arduino
-    └── video_demostracion.mp4          #   - Video: simulacion + implementacion real
+    ├── robot completo con el gripper.jpg    #   - Estacion completa
+    ├── pcbs sobe las mesas.jpg              #   - PCBs en zona de entrega
+    ├── sopostes que cieeran la caja...jpg   #   - Soportes de cierre de caja
+    ├── gripper sobre el robot.jpg           #   - Gripper montado
+    ├── griper agarrando la pcb.jpg          #   - Agarre de PCB
+    ├── foto del circuto del gripper...jpg   #   - Circuito electronico
+    ├── pcb pocoonada en cajas.jpeg          #   - PCB depositada en caja
+    └── video_demostracion.mp4               #   - Video: simulacion + implementacion real
 ```
 
 ---
