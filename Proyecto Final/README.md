@@ -128,9 +128,9 @@ Los soportes estan modelados como parte integral del archivo `Banda tranportador
 y se ubican a ambos lados de la banda, a la altura de la zona de trabajo del robot.
 
 <p align="center">
-  <img src="./evidencias/sopostes%20que%20cieeran%20la%20caja%20pocicionados.jpg" alt="Soportes de la banda" width="400"/>
+  <img src="./evidencias/sopostes%20que%20cieeran%20la%20caja%20pocicionados.jpg" alt="Soportes de la banda" height="280"/>
   &nbsp;&nbsp;
-  <img src="./evidencias/caja%20cerandose.jpeg" alt="Caja cerrandose" width="400"/>
+  <img src="./evidencias/caja%20cerandose.jpeg" alt="Caja cerrandose" height="280"/>
   <br/>
   <em>Figura 2. Soportes laterales integrados a la banda (izq.) y caja cerr&aacute;ndose por acci&oacute;n de los soportes (der.).</em>
 </p>
@@ -230,9 +230,9 @@ garantizando un agarre centrado.
 | Engranajes | Plasticos (limitacion: sin realimentacion de posicion ni control de fuerza) |
 
 <p align="center">
-  <img src="./evidencias/gripper%20sobre%20el%20robot.jpg" alt="Gripper montado en brida" width="400"/>
+  <img src="./evidencias/gripper%20sobre%20el%20robot.jpg" alt="Gripper montado en brida" height="280"/>
   &nbsp;&nbsp;
-  <img src="./evidencias/griper%20agarrando%20la%20pcb.jpg" alt="Gripper agarrando PCB" width="400"/>
+  <img src="./evidencias/griper%20agarrando%20la%20pcb.jpg" alt="Gripper agarrando PCB" height="280"/>
   <br/>
   <em>Figura 5. Gripper montado sobre la brida del IRB 140 (izq.) y sujetando la PCB por sus pestanas laterales (der.).</em>
 </p>
