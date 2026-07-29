@@ -5,8 +5,6 @@
 Automatizacion de la estacion de empaque dentro de la linea simulada de ensamblaje,
 soldadura y empaque de PCBs.
 
-![Estacion Completa](./evidencias/estacion_completa.png)
-
 ---
 
 ## Tabla de Contenido
@@ -25,9 +23,8 @@ soldadura y empaque de PCBs.
 12. [Interfaz de Supervision (UART)](#12-interfaz-de-supervision-uart)
 13. [Estructura del Repositorio](#13-estructura-del-repositorio)
 14. [Instrucciones de Puesta en Marcha](#14-instrucciones-de-puesta-en-marcha)
-15. [Evidencias](#15-evidencias)
-16. [Seguridad](#16-seguridad)
-17. [Referencias](#17-referencias)
+15. [Seguridad](#15-seguridad)
+16. [Referencias](#16-referencias)
 
 ---
 
@@ -124,8 +121,6 @@ funciones:
 Los soportes estan modelados como parte integral del archivo `Banda tranportadora.sat`
 y se ubican a ambos lados de la banda, a la altura de la zona de trabajo del robot.
 
-> **Evidencia**: Ver `evidencias/soportes_banda.png`
-
 ### 2.4. Entradas y salidas de la estacion
 
 | Concepto | Detalle |
@@ -156,8 +151,6 @@ Cada ciclo completo procesa **2 PCBs** en **2 cajas**:
 Antes del ciclo productivo, el operario puede ejecutar un **modo de calibracion**
 activando DI_02, que hace avanzar la banda 3.8 s y luego retroceder 5 s para
 posicionar la primera caja en la marca inicial.
-
-> **Evidencia**: Ver `evidencias/ciclo_produccion.png`
 
 ---
 
@@ -195,13 +188,7 @@ block-beta
     Banda["Banda Transportadora\n+ Soportes"]:5
 ```
 
-> **Evidencia**: Ver `evidencias/layout_planta.png`
-
-### 3.3. Vista de la estacion en RobotStudio
-
-> **Pantallazo RobotStudio**: `evidencias/robotstudio_estacion.png`
-
-![Vista de la estacion](./evidencias/robotstudio_estacion.png)
+![Vista de la estacion en RobotStudio](./evidencias/robotstudio_estacion.png)
 
 ---
 
@@ -226,7 +213,7 @@ garantizando un agarre centrado.
 | Alimentacion | 5 V DC |
 | Engranajes | Plasticos (limitacion: sin realimentacion de posicion ni control de fuerza) |
 
-> **Evidencia**: Ver `evidencias/gripper_montaje.png`
+![Gripper montado en brida del IRB 140](./evidencias/gripper_montaje.png)
 
 ### 4.3. Angulos de operacion calibrados
 
@@ -289,7 +276,7 @@ ALIMENTACION: LM2596 (24V -> 5V) ----> Arduino VIN + Servo VCC
                                        GND comun
 ```
 
-> **Evidencia**: Ver `evidencias/diagrama_conexionado.png` y `evidencias/circuito_montaje.png`
+![Circuito electronico armado](./evidencias/circuito_montaje.png)
 
 ### 5.3. Esquematico de conexionado completo
 
@@ -516,9 +503,9 @@ el firmware utiliza un buffer de caracteres de tamano fijo (24 bytes) en lugar d
 la clase `String` de Arduino. Los caracteres que exceden la capacidad del buffer
 se descartan silenciosamente para prevenir desbordamiento.
 
-> **Evidencia**: Ver `evidencias/arduino_montaje.png` y `evidencias/monitor_serie.png`
-
 ---
+
+
 
 ## 7. Programacion del Robot (RAPID)
 
@@ -900,16 +887,14 @@ dos fisicamente sobre el robot real |
    el gripper impreso pueden requerir ajuste en funcion del material, desgaste de
    engranajes o tolerancias de impresion.
 
-### 10.3. Evidencias comparativas
+![Estacion: simulacion vs planta real](./evidencias/comparativa_sim_vs_real.png)
 
-| Evidencia | Simulacion | Planta Real |
-|-----------|:----------:|:-----------:|
-| Estacion completa | ![Sim](./evidencias/robotstudio_estacion.png) | ![Real](./evidencias/planta_real_estacion.png) |
-| Robot en HOME | *(pantallazo)* | *(foto)* |
-| Agarre de PCB | *(pantallazo)* | *(foto)* |
-| Deposito en caja | *(pantallazo)* | *(foto)* |
-| Banda en avance | *(pantallazo)* | *(foto)* |
-| Circuito electronico | N/A (no aplica) | *(foto)* |
+### 10.4. Video demostrativo
+
+Video unico que integra la simulacion en RobotStudio y la implementacion real
+sobre el robot ABB IRB 140:
+
+- **Video**: [Simulacion + Implementacion Real &mdash; Etapa 4](./evidencias/video_demostracion.mp4)
 
 ---
 
@@ -1028,7 +1013,7 @@ Ejemplo: `ST,OK,ABIERTO,10,1,45230`
 < EV,CAL,1,95
 ```
 
-> **Evidencia**: Ver `evidencias/monitor_serie.png`
+![Monitor Serie Arduino - telemetria en tiempo real](./evidencias/monitor_serie.png)
 
 ---
 
@@ -1058,19 +1043,14 @@ Proyecto Final/
 │       ├── Station/                   #     Datos de la estacion 3D
 │       ├── Controller Data/           #     Configuracion del controlador
 │       └── Virtual Controllers/       #     Controlador virtual IRC5
-└── evidencias/                        # Imagenes, fotos y capturas
-    ├── estacion_completa.png          #   Vista general de la estacion
-    ├── layout_planta.png              #   Layout / plano de planta
-    ├── soportes_banda.png             #   Soportes de la banda transportadora
-    ├── robotstudio_estacion.png       #   Pantallazo RobotStudio
-    ├── ciclo_produccion.png           #   Secuencia del ciclo
-    ├── gripper_montaje.png            #   Gripper montado en la brida
-    ├── diagrama_conexionado.png       #   Diagrama de conexionado electronico
-    ├── circuito_montaje.png           #   Foto del circuito armado
-    ├── arduino_montaje.png            #   Arduino + modulos conectados
-    ├── monitor_serie.png              #   Monitor serie Arduino
-    ├── planta_real_estacion.png       #   Foto de la estacion en planta real
-    └── (videos y fotos adicionales)
+└── evidencias/                        # Imagenes, fotos y video del proyecto
+    ├── robotstudio_estacion.png        #   - Pantallazo de la simulacion
+    ├── layout_planta.png               #   - Plano de planta
+    ├── gripper_montaje.png             #   - Gripper montado en brida
+    ├── circuito_montaje.png            #   - Circuito electronico armado
+    ├── comparativa_sim_vs_real.png     #   - Comparacion simulacion vs real
+    ├── monitor_serie.png               #   - Monitor serie Arduino
+    └── video_demostracion.mp4          #   - Video: simulacion + implementacion real
 ```
 
 ---
@@ -1153,63 +1133,7 @@ Proyecto Final/
 
 ---
 
-## 15. Evidencias
-
-### 15.1. Simulacion en RobotStudio
-
-| Descripcion | Captura |
-|-------------|---------|
-| Vista general de la estacion en RobotStudio | ![RS Estacion](./evidencias/robotstudio_estacion.png) |
-| Robot en posicion HOME | *(pantallazo pendiente)* |
-| Agarrando PCB de la mesa | *(pantallazo pendiente)* |
-| Depositando PCB en caja sobre banda | *(pantallazo pendiente)* |
-| Banda en movimiento | *(pantallazo pendiente)* |
-| Panel de senales E/S | *(pantallazo pendiente)* |
-| Ejecucion de programa RAPID en FlexPendant virtual | *(pantallazo pendiente)* |
-
-### 15.2. Implementacion real
-
-| Descripcion | Foto |
-|-------------|------|
-| Montaje completo de la estacion | ![Real Estacion](./evidencias/planta_real_estacion.png) |
-| Gripper impreso montado en la brida del IRB 140 | *(foto pendiente)* |
-| Gripper sujetando PCB | *(foto pendiente)* |
-| Circuito electronico (Arduino + LM2596 + PC817 + reles) | *(foto pendiente)* |
-| Conexionado al controlador IRC5 | *(foto pendiente)* |
-| Robot ejecutando ciclo real | *(foto pendiente)* |
-| Detalle de la caja con PCB depositada | *(foto pendiente)* |
-
-### 15.3. Diseno CAD
-
-| Descripcion | Imagen |
-|-------------|--------|
-| Banda transportadora con soportes laterales | *(imagen pendiente)* |
-| Mesa de trabajo con posiciones de PCB | *(imagen pendiente)* |
-| Gripper paralelo (despiece) | *(imagen pendiente)* |
-| Pedestal del robot | *(imagen pendiente)* |
-| Layout de planta (vista superior) | ![Layout](./evidencias/layout_planta.png) |
-
-### 15.4. Electronica
-
-| Descripcion | Imagen |
-|-------------|--------|
-| Diagrama de conexionado completo | ![Diagrama](./evidencias/diagrama_conexionado.png) |
-| Esquematico del circuito | *(imagen pendiente)* |
-| Arduino Uno con modulos conectados | *(foto pendiente)* |
-| Monitor Serie Arduino (telemetria) | ![Monitor](./evidencias/monitor_serie.png) |
-
-### 15.5. Videos
-
-| Descripcion | Enlace |
-|-------------|--------|
-| Video de simulacion completa en RobotStudio | *(enlace pendiente)* |
-| Video de implementacion real (ciclo completo) | *(enlace pendiente)* |
-| Video de calibracion del gripper | *(enlace pendiente)* |
-| Video de prueba de senales Arduino-IRC5 | *(enlace pendiente)* |
-
----
-
-## 16. Seguridad
+## 15. Seguridad
 
 - **Proteccion ESD**: usar pulsera antiestatica y superficie disipativa al
   manipular la PCB y el Arduino. Las descargas electrostaticas pueden danar el
@@ -1232,7 +1156,7 @@ Proyecto Final/
 
 ---
 
-## 17. Referencias
+## 16. Referencias
 
 1. Guia del Proyecto Final &mdash; Robotica Industrial 2026-I. Automatizacion del
    Proceso de Ensamblaje, Soldadura y Empaque de PCBs. Universidad Nacional de
@@ -1248,4 +1172,4 @@ Proyecto Final/
 
 ---
 
-_Ultima actualizacion: julio 2026 &mdash; Version 3.0 &mdash; Documentacion completa con diagramas, maquinas de estados y evidencias_
+_Ultima actualizacion: julio 2026 &mdash; Version 3.1 &mdash; Documentacion completa con diagramas Mermaid y maquinas de estados_
