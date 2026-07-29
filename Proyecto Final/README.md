@@ -104,7 +104,11 @@ flowchart LR
 | PCB | Placa de circuito impreso a manipular (2 por ciclo) | `pcb.sat` |
 | Gripper | Herramienta de sujecion montada en la brida del robot | `gripper2.zip` |
 
-![PCBs sobre la mesa de trabajo](./evidencias/pcbs%20sobe%20las%20mesas.jpg)
+<p align="center">
+  <img src="./evidencias/pcbs%20sobe%20las%20mesas.jpg" alt="PCBs sobre la mesa" width="650"/>
+  <br/>
+  <em>Figura 1. PCBs ubicadas en las dos posiciones de entrega sobre la mesa de trabajo.</em>
+</p>
 
 ### 2.3. Soportes de la banda transportadora
 
@@ -123,9 +127,17 @@ funciones:
 Los soportes estan modelados como parte integral del archivo `Banda tranportadora.sat`
 y se ubican a ambos lados de la banda, a la altura de la zona de trabajo del robot.
 
-![Soportes laterales para cierre de caja](./evidencias/sopostes%20que%20cieeran%20la%20caja%20pocicionados.jpg)
+<p align="center">
+  <img src="./evidencias/sopostes%20que%20cieeran%20la%20caja%20pocicionados.jpg" alt="Soportes de la banda" width="650"/>
+  <br/>
+  <em>Figura 2. Soportes laterales integrados a la banda transportadora para guiar y cerrar las cajas.</em>
+</p>
 
-![Caja cerrándose mediante los soportes laterales](./evidencias/caja%20cerandose.jpeg)
+<p align="center">
+  <img src="./evidencias/caja%20cerandose.jpeg" alt="Caja cerrandose" width="650"/>
+  <br/>
+  <em>Figura 3. Caja cerrándose por la acción de los soportes laterales al avanzar sobre la banda.</em>
+</p>
 
 ### 2.4. Entradas y salidas de la estacion
 
@@ -186,7 +198,11 @@ de entrega de PCB.
 El gripper se monta directamente sobre la brida del eje 6 del robot mediante un
 acople disenado a medida.
 
-![Planta real de la estacion](./evidencias/foto%20de%20planta.jpg)
+<p align="center">
+  <img src="./evidencias/foto%20de%20planta.jpg" alt="Planta real de la estacion" width="700"/>
+  <br/>
+  <em>Figura 4. Vista en planta de la estacion: robot IRB 140, banda transportadora y mesa de trabajo.</em>
+</p>
 
 ```mermaid
 block-beta
@@ -196,7 +212,11 @@ block-beta
     Banda["Banda Transportadora\n+ Soportes"]:5
 ```
 
-![Vista general de la estacion](./evidencias/robot%20completo%20con%20el%20gripper.jpg)
+<p align="center">
+  <img src="./evidencias/robot%20completo%20con%20el%20gripper.jpg" alt="Estacion completa" width="700"/>
+  <br/>
+  <em>Figura 5. Estacion completa con el robot ABB IRB 140, pedestal, banda transportadora y gripper montado.</em>
+</p>
 
 ---
 
@@ -221,9 +241,17 @@ garantizando un agarre centrado.
 | Alimentacion | 5 V DC |
 | Engranajes | Plasticos (limitacion: sin realimentacion de posicion ni control de fuerza) |
 
-![Gripper montado sobre la brida del IRB 140](./evidencias/gripper%20sobre%20el%20robot.jpg)
+<p align="center">
+  <img src="./evidencias/gripper%20sobre%20el%20robot.jpg" alt="Gripper montado en brida" width="550"/>
+  <br/>
+  <em>Figura 6. Gripper paralelo impreso en 3D montado sobre la brida del eje 6 del IRB 140.</em>
+</p>
 
-![Gripper sujetando PCB por las pestanas laterales](./evidencias/griper%20agarrando%20la%20pcb.jpg)
+<p align="center">
+  <img src="./evidencias/griper%20agarrando%20la%20pcb.jpg" alt="Gripper agarrando PCB" width="550"/>
+  <br/>
+  <em>Figura 7. Gripper sujetando la PCB por sus pestanas laterales durante el ciclo de produccion.</em>
+</p>
 
 ### 4.3. Angulos de operacion calibrados
 
@@ -286,7 +314,11 @@ ALIMENTACION: LM2596 (24V -> 5V) ----> Arduino VIN + Servo VCC
                                        GND comun
 ```
 
-![Circuito electronico: Arduino, LM2596, PC817 y reles](./evidencias/foto%20del%20circuto%20del%20gripper%20y%20el%20robot.jpg)
+<p align="center">
+  <img src="./evidencias/foto%20del%20circuto%20del%20gripper%20y%20el%20robot.jpg" alt="Circuito electronico" width="650"/>
+  <br/>
+  <em>Figura 8. Circuito electronico: Arduino Uno, modulo LM2596, optoacopladores PC817 y modulo de reles.</em>
+</p>
 
 ### 5.3. Esquematico de conexionado completo
 
@@ -897,7 +929,11 @@ dos fisicamente sobre el robot real |
    el gripper impreso pueden requerir ajuste en funcion del material, desgaste de
    engranajes o tolerancias de impresion.
 
-![PCB depositada en caja sobre banda transportadora](./evidencias/pcb%20pocoonada%20en%20cajas.jpeg)
+<p align="center">
+  <img src="./evidencias/pcb%20pocoonada%20en%20cajas.jpeg" alt="PCB depositada en caja" width="650"/>
+  <br/>
+  <em>Figura 9. PCB depositada dentro de la caja de empaque sobre la banda transportadora, producto final del ciclo.</em>
+</p>
 
 ### 10.4. Video demostrativo
 
