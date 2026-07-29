@@ -128,15 +128,11 @@ Los soportes estan modelados como parte integral del archivo `Banda tranportador
 y se ubican a ambos lados de la banda, a la altura de la zona de trabajo del robot.
 
 <p align="center">
-  <img src="./evidencias/sopostes%20que%20cieeran%20la%20caja%20pocicionados.jpg" alt="Soportes de la banda" width="650"/>
+  <img src="./evidencias/sopostes%20que%20cieeran%20la%20caja%20pocicionados.jpg" alt="Soportes de la banda" width="400"/>
+  &nbsp;&nbsp;
+  <img src="./evidencias/caja%20cerandose.jpeg" alt="Caja cerrandose" width="400"/>
   <br/>
-  <em>Figura 2. Soportes laterales integrados a la banda transportadora para guiar y cerrar las cajas.</em>
-</p>
-
-<p align="center">
-  <img src="./evidencias/caja%20cerandose.jpeg" alt="Caja cerrandose" width="650"/>
-  <br/>
-  <em>Figura 3. Caja cerrándose por la acción de los soportes laterales al avanzar sobre la banda.</em>
+  <em>Figura 2. Soportes laterales integrados a la banda (izq.) y caja cerr&aacute;ndose por acci&oacute;n de los soportes (der.).</em>
 </p>
 
 ### 2.4. Entradas y salidas de la estacion
@@ -201,21 +197,13 @@ acople disenado a medida.
 <p align="center">
   <img src="./evidencias/foto%20de%20planta.jpg" alt="Planta real de la estacion" width="700"/>
   <br/>
-  <em>Figura 4. Vista en planta de la estacion: robot IRB 140, banda transportadora y mesa de trabajo.</em>
+  <em>Figura 3. Vista en planta de la estacion: robot IRB 140, banda transportadora y mesa de trabajo.</em>
 </p>
-
-```mermaid
-block-beta
-    columns 5
-    space:1 Robot["Robot IRB 140\n+ Pedestal"] space:1 space:1
-    space:1 space:1 space:1 Mesa["Mesa de\nPCBs"]
-    Banda["Banda Transportadora\n+ Soportes"]:5
-```
 
 <p align="center">
   <img src="./evidencias/robot%20completo%20con%20el%20gripper.jpg" alt="Estacion completa" width="700"/>
   <br/>
-  <em>Figura 5. Estacion completa con el robot ABB IRB 140, pedestal, banda transportadora y gripper montado.</em>
+  <em>Figura 4. Estacion completa con el robot ABB IRB 140 y el gripper montado.</em>
 </p>
 
 ---
@@ -242,15 +230,11 @@ garantizando un agarre centrado.
 | Engranajes | Plasticos (limitacion: sin realimentacion de posicion ni control de fuerza) |
 
 <p align="center">
-  <img src="./evidencias/gripper%20sobre%20el%20robot.jpg" alt="Gripper montado en brida" width="550"/>
+  <img src="./evidencias/gripper%20sobre%20el%20robot.jpg" alt="Gripper montado en brida" width="400"/>
+  &nbsp;&nbsp;
+  <img src="./evidencias/griper%20agarrando%20la%20pcb.jpg" alt="Gripper agarrando PCB" width="400"/>
   <br/>
-  <em>Figura 6. Gripper paralelo impreso en 3D montado sobre la brida del eje 6 del IRB 140.</em>
-</p>
-
-<p align="center">
-  <img src="./evidencias/griper%20agarrando%20la%20pcb.jpg" alt="Gripper agarrando PCB" width="550"/>
-  <br/>
-  <em>Figura 7. Gripper sujetando la PCB por sus pestanas laterales durante el ciclo de produccion.</em>
+  <em>Figura 5. Gripper montado sobre la brida del IRB 140 (izq.) y sujetando la PCB por sus pestanas laterales (der.).</em>
 </p>
 
 ### 4.3. Angulos de operacion calibrados
@@ -317,7 +301,7 @@ ALIMENTACION: LM2596 (24V -> 5V) ----> Arduino VIN + Servo VCC
 <p align="center">
   <img src="./evidencias/foto%20del%20circuto%20del%20gripper%20y%20el%20robot.jpg" alt="Circuito electronico" width="650"/>
   <br/>
-  <em>Figura 8. Circuito electronico: Arduino Uno, modulo LM2596, optoacopladores PC817 y modulo de reles.</em>
+  <em>Figura 6. Circuito electronico: Arduino Uno, modulo LM2596, optoacopladores PC817 y modulo de reles.</em>
 </p>
 
 ### 5.3. Esquematico de conexionado completo
@@ -932,7 +916,7 @@ dos fisicamente sobre el robot real |
 <p align="center">
   <img src="./evidencias/pcb%20pocoonada%20en%20cajas.jpeg" alt="PCB depositada en caja" width="650"/>
   <br/>
-  <em>Figura 9. PCB depositada dentro de la caja de empaque sobre la banda transportadora, producto final del ciclo.</em>
+  <em>Figura 7. PCB depositada dentro de la caja de empaque sobre la banda transportadora, producto final del ciclo.</em>
 </p>
 
 ### 10.4. Video demostrativo
