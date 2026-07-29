@@ -1077,6 +1077,8 @@ Proyecto Final/
 ├── rapid/                             # Programacion del robot
 │   ├── Module1.mod                    #   Programa RAPID principal
 │   └── EIO.cfg                        #   Configuracion de entradas/salidas
+├── hmi/                               # Interfaz grafica HMI
+│   └── index.html                     #   Dashboard web (Web Serial API, Chrome)
 ├── simulacion/                        # Proyecto RobotStudio
 │   └── Project3/                      #   Estacion completa con controlador virtual
 │       ├── Project3.rsproj            #     Archivo de proyecto
