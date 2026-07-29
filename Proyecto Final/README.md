@@ -938,7 +938,7 @@ dos fisicamente sobre el robot real |
 Video unico que integra la simulacion en RobotStudio y la implementacion real
 sobre el robot ABB IRB 140:
 
-- **Video**: [Simulacion + Implementacion Real -- Etapa 4](./evidencias/video_demostracion.mp4)
+- **Video**: [Simulacion + Implementacion Real -- Etapa 4](https://youtu.be/fSk1De6c6Eo)
 
 ---
 
@@ -1222,7 +1222,7 @@ Proyecto Final/
     ├── pcb pocoonada en cajas.jpeg          #   - PCB depositada en caja
     ├── pantallazo simulacion...studio.png   #   - Simulacion en RobotStudio
     ├── pantallazoHMI.png                    #   - Pantallazo de la HMI
-    └── video_demostracion.mp4               #   - Video: simulacion + implementacion
+    └── video_demostracion.mp4               #   - Video (ver enlace YouTube en seccion 10.4)
 ```
 
 ---
