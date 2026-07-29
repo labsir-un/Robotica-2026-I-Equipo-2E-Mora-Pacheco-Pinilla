@@ -212,6 +212,12 @@ acople disenado a medida.
 
 ### 4.1. Tipo y principio de funcionamiento
 
+<p align="center">
+  <img src="./evidencias/modelado%20griper.png" alt="Modelado CAD del gripper" width="650"/>
+  <br/>
+  <em>Figura 6. Modelado CAD del gripper paralelo de dos dedos.</em>
+</p>
+
 Se utiliza un **gripper paralelo de dos dedos**, impreso en 3D, basado en el modelo
 _Parallel Gripper for EEZYbotARM MK2_ (autor: sthone, Printables, licencia CC BY-NC 4.0).
 El mecanismo emplea un sistema de engranajes que convierte el movimiento rotatorio
@@ -234,7 +240,7 @@ garantizando un agarre centrado.
   &nbsp;&nbsp;
   <img src="./evidencias/griper%20agarrando%20la%20pcb.jpg" alt="Gripper agarrando PCB" height="280"/>
   <br/>
-  <em>Figura 5. Gripper montado sobre la brida del IRB 140 (izq.) y sujetando la PCB por sus pestanas laterales (der.).</em>
+  <em>Figura 6. Gripper montado sobre la brida del IRB 140 (izq.) y sujetando la PCB por sus pestanas laterales (der.).</em>
 </p>
 
 ### 4.3. Angulos de operacion calibrados
@@ -301,7 +307,7 @@ ALIMENTACION: LM2596 (24V -> 5V) ----> Arduino VIN + Servo VCC
 <p align="center">
   <img src="./evidencias/foto%20del%20circuto%20del%20gripper%20y%20el%20robot.jpg" alt="Circuito electronico" width="650"/>
   <br/>
-  <em>Figura 6. Circuito electronico: Arduino Uno, modulo LM2596, optoacopladores PC817 y modulo de reles.</em>
+  <em>Figura 9. Circuito electronico: Arduino Uno, modulo LM2596, optoacopladores PC817 y modulo de reles.</em>
 </p>
 
 ### 5.3. Esquematico de conexionado completo
@@ -919,6 +925,12 @@ dos fisicamente sobre el robot real |
   <em>Figura 7. PCB depositada dentro de la caja de empaque sobre la banda transportadora, producto final del ciclo.</em>
 </p>
 
+<p align="center">
+  <img src="./evidencias/pantallazo%20simulacion%20en%20robot%20estudio.png" alt="Simulacion en RobotStudio" width="700"/>
+  <br/>
+  <em>Figura 8. Simulacion de la Etapa 4 en RobotStudio con el robot IRB 140 y la banda transportadora.</em>
+</p>
+
 ### 10.4. Video demostrativo
 
 Video unico que integra la simulacion en RobotStudio y la implementacion real
@@ -1075,11 +1087,15 @@ Proyecto Final/
     ├── robot completo con el gripper.jpg    #   - Estacion completa
     ├── pcbs sobe las mesas.jpg              #   - PCBs en zona de entrega
     ├── sopostes que cieeran la caja...jpg   #   - Soportes de cierre de caja
-    ├── gripper sobre el robot.jpg           #   - Gripper montado
+    ├── caja cerandose.jpeg                  #   - Caja cerrrandose
+    ├── foto de planta.jpg                   #   - Planta real de la estacion
+    ├── modelado griper.png                  #   - Modelado CAD del gripper
+    ├── gripper sobre el robot.jpg           #   - Gripper montado en brida
     ├── griper agarrando la pcb.jpg          #   - Agarre de PCB
     ├── foto del circuto del gripper...jpg   #   - Circuito electronico
     ├── pcb pocoonada en cajas.jpeg          #   - PCB depositada en caja
-    └── video_demostracion.mp4               #   - Video: simulacion + implementacion real
+    ├── pantallazo simulacion...studio.png   #   - Simulacion en RobotStudio
+    └── video_demostracion.mp4               #   - Video: simulacion + implementacion
 ```
 
 ---
